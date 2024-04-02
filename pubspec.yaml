@@ -70,6 +70,7 @@ flutter:
     - Assets/Images/TNS-logo.png
     - Assets/Images/Start Engine.png
     - Assets/Images/Stop Engine.png
+    - Assets/Images/Powered by TNS.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

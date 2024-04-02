@@ -22,7 +22,7 @@ class UserInfoNewDriver extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
         leading: IconButton(
-          icon: const Icon(Icons.menu),
+          icon: const Icon(Icons.menu, color: Colors.white,),
           onPressed: () {},
         ),
         title: const Text(
@@ -37,14 +37,14 @@ class UserInfoNewDriver extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.notifications_rounded),
+            icon: const Icon(Icons.notifications_rounded, color: Colors.white,),
           ),
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search, color: Colors.white,),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.more_vert_outlined),
+            icon: const Icon(Icons.more_vert_outlined, color: Colors.white,),
             onPressed: () {},
           )
         ],
@@ -142,135 +142,124 @@ class UserInfoNewDriver extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: screenWidth / 3,
-              decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      color: Colors.black,
-                      width: 1.0,
-                    ),
-                  )),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: screenHeight * 0.025,
-                    width: screenWidth * 0.04,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.home,
-                        size: 20,
-                        color: Colors.white,
-                      ),
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => VLMDashboard()));
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Home',
-                    style: TextStyle(
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => VLMDashboard()));
+              },
+              child: Container(
+                width: screenWidth / 3,
+                padding: EdgeInsets.all(5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.home,
+                      size: 30,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      fontFamily: 'default',
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      'Home',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontFamily: 'default',
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      color: Colors.black,
-                      width: 1.0,
-                    ),
-                  )),
-              width: screenWidth / 3,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: screenHeight * 0.025,
-                    width: screenWidth * 0.04,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.search,
-                        size: 20,
-                        color: Colors.white,
+            GestureDetector(
+              onTap: (){
+                /*Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SearchUser()));*/
+              },
+              behavior: HitTestBehavior.translucent,
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Colors.black,
+                        width: 1.0,
                       ),
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        /*Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => ));*/
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Search',
-                    style: TextStyle(
+                    )),
+                width: screenWidth / 3,
+                padding: EdgeInsets.all(5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.search,
+                      size: 30,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      fontFamily: 'default',
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      'Search',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontFamily: 'default',
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(
-                      color: Colors.black,
-                      width: 1.0,
-                    ),
-                  )),
-              width: screenWidth / 3,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: screenHeight * 0.025,
-                    width: screenWidth * 0.04,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.info,
-                        size: 20,
-                        color: Colors.white,
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: (){
+                /*Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Information()));*/
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Colors.black,
+                        width: 1.0,
                       ),
-                      padding: EdgeInsets.zero,
-                      onPressed: () {
-                        /*Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => ));*/
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Information',
-                    style: TextStyle(
+                    )),
+                width: screenWidth / 3,
+                padding: EdgeInsets.all(5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.info,
+                      size: 30,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      fontFamily: 'default',
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      'Information',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontFamily: 'default',
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

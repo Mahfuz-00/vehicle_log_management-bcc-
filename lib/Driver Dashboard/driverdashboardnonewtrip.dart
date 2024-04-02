@@ -27,7 +27,7 @@ class _DriverDashboardState extends State<DriverDashboardNoNewTrip> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
         leading: IconButton(
-          icon: const Icon(Icons.menu),
+          icon: const Icon(Icons.menu, color: Colors.white,),
           onPressed: () {},
         ),
         title: const Text(
@@ -42,14 +42,14 @@ class _DriverDashboardState extends State<DriverDashboardNoNewTrip> {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.notifications_rounded),
+            icon: const Icon(Icons.notifications_rounded, color: Colors.white,),
           ),
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.search, color: Colors.white,),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.more_vert_outlined),
+            icon: const Icon(Icons.more_vert_outlined, color: Colors.white,),
             onPressed: () {},
           )
         ],

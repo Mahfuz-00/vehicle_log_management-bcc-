@@ -24,6 +24,7 @@ class UserListTile extends StatelessWidget {
           width: screenWidth*0.9,
           height: screenHeight*0.1,
           decoration: BoxDecoration(
+            color: Color.fromRGBO(25, 192, 122, 1),
             border: Border.all(
               color: Colors.grey,
               width: 1.0,
@@ -31,8 +32,18 @@ class UserListTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: ListTile(
-            title: Text(staff.name),
-            subtitle: Text(DateFormat('yyyy-MM-dd HH:mm').format(staff.dateTime)),
+            title: Text(staff.name, style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              fontFamily: 'default',
+            ),),
+            subtitle: Text(DateFormat('yyyy-MM-dd HH:mm').format(staff.dateTime), style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              fontFamily: 'default',
+            ),),
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: onPressed,
           ),
