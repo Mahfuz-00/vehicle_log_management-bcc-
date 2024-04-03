@@ -277,45 +277,41 @@ class _DriverDashboardState extends State<DriverDashboard> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: screenWidth / 3,
-                decoration: BoxDecoration(
-                    color: const Color.fromRGBO(25, 192, 122, 1),
-                    ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: screenHeight * 0.025,
-                      width: screenWidth * 0.04,
-                      child: IconButton(
-                        icon: const Icon(
+              GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => VLMDashboard()));
+                },
+                child: Container(
+                  width: screenWidth / 3,
+                  decoration: BoxDecoration(
+                      color: const Color.fromRGBO(25, 192, 122, 1),
+                      ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
                           Icons.home,
-                          size: 20,
+                          size: 30,
                           color: Colors.white,
                         ),
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => VLMDashboard()));
-                        },
+                      SizedBox(
+                        height: 5,
                       ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Home',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        fontFamily: 'default',
+                      Text(
+                        'Home',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontFamily: 'default',
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               ClipPath(
@@ -346,7 +342,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 14,
                               fontFamily: 'default',
                             ),
                           ),
@@ -359,48 +355,46 @@ class _DriverDashboardState extends State<DriverDashboard> {
                   ),
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                    color: const Color.fromRGBO(25, 192, 122, 1),
-                    border: Border(
-                      left: BorderSide(
-                        color: Colors.black,
-                        width: 1.0,
-                      ),
-                    )),
-                width: screenWidth / 3,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: screenHeight * 0.025,
-                      width: screenWidth * 0.04,
-                      child: IconButton(
-                        icon: const Icon(
+              GestureDetector(
+                onTap: (){
+                  /*Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SearchUser()));*/
+                },
+                behavior: HitTestBehavior.translucent,
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: const Color.fromRGBO(25, 192, 122, 1),
+                      border: Border(
+                        left: BorderSide(
+                          color: Colors.black,
+                          width: 1.0,
+                        ),
+                      )),
+                  width: screenWidth / 3,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
                           Icons.info,
-                          size: 20,
+                          size: 30,
                           color: Colors.white,
                         ),
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          /*Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => ));*/
-                        },
+                      SizedBox(
+                        height: 5,
                       ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Information',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        fontFamily: 'default',
+                      Text(
+                        'Information',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontFamily: 'default',
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
+import 'package:vehicle_log_management/Sign%20Up%20UI/radiooption.dart';
 
 import '../API Models(Login and Sign Up)/registermodels.dart';
 import '../API Service(Login and Sign Up)/apiserviceregister.dart';
@@ -25,9 +26,9 @@ class _SignupState extends State<Signup> {
   GlobalKey<FormState> globalfromkey = GlobalKey<FormState>();
 
   List<DropdownMenuItem<String>> dropdownItems1 = [
-    DropdownMenuItem(child: Text("User"), value: "ISP"),
-    DropdownMenuItem(child: Text("BCC Staff"), value: "BCC"),
-    DropdownMenuItem(child: Text("NTTN Provider"), value: "NTTN"),
+    DropdownMenuItem(child: Text("IT"), value: "IT"),
+    DropdownMenuItem(child: Text("Management"), value: "Management"),
+    DropdownMenuItem(child: Text("Executive"), value: "Executive"),
   ];
 
   IconData _getIconPassword() {
@@ -56,7 +57,9 @@ class _SignupState extends State<Signup> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+        final screenWidth = MediaQuery.of(context).size.width;
+        final screenHeight = MediaQuery.of(context).size.height;
+     return Scaffold(
       //resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: SafeArea(
@@ -92,6 +95,31 @@ class _SignupState extends State<Signup> {
                           ),
                         ),
                         const SizedBox(height: 50),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: screenWidth*0.07),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text('Choose User Type',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'default',
+                              )),
+                            ],
+                          ),
+                        ),
+                        RadioListTileGroup(
+                            options: ['Staff', 'Driver'],
+                            selectedOption: null,
+                            onChanged: (String value) {
+                              print('Selected option: $value');
+                              // You can perform any other actions here based on the selected option
+                            }
+                        ),
+                        SizedBox(height: 10,),
                         Form(
                           key: globalfromkey,
                           child: Column(
@@ -135,31 +163,6 @@ class _SignupState extends State<Signup> {
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: OutlineInputBorder(),
-                                    labelText: 'Organization Name',
-                                    labelStyle: TextStyle(
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      fontFamily: 'default',
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Container(
-                                width: 350,
-                                height: 70,
-                                child: TextFormField(
-                                  style: const TextStyle(
-                                    color: Color.fromRGBO(143, 150, 158, 1),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'default',
-                                  ),
-                                  decoration: const InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(),
                                     labelText: 'Designation',
                                     labelStyle: TextStyle(
                                       color: Colors.black87,
@@ -171,6 +174,8 @@ class _SignupState extends State<Signup> {
                                 ),
                               ),
                               const SizedBox(height: 5),
+                              DropdownFormField(hintText: 'Department', dropdownItems: dropdownItems1,),
+                              const SizedBox(height: 20),
                               Container(
                                 width: 350,
                                 height: 70,
@@ -309,9 +314,7 @@ class _SignupState extends State<Signup> {
                                   ),
                                 ),
                               ),
-                              //const SizedBox(height: 5),
-                              DropdownFormField(hintText: 'Vendor', dropdownItems: dropdownItems1,),
-                              const SizedBox(height: 15),
+                              const SizedBox(height: 5),
                               Container(
                                 width: 350,
                                 height: 70,
@@ -332,35 +335,6 @@ class _SignupState extends State<Signup> {
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                       fontFamily: 'default',
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              //const SizedBox(height: 5),
-                              Container(
-                                width: 350,
-                                height: 120,
-                                child: TextFormField(
-                                  style: const TextStyle(
-                                    color: Color.fromRGBO(143, 150, 158, 1),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'default',
-                                  ),
-                                  decoration: InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    labelText: 'Address',
-                                    labelStyle: TextStyle(
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      fontFamily: 'default',
-                                    ),
-                                    alignLabelWithHint: true,
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 10,vertical: 145),
-                                    border:  const OutlineInputBorder(
-                                        borderRadius: const BorderRadius.all(Radius.circular(5))
                                     ),
                                   ),
                                 ),
