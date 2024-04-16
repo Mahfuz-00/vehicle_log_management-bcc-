@@ -1,6 +1,7 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
+import '../Login UI/loginUI.dart';
 import '../Template Models/customclipperbottomnavbar.dart';
 import '../Template Models/customnotchpainter.dart';
 import '../Template Models/userdetailsnewtripdriver.dart';
@@ -19,6 +20,7 @@ class DriverDashboard extends StatefulWidget {
 }
 
 class _DriverDashboardState extends State<DriverDashboard> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -29,11 +31,15 @@ class _DriverDashboardState extends State<DriverDashboard> {
 
     return Scaffold(
       extendBody: true,
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+        titleSpacing: 5,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white,),
-          onPressed: () {},
+          onPressed: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
         ),
         title: const Text(
           'Driver Dashboard',
@@ -53,11 +59,101 @@ class _DriverDashboardState extends State<DriverDashboard> {
             icon: const Icon(Icons.search, color: Colors.white,),
             onPressed: () {},
           ),
-          IconButton(
-            icon: const Icon(Icons.more_vert_outlined, color: Colors.white,),
-            onPressed: () {},
-          )
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(25, 192, 122, 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    child: Icon(
+                      Icons.person,
+                      size: 35,
+                    ),
+                    radius: 30,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'User Name',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'default',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              title: Text('Home',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const VLMDashboard())); // Close the drawer
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Report',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                /* Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const BCCReport()));*/
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Information',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                /* Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Information()));*/
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Logout',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Login())); // Close the drawer
+              },
+            ),
+            Divider(),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(

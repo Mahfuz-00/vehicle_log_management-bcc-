@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../Login UI/loginUI.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
 import '../Template Models/dropdownmodel.dart';
 import '../User Type Dashboard(Demo)/DemoAppDashboard.dart';
@@ -16,6 +17,7 @@ class TripRequestForm extends StatefulWidget {
 class _TripRequestFormState extends State<TripRequestForm> {
   late TextEditingController _Clockcontroller= TextEditingController();
   late TextEditingController _Datecontroller= TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void dispose() {
@@ -34,14 +36,18 @@ class _TripRequestFormState extends State<TripRequestForm> {
     ];
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+        titleSpacing: 5,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white,),
-          onPressed: () {},
+          onPressed: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
         ),
         title: const Text(
-          'Staff Dashboard',
+          'BCC Admin Dashboard',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -58,11 +64,101 @@ class _TripRequestFormState extends State<TripRequestForm> {
             icon: const Icon(Icons.search, color: Colors.white,),
             onPressed: () {},
           ),
-          IconButton(
-            icon: const Icon(Icons.more_vert_outlined, color: Colors.white,),
-            onPressed: () {},
-          )
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(25, 192, 122, 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    child: Icon(
+                      Icons.person,
+                      size: 35,
+                    ),
+                    radius: 30,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'User Name',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'default',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              title: Text('Home',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const VLMDashboard())); // Close the drawer
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Report',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                /* Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const BCCReport()));*/
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Information',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                /* Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Information()));*/
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Logout',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Login())); // Close the drawer
+              },
+            ),
+            Divider(),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -230,7 +326,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(12.0), // Adjust the padding as needed
-                              child: Icon(Icons.schedule_rounded, size: 40,),
+                              child: Icon(Icons.schedule_rounded, size: 30,),
                             ),
                           ),
                         ),
@@ -280,7 +376,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(12.0), // Adjust the padding as needed
-                              child: Icon(Icons.calendar_today_outlined, size: 40,),
+                              child: Icon(Icons.calendar_today_outlined, size: 30,),
                             ),
                           ),
                         ),

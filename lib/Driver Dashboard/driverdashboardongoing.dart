@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../Login UI/loginUI.dart';
 import '../Template Models/customclipperbottomnavbar.dart';
 import '../Template Models/customnotchpainter.dart';
 import '../Template Models/userinfodrivercurrenttrip.dart';
@@ -15,6 +16,7 @@ class DriverDashboardOngoing extends StatefulWidget {
 }
 
 class _DriverDashboardOngoingState extends State<DriverDashboardOngoing> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final staff = User(
   name: 'Md. Labib Hossain',
@@ -32,11 +34,15 @@ class _DriverDashboardOngoingState extends State<DriverDashboardOngoing> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+        titleSpacing: 5,
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white,),
-          onPressed: () {},
+          onPressed: () {
+            _scaffoldKey.currentState!.openDrawer();
+          },
         ),
         title: const Text(
           'Driver Dashboard',
@@ -56,98 +62,191 @@ class _DriverDashboardOngoingState extends State<DriverDashboardOngoing> {
             icon: const Icon(Icons.search, color: Colors.white,),
             onPressed: () {},
           ),
-          IconButton(
-            icon: const Icon(Icons.more_vert_outlined, color: Colors.white,),
-            onPressed: () {},
-          )
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(25, 192, 122, 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    child: Icon(
+                      Icons.person,
+                      size: 35,
+                    ),
+                    radius: 30,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'User Name',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'default',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              title: Text('Home',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const VLMDashboard())); // Close the drawer
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Report',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                /* Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const BCCReport()));*/
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Information',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                /* Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Information()));*/
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Logout',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',)),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Login())); // Close the drawer
+              },
+            ),
+            Divider(),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20.0),
           child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 15.0),
-              child: Center(
-                child: Column(
-                  children: [
-                    Text('Current Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    Container(
-                      width: screenWidth * 0.9,
-                      padding: EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
+            child: Container(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 15.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text('Current Trip',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                            fontFamily: 'default',
+                          )),
+                      SizedBox(height: screenHeight * 0.01),
+                      Container(
+                        width: screenWidth * 0.9,
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Name: ${staff.name}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
+                            ),
+                            Text(
+                              'Designation: ${staff.designation}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
+                            ),
+                            Text(
+                              'Department: ${staff.department}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
+                            ),
+                            Text(
+                              'Trip Type: ${staff.tripType}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
+                            ),
+                            Text(
+                              'Date and Time: ${DateFormat('yyyy-MM-dd hh:mm a').format(staff.dateTime)}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
+                            ),
+                            Text(
+                              'Destination: ${staff.destination}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
+                            ),
+                            Text(
+                              'Car Name: ${staff.car}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
+                            ),
+                            Text(
+                              'Start Time: ${staff.starttime}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Name: ${staff.name}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
-                          ),
-                          Text(
-                            'Designation: ${staff.designation}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
-                          ),
-                          Text(
-                            'Department: ${staff.department}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
-                          ),
-                          Text(
-                            'Trip Type: ${staff.tripType}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
-                          ),
-                          Text(
-                            'Date and Time: ${DateFormat('yyyy-MM-dd hh:mm a').format(staff.dateTime)}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
-                          ),
-                          Text(
-                            'Destination: ${staff.destination}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
-                          ),
-                          Text(
-                            'Car Name: ${staff.car}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
-                          ),
-                          Text(
-                            'Start Time: ${staff.starttime}',
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'default',),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.02),
-                    Text('Banani to Cumilla',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.03),
-                    Text('Duration',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    Text('2:25',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 25,
-                          fontFamily: 'default',
-                        )),
-                  ],
+                      SizedBox(height: screenHeight * 0.02),
+                      Text('Banani to Cumilla',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                            fontFamily: 'default',
+                          )),
+                      SizedBox(height: screenHeight * 0.03),
+                      Text('Duration',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            fontFamily: 'default',
+                          )),
+                      SizedBox(height: screenHeight * 0.01),
+                      Text('2:25',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontFamily: 'default',
+                          )),
+                      SizedBox(height: screenHeight * 0.03),
+                    ],
+                  ),
                 ),
               ),
             ),

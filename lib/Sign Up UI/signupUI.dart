@@ -325,7 +325,7 @@ class _SignupState extends State<Signup> {
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'default',
                                   ),
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: OutlineInputBorder(),
@@ -335,6 +335,35 @@ class _SignupState extends State<Signup> {
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                       fontFamily: 'default',
+                                    ),
+                                    suffixIcon: GestureDetector(
+                                      onTap: (){},
+                                      child: Container(
+                                          margin: EdgeInsets.only(right: 2),
+                                          padding: EdgeInsets.all(3),
+                                          width: 80,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius: BorderRadius.only(
+                                              topRight: Radius.circular(2),
+                                              bottomRight: Radius.circular(2),
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Icon(Icons.file_upload,
+                                                color: Color.fromRGBO(143, 150, 158, 1),),
+                                              Text('Upload',
+                                                style: TextStyle(
+                                                  color: Color.fromRGBO(143, 150, 158, 1),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'default',
+                                                ),)
+                                            ],
+                                          )
+                                      ),
                                     ),
                                   ),
                                 ),
