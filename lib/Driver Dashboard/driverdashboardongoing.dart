@@ -34,6 +34,7 @@ class _DriverDashboardOngoingState extends State<DriverDashboardOngoing> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
@@ -244,7 +245,7 @@ class _DriverDashboardOngoingState extends State<DriverDashboardOngoing> {
                             fontSize: 25,
                             fontFamily: 'default',
                           )),
-                      SizedBox(height: screenHeight * 0.03),
+                      SizedBox(height: screenHeight * 0.15),
                     ],
                   ),
                 ),
