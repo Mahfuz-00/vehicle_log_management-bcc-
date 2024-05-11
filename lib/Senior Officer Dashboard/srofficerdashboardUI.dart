@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vehicle_log_management/Profile UI/profileUI.dart';
 
 import '../Login UI/loginUI.dart';
 import '../Template Models/userdetailsnewtripSrOfficer.dart';
@@ -26,29 +27,25 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
         titleSpacing: 5,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white,),
-          onPressed: () {
-            _scaffoldKey.currentState!.openDrawer();
-          },
-        ),
-        title: const Text(
-          'Sr Officer Dashboard',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            fontFamily: 'default',
-          ),
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            SizedBox(width: 28,),
+            const Text(
+              'Sr Officer Dashboard',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontFamily: 'default',
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.notifications_rounded, color: Colors.white,),
-          ),
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white,),
-            onPressed: () {},
           ),
         ],
       ),
@@ -364,7 +361,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => VLMDashboard()));
+                        builder: (context) => SROfficerDashboard()));
               },
               child: Container(
                 width: screenWidth / 3,
@@ -396,10 +393,10 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
             ),
             GestureDetector(
               onTap: (){
-                /*Navigator.push(
+                Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SearchUser()));*/
+                        builder: (context) => const Profile()));
               },
               behavior: HitTestBehavior.translucent,
               child: Container(
@@ -416,7 +413,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
-                      Icons.search,
+                      Icons.person,
                       size: 30,
                       color: Colors.white,
                     ),
@@ -424,7 +421,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                       height: 5,
                     ),
                     Text(
-                      'Search',
+                      'Profile',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -439,10 +436,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
             GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: (){
-                /*Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const Information()));*/
+                _showLogoutDialog(context);
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -458,7 +452,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
-                      Icons.info,
+                      Icons.logout,
                       size: 30,
                       color: Colors.white,
                     ),
@@ -466,7 +460,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                       height: 5,
                     ),
                     Text(
-                      'Information',
+                      'Log Out',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -483,4 +477,69 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
       ),
     );
   }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              Text('Logout Confirmation',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  fontFamily: 'default',
+                ),),
+              Divider()
+            ],
+          ),
+          content: Text('Are you sure you want to log out?',
+            style: TextStyle(
+              color: const Color.fromRGBO(25, 192, 122, 1),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              fontFamily: 'default',
+            ),),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text('Cancel',
+                    style: TextStyle(
+                      color: const Color.fromRGBO(25, 192, 122, 1),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      fontFamily: 'default',
+                    ),),
+                ),
+                SizedBox(width: 10,),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Login()));
+                  },
+                  child: Text('Logout',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      fontFamily: 'default',
+                    ),),
+                ),
+              ],
+            )
+          ],
+        );
+      },
+    );
+  }
+
 }

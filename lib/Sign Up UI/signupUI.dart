@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
 import 'package:vehicle_log_management/Sign%20Up%20UI/radiooption.dart';
 
-import '../API Models(Login and Sign Up)/registermodels.dart';
-import '../API Service(Login and Sign Up)/apiserviceregister.dart';
+import '../API Model and Service (Sign Up)/registermodels.dart';
 import '../Login UI/loginUI.dart';
 import 'dropdownfield.dart';
 
@@ -42,7 +41,7 @@ class _SignupState extends State<Signup> {
   @override
   void initState() {
     super.initState();
-    _registerRequest = RegisterRequestmodel(Email: '', Password: '');
+    //_registerRequest = RegisterRequestmodel(Email: '', Password: '');
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
@@ -181,7 +180,7 @@ class _SignupState extends State<Signup> {
                                 height: 70,
                                 child: TextFormField(
                                   keyboardType: TextInputType.emailAddress,
-                                  onSaved: (input) => _registerRequest.Email= input!,
+                                 // onSaved: (input) => _registerRequest.Email= input!,
                                   validator: (input) {
                                     if (input == null || !input.contains('@')) {
                                       return "Please enter a valid email address";
@@ -240,7 +239,7 @@ class _SignupState extends State<Signup> {
                                 height: 70,
                                 child: TextFormField(
                                   keyboardType: TextInputType.text,
-                                  onSaved: (input)=> _registerRequest.Password = input!,
+                                  //onSaved: (input)=> _registerRequest.Password = input!,
                                   validator: (input) => input!.length < 6 ? "Password should be more than 3 characters": null,
                                   controller: _passwordController,
                                   obscureText: _isObscuredPassword,
@@ -280,7 +279,7 @@ class _SignupState extends State<Signup> {
                                 height: 70,
                                 child: TextFormField(
                                   keyboardType: TextInputType.text,
-                                  onSaved: (input)=> _registerRequest.Password = input!,
+                                  //onSaved: (input)=> _registerRequest.Password = input!,
                                   validator: (input) => input!.length < 6 ? "Password should be more than 3 characters": null,
                                   controller: _confirmPasswordController,
                                   obscureText: _isObscuredConfirmPassword,
@@ -373,7 +372,7 @@ class _SignupState extends State<Signup> {
                         ),
                         const SizedBox(height: 50),
                         ElevatedButton(
-                            onPressed: _registerUser,
+                            onPressed: /*_registerUser*/() {},
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color.fromRGBO(25, 192, 122, 1),
                               shape: RoundedRectangleBorder(
@@ -442,7 +441,7 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  void _registerUser() {
+/*  void _registerUser() {
     if (validateAndSave() && checkConfirmPassword()) {
       RegisterRequestmodel registerRequest = RegisterRequestmodel(
         //fullName: _fullNameController.text,
@@ -466,7 +465,7 @@ class _SignupState extends State<Signup> {
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     }
-  }
+  }*/
 
   bool validateAndSave() {
     final form = globalfromkey.currentState;

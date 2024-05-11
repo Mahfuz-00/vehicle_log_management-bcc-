@@ -1,5 +1,6 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:vehicle_log_management/Profile UI/profileUI.dart';
 
 import '../Login UI/loginUI.dart';
 import '../Template Models/customclipperbottomnavbar.dart';
@@ -35,125 +36,27 @@ class _DriverDashboardState extends State<DriverDashboard> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
         titleSpacing: 5,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white,),
-          onPressed: () {
-            _scaffoldKey.currentState!.openDrawer();
-          },
-        ),
-        title: const Text(
-          'Driver Dashboard',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            fontFamily: 'default',
-          ),
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            SizedBox(width: 28,),
+            const Text(
+              'Driver Dashboard',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontFamily: 'default',
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.notifications_rounded, color: Colors.white,),
           ),
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white,),
-            onPressed: () {},
-          ),
         ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(25, 192, 122, 1),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    child: Icon(
-                      Icons.person,
-                      size: 35,
-                    ),
-                    radius: 30,
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'User Name',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              title: Text('Home',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'default',)),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const VLMDashboard())); // Close the drawer
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Report',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'default',)),
-              onTap: () {
-                /* Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const BCCReport()));*/
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Information',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'default',)),
-              onTap: () {
-                /* Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const Information()));*/
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Logout',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'default',)),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const Login())); // Close the drawer
-              },
-            ),
-            Divider(),
-          ],
-        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -324,7 +227,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+/*      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Stack(
         children: [
           Positioned(
@@ -356,7 +259,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
             ),
           ),
         ],
-      ),
+      ),*/
       bottomNavigationBar: BottomAppBar(
         color: Colors.transparent,
         elevation: 5,
@@ -379,7 +282,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => VLMDashboard()));
+                          builder: (context) => DriverDashboard()));
                 },
                 child: Container(
                   width: screenWidth / 3,
@@ -410,7 +313,44 @@ class _DriverDashboardState extends State<DriverDashboard> {
                   ),
                 ),
               ),
-              ClipPath(
+              GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Profile()));
+                },
+                child: Container(
+                  width: screenWidth / 3,
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(25, 192, 122, 1),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.person,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        'Profile',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontFamily: 'default',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+        /*      ClipPath(
                 clipper: NotchClipper(),
                 child: CustomPaint(
                   painter: NotchPainter(),
@@ -443,20 +383,17 @@ class _DriverDashboardState extends State<DriverDashboard> {
                             ),
                           ),
                         ),
-                      /*  CustomPaint(
+                      *//*  CustomPaint(
                           painter: NotchPainter(),
-                        ),*/
+                        ),*//*
                       ],
                     ),
                   ),
                 ),
-              ),
+              ),*/
               GestureDetector(
                 onTap: (){
-                  /*Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SearchUser()));*/
+                 _showLogoutDialog(context);
                 },
                 behavior: HitTestBehavior.translucent,
                 child: Container(
@@ -473,7 +410,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                          Icons.info,
+                          Icons.logout,
                           size: 30,
                           color: Colors.white,
                         ),
@@ -481,7 +418,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                         height: 5,
                       ),
                       Text(
-                        'Information',
+                        'Log Out',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -521,4 +458,70 @@ class _DriverDashboardState extends State<DriverDashboard> {
       ),*/
     );
   }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              Text('Logout Confirmation',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  fontFamily: 'default',
+                ),),
+              Divider()
+            ],
+          ),
+          content: Text('Are you sure you want to log out?',
+            style: TextStyle(
+              color: const Color.fromRGBO(25, 192, 122, 1),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              fontFamily: 'default',
+            ),),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text('Cancel',
+                    style: TextStyle(
+                      color: const Color.fromRGBO(25, 192, 122, 1),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      fontFamily: 'default',
+                    ),),
+                ),
+                SizedBox(width: 10,),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Login()));
+                  },
+                  child: Text('Logout',
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      fontFamily: 'default',
+                    ),),
+                ),
+              ],
+            )
+          ],
+        );
+      },
+    );
+  }
+
+
 }

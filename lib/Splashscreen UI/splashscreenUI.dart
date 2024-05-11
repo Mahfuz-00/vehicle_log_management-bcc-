@@ -143,9 +143,9 @@ class _SplashScreenState extends State<SplashScreen>
                                 fontFamily: 'default',
                               ))),
                       const SizedBox(
-                        height: 20,
+                        height: 40,
                       ),
-                      ElevatedButton(
+                      /* ElevatedButton(
                           onPressed: () {
                             Navigator.push(
                                 context,
@@ -168,7 +168,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                                 fontFamily: 'default',
-                              )))
+                              )))*/
                     ],
                   ),
                 ),

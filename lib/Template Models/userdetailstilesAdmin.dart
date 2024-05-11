@@ -44,7 +44,7 @@ class UserListTile extends StatelessWidget {
               fontSize: 16,
               fontFamily: 'default',
             ),),
-            trailing: Icon(Icons.arrow_forward_ios),
+            trailing: Icon(Icons.arrow_forward_ios, color: Colors.white,),
             onTap: onPressed,
           ),
         ),
