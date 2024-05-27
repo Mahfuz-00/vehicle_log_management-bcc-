@@ -44,6 +44,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   fl_chart: ^0.66.2
   fluttertoast: ^8.2.4
+  rename_app: ^1.3.2
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +56,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: "^0.13.1"
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "Assets/Images/BCC-Logo-Textless-1024.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -74,6 +83,7 @@ flutter:
     - Assets/Images/Start Engine.png
     - Assets/Images/Stop Engine.png
     - Assets/Images/Powered by TNS.png
+    - Assets/Images/BCC-Logo-Textless-1024.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -5,7 +5,10 @@ import 'package:vehicle_log_management/Staff%20Dashboard/staffdashboardUI.dart';
 
 import '../API Model and Service (Login)/apiservicelogin.dart';
 import '../API Model and Service (Login)/loginmodels.dart';
+import '../Admin Dashboard/admindashboardUI.dart';
+import '../Driver Dashboard/driverdashboardUI.dart';
 import '../Forgot Password UI/forgotpasswordUI.dart';
+import '../Senior Officer Dashboard/srofficerdashboardUI.dart';
 import '../Sign Up UI/signupUI.dart';
 import '../User Type Dashboard(Demo)/DemoAppDashboard.dart';
 
@@ -246,24 +249,24 @@ class _LoginState extends State<Login> {
                                         MaterialPageRoute(builder: (context) => StaffDashboard(/*shouldRefresh: true*/)),
                                       );
                                     }
-                                  /*  if (userType == 'bcc_staff') {
+                                    if (userType == 'bcc_staff') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => BCCDashboard()),
+                                        MaterialPageRoute(builder: (context) => DriverDashboard()),
                                       );
                                     }
                                     if (userType == 'nttn_sbl_staff') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => NTTNDashboard(shouldRefresh: true)),
+                                        MaterialPageRoute(builder: (context) => SROfficerDashboard(/*shouldRefresh: true*/)),
                                       );
                                     }
                                     if (userType == 'nttn_adsl_staff') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => NTTNDashboard(shouldRefresh: true)),
+                                        MaterialPageRoute(builder: (context) => AdminDashboard(/*shouldRefresh: true*/)),
                                       );
-                                    }*/
+                                    }
                                   }
                                 }
                                 setState(() {
