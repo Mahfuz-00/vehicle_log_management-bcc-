@@ -31,6 +31,8 @@ class _PasswordChangedState extends State<PasswordChanged> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return InternetChecker(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -40,6 +42,15 @@ class _PasswordChangedState extends State<PasswordChanged> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children:[
+                Center(
+                  child: Image(
+                    image: AssetImage('Assets/Images/Success-Mark.png'),
+                    height: 150,
+                    width: 150,
+                    alignment: Alignment.center,
+                  ),
+                ),
+                SizedBox(height: 20,),
                 Text(
                   'Password Changed!',
                   textAlign: TextAlign.center,
@@ -72,7 +83,7 @@ class _PasswordChangedState extends State<PasswordChanged> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    fixedSize: Size(350, 70),
+                    fixedSize: Size(screenWidth*0.9, 70),
                   ),
                   child: Text(
                     'Back to Login',

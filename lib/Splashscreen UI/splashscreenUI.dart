@@ -45,6 +45,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -132,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
                               //side: BorderSide(color: Colors.black, width: 2),
                             ),
                             //elevation: 3,
-                            fixedSize: const Size(350, 70),
+                            fixedSize: Size(screenWidth*0.9, 70),
                           ),
                           child: const Text('Login',
                               textAlign: TextAlign.center,

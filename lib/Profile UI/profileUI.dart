@@ -44,13 +44,10 @@ class _ProfileState extends State<Profile> {
 
     try {
       await prefs.setString('userName', userProfile!.name);
-      await prefs.setString('organizationName', userProfile!.organization);
       await prefs.setString('photoUrl', userProfile!.photo);
       final String? UserName = prefs.getString('userName');
-      final String? OrganizationName = prefs.getString('organizationName');
       final String? PhotoURL = prefs.getString('photoUrl');
       print('User Name: $UserName');
-      print('Organization Name: $OrganizationName');
       print('Photo URL: $PhotoURL');
       print('User profile saved successfully');
     } catch (e) {
@@ -84,7 +81,15 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    return InternetChecker(
+    return _pageLoading
+        ? Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        // Show circular loading indicator while waiting
+        child: CircularProgressIndicator(),
+      ),
+    )
+        : InternetChecker(
       child: PopScope(
         canPop: false,
         child: Scaffold(
@@ -195,17 +200,6 @@ class _ProfileState extends State<Profile> {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          userProfile!.organization,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'default',
                           ),

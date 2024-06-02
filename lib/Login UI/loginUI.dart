@@ -5,12 +5,13 @@ import 'package:vehicle_log_management/Staff%20Dashboard/staffdashboardUI.dart';
 
 import '../API Model and Service (Login)/apiservicelogin.dart';
 import '../API Model and Service (Login)/loginmodels.dart';
+import '../API Model and Service (Profile)/apiserviceprofile.dart';
+import '../API Model and Service (Profile)/profilemodel.dart';
 import '../Admin Dashboard/admindashboardUI.dart';
 import '../Driver Dashboard/driverdashboardUI.dart';
 import '../Forgot Password UI/forgotpasswordUI.dart';
 import '../Senior Officer Dashboard/srofficerdashboardUI.dart';
-import '../Sign Up UI/signupUI.dart';
-import '../User Type Dashboard(Demo)/DemoAppDashboard.dart';
+
 
 
 class Login extends StatefulWidget {
@@ -59,6 +60,8 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       key: globalKey,
       resizeToAvoidBottomInset: false,
@@ -102,7 +105,7 @@ class _LoginState extends State<Login> {
                             child: Column(
                               children: [
                                 Container(
-                                  width: 350,
+                                  width: screenWidth*0.9,
                                   height: 70,
                                   child: TextFormField(
                                     controller: _emailController,
@@ -142,7 +145,7 @@ class _LoginState extends State<Login> {
                                 ),
                                 const SizedBox(height: 15),
                                 Container(
-                                  width: 350,
+                                  width: screenWidth*0.9,
                                   height: 85,
                                   child: Column(
                                     children: [
@@ -243,28 +246,28 @@ class _LoginState extends State<Login> {
                                   //print(_loginRequest.toJSON());
                                   print('Checking $userType');
                                   if(userType != null){
-                                    if (userType == 'isp_staff') {
+                                    if (userType == 'vlm_staff') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => StaffDashboard(/*shouldRefresh: true*/)),
+                                        MaterialPageRoute(builder: (context) => StaffDashboard(shouldRefresh: true)),
                                       );
                                     }
-                                    if (userType == 'bcc_staff') {
+                                    if (userType == 'vlm_driver') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => DriverDashboard()),
+                                        MaterialPageRoute(builder: (context) => DriverDashboard(shouldRefresh: true)),
                                       );
                                     }
-                                    if (userType == 'nttn_sbl_staff') {
+                                    if (userType == 'vlm_senior_officer') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => SROfficerDashboard(/*shouldRefresh: true*/)),
+                                        MaterialPageRoute(builder: (context) => SROfficerDashboard(shouldRefresh: true)),
                                       );
                                     }
-                                    if (userType == 'nttn_adsl_staff') {
+                                    if (userType == 'vlm_admin') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => AdminDashboard(/*shouldRefresh: true*/)),
+                                        MaterialPageRoute(builder: (context) => AdminDashboard(shouldRefresh: true)),
                                       );
                                     }
                                   }
@@ -278,9 +281,11 @@ class _LoginState extends State<Login> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                fixedSize: const Size(350, 70),
+                                fixedSize: Size(screenWidth*0.9, 70),
                               ),
-                              child: const Text('Login',
+                              child: _isButtonClicked
+                                  ? CircularProgressIndicator() // Show circular progress indicator when button is clicked
+                                  : const Text('Login',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 20,
@@ -361,15 +366,10 @@ class _LoginState extends State<Login> {
           storeTokenLocally(response.token);
           userType = response.userType;
           print('UserType :: $userType');
-          //_fetchUserProfile(response.token);
+          _fetchUserProfile(response.token);
           return true;
         } else {
-          // Handle unsuccessful login
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Email or password is not valid.'),
-            ),
-          );
+          showTopToast(context, 'Email or password is not valid.');
           return false;
         }
       } catch (e) {
@@ -384,16 +384,44 @@ class _LoginState extends State<Login> {
         else if (e.toString().contains('The email field is required') || e.toString().contains('The password field is required')) {
           errorMessage = 'Email or password is empty. Please fill in both fields.';
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-          ),
-        );
+        showTopToast(context, errorMessage);
         return false;
       }
     }
     // Return false if form validation fails
     return false;
+  }
+
+  void showTopToast(BuildContext context, String message) {
+    OverlayState? overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10, // 10 is for a little margin from the top
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              message,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlayState?.insert(overlayEntry);
+
+    // Remove the overlay entry after some time (e.g., 3 seconds)
+    Future.delayed(Duration(seconds: 3)).then((_) {
+      overlayEntry.remove();
+    });
   }
 
   late String AuthenToken;
@@ -407,7 +435,7 @@ class _LoginState extends State<Login> {
     print(prefs.getString('token'));
   }
 
-/*  Future<void> _fetchUserProfile(String token) async {
+  Future<void> _fetchUserProfile(String token) async {
     try {
       final apiService = await APIProfileService();
       final profile = await apiService.fetchUserProfile(token);
@@ -434,5 +462,5 @@ class _LoginState extends State<Login> {
       print('Error fetching user profile: $e');
       // Handle error as needed
     }
-  }*/
+  }
 }
