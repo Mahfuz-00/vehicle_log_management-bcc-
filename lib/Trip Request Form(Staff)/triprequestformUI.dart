@@ -214,7 +214,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                           controller: _purposeController,
                           validator: (input) {
                             if (input == null || input.isEmpty) {
-                              return 'Please enter the purpose of your trip';
+                              return 'Please enter the purpose of your trip and trip details';
                             }
                             return null;
                           },
@@ -225,7 +225,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                             fontFamily: 'default',
                           ),
                           decoration: InputDecoration(
-                            labelText: 'Purpose',
+                            labelText: 'Purpose and Trip details',
                             labelStyle: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -246,7 +246,9 @@ class _TripRequestFormState extends State<TripRequestForm> {
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
                           inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
+                            FilteringTextInputFormatter.digitsOnly,
+                            // Only allow digits
+                            LengthLimitingTextInputFormatter(11),
                           ],
                           validator: (input) {
                             if (input == null || input.isEmpty) {
