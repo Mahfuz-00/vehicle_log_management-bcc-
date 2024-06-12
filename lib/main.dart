@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'Splashscreen UI/splashscreenUI.dart';
 import 'package:rename_app/rename_app.dart';
+
+import 'UI/Splashscreen UI/splashscreenUI.dart';
 
 void main() {
   runApp(const MyApp());
