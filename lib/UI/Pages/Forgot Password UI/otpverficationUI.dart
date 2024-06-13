@@ -4,8 +4,9 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
-import '../../Data/API Service (Forgot Password)/apiServiceOTPVerification.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Forgot Password)/apiServiceOTPVerification.dart';
+import '../../Widgets/otpbox.dart';
 import 'createnewpasswordUI.dart';
 
 class OPTVerfication extends StatefulWidget {
@@ -151,161 +152,19 @@ class _OPTVerficationState extends State<OPTVerfication> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Container(
-                                      width: screenWidth*0.2,
-                                      height: 70,
-                                      child: TextFormField(
-                                        controller: _firstdigitcontroller,
-                                        keyboardType: TextInputType.number,
-                                       // maxLength: 1, // Limit to one digit
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly, // Allow only digits
-                                        ],
-                                        style: const TextStyle(
-                                          color:
-                                              Color.fromRGBO(143, 150, 158, 1),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'default',
-                                        ),
-                                        decoration: const InputDecoration(
-                                          /*filled: true,
-                                              fillColor: Color.fromRGBO(247,248,250,255),*/
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  25, 192, 122, 1),
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  25, 192, 122, 1),
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          labelText: '',
-                                        ),
-                                      ),
-                                    ),
+                                    CustomTextFormField(textController: _firstdigitcontroller,),
                                     SizedBox(
                                       width: 10,
                                     ),
-                                    Container(
-                                      width: screenWidth*0.2,
-                                      height: 70,
-                                      child: TextFormField(
-                                        controller: _seconddigitcontroller,
-                                        keyboardType: TextInputType.number,
-                                       // maxLength: 1, // Limit to one digit
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly, // Allow only digits
-                                        ],
-                                        style: const TextStyle(
-                                          color:
-                                              Color.fromRGBO(143, 150, 158, 1),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'default',
-                                        ),
-                                        decoration: const InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  25, 192, 122, 1),
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  25, 192, 122, 1),
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          labelText: '',
-                                        ),
-                                      ),
-                                    ),
+                                    CustomTextFormField(textController: _seconddigitcontroller,),
                                     SizedBox(
                                       width: 10,
                                     ),
-                                    Container(
-                                      width: screenWidth*0.2,
-                                      height: 70,
-                                      child: TextFormField(
-                                        controller: _thirddigitcontroller,
-                                        keyboardType: TextInputType.number,
-                                        //maxLength: 1, // Limit to one digit
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly, // Allow only digits
-                                        ],
-                                        style: const TextStyle(
-                                          color:
-                                              Color.fromRGBO(143, 150, 158, 1),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'default',
-                                        ),
-                                        decoration: const InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  25, 192, 122, 1),
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  25, 192, 122, 1),
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          labelText: '',
-                                        ),
-                                      ),
-                                    ),
+                                    CustomTextFormField(textController: _thirddigitcontroller,),
                                     SizedBox(
                                       width: 10,
                                     ),
-                                    Container(
-                                      width: screenWidth*0.2,
-                                      height: 70,
-                                      child: TextFormField(
-                                        controller: _forthdigitcontroller,
-                                        keyboardType: TextInputType.number,
-                                        //maxLength: 1, // Limit to one digit
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly, // Allow only digits
-                                        ],
-                                        style: const TextStyle(
-                                          color:
-                                              Color.fromRGBO(143, 150, 158, 1),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'default',
-                                        ),
-                                        decoration: const InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  25, 192, 122, 1),
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Color.fromRGBO(
-                                                  25, 192, 122, 1),
-                                              width: 2.0,
-                                            ),
-                                          ),
-                                          labelText: '',
-                                        ),
-                                      ),
-                                    ),
+                                    CustomTextFormField(textController: _forthdigitcontroller,),
                                   ],
                                 ),
                               ),

@@ -1,7 +1,7 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../Login UI/loginUI.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
 
 class PasswordChanged extends StatefulWidget {
   const PasswordChanged({super.key});

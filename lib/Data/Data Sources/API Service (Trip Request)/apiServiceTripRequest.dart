@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Models/tripRequestModel.dart';
+import '../../Models/tripRequestModel.dart';
+
 
 class APIServiceTripRequest {
   final String URL = 'https://bcc.touchandsolve.com/api';

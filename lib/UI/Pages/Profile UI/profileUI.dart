@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../Data/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../Data/API Service (Profile)/apiserviceprofile.dart';
-import '../../Data/Models/profileModelFull.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
+import '../../../Data/Data Sources/API Service (Profile)/apiserviceprofile.dart';
+import '../../../Data/Models/profileModelFull.dart';
 import '../Login UI/loginUI.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
 
 class Profile extends StatefulWidget {
   final bool shouldRefresh;

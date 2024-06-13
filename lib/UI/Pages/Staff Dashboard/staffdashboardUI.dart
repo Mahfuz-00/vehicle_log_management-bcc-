@@ -1,33 +1,34 @@
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 
-import '../../Data/API Service (Dashboard)/apiserviceDashboard.dart';
-import '../../Data/API Service (Notification)/apiServiceNotificationRead.dart';
-import '../../Data/Models/tripRequestModel.dart';
-import '../../Data/Models/tripRequestModelApprovedStaff.dart';
-import '../../Data/Models/tripRequestModelRecent.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
+import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
+import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
+import '../../../Data/Models/tripRequestModel.dart';
+import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
+import '../../../Data/Models/tripRequestModelRecent.dart';
+import '../../Widgets/RecentTripDetails.dart';
+import '../../Widgets/StaffApprovedTripDetails.dart';
+import '../../Widgets/requestWidget.dart';
+import '../../Widgets/staffPendingTripDetails.dart';
+import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
-import '../Widgets/RecentTripDetails.dart';
-import '../Widgets/staffTripTile.dart';
-import '../Widgets/templateerrorcontainer.dart';
-import 'driverStartTrip.dart';
-import 'driverStopTrip.dart';
+import '../Trip Request Form(Staff)/triprequestformUI.dart';
 
-class DriverDashboard extends StatefulWidget {
+
+class StaffDashboard extends StatefulWidget {
   final bool shouldRefresh;
 
-  const DriverDashboard({Key? key, this.shouldRefresh = false})
+  const StaffDashboard({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<DriverDashboard> createState() => _DriverDashboardState();
+  State<StaffDashboard> createState() => _StaffDashboardState();
 }
 
-class _DriverDashboardState extends State<DriverDashboard> {
+class _StaffDashboardState extends State<StaffDashboard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -90,12 +91,12 @@ class _DriverDashboardState extends State<DriverDashboard> {
       // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
-      final List<dynamic> pendingRequestsData = records['New_Trip'] ?? [];
+      final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
       for (var index = 0; index < pendingRequestsData.length; index++) {
         print(
             'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
-      final List<dynamic> acceptedRequestsData = records['Ongoing'] ?? [];
+      final List<dynamic> acceptedRequestsData = records['Accepted'] ?? [];
       for (var index = 0; index < acceptedRequestsData.length; index++) {
         print(
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
@@ -134,22 +135,18 @@ class _DriverDashboardState extends State<DriverDashboard> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DriverStartTrip(
-                  staff: TripRequestApprovedStaff(
-                    driver: request['driver'],
-                    Car: request['car'],
-                    id: request['trip_id'],
-                    name: request['name'],
-                    designation: request['designation'],
-                    department: request['department'],
-                    purpose: request['purpose'],
-                    phone: request['phone'],
-                    destinationFrom: request['destination_from'],
-                    destinationTo: request['destination_to'],
-                    date: request['date'],
-                    time: request['time'],
-                    type: request['trip_type'],
-                  ),
+                builder: (context) => PendingTripStaff(
+                  staff: TripRequest(
+                      name: request['name'],
+                      designation: request['designation'],
+                      department: request['department'],
+                      purpose: request['purpose'],
+                      phone: request['phone'],
+                      destinationFrom: request['destination_from'],
+                      destinationTo: request['destination_to'],
+                      date: request['date'],
+                      time: request['time'],
+                      type: request['trip_type']),
                 ),
               ),
             );
@@ -172,10 +169,10 @@ class _DriverDashboardState extends State<DriverDashboard> {
               time: request['time'],
               type: request['trip_type']),
           onPressed: () {
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DriverStopTrip(
+                builder: (context) => ApprovedTripStaff(
                   staff: TripRequestApprovedStaff(
                     driver: request['driver'],
                     Car: request['car'],
@@ -193,22 +190,6 @@ class _DriverDashboardState extends State<DriverDashboard> {
                   ),
                 ),
               ),
-            );
-            DriverStopTrip(
-              staff: TripRequestApprovedStaff(
-                  driver: request['driver'],
-                  Car: request['car'],
-                  name: request['name'],
-                  designation: request['designation'],
-                  department: request['department'],
-                  purpose: request['purpose'],
-                  phone: request['phone'],
-                  destinationFrom: request['destination_from'],
-                  destinationTo: request['destination_to'],
-                  date: request['date'],
-                  time: request['time'],
-                  type: request['trip_type'],
-                  id: request['trip_id']),
             );
           },
         );
@@ -303,10 +284,6 @@ class _DriverDashboardState extends State<DriverDashboard> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    double fabHeight =
-        56.0; // Default FAB height is 56, adjust if your FAB size is different
-    double containerHeight = screenHeight * 0.08; // Your container height
-
     return _pageLoading
         ? Scaffold(
             backgroundColor: Colors.white,
@@ -319,14 +296,13 @@ class _DriverDashboardState extends State<DriverDashboard> {
             child: PopScope(
               canPop: false,
               child: Scaffold(
-                extendBody: true,
                 key: _scaffoldKey,
                 appBar: AppBar(
                   backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                   titleSpacing: 5,
                   automaticallyImplyLeading: false,
                   title: const Text(
-                    'Driver Dashboard',
+                    'Staff Dashboard',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -376,11 +352,21 @@ class _DriverDashboardState extends State<DriverDashboard> {
                           ),
                       ],
                     ),
+                    IconButton(
+                      onPressed: () {
+                        _showLogoutDialog(context);
+                      },
+                      icon: const Icon(
+                        Icons.logout,
+                        color: Colors.white,
+                      ),
+                    ),
                   ],
                 ),
                 body: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20.0, horizontal: 20),
                     child: SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 15.0),
@@ -399,132 +385,27 @@ class _DriverDashboardState extends State<DriverDashboard> {
                               SizedBox(
                                 height: 20,
                               ),
-                              Text('New Trip',
+                              Text('Pending Trip',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 30,
+                                    fontSize: 25,
                                     fontFamily: 'default',
                                   )),
                               SizedBox(height: screenHeight * 0.01),
                               Divider(),
-                              SizedBox(height: screenHeight * 0.01),
-                              if (acceptedRequests.isEmpty) ...[
-                                RequestsWidget(
-                                    loading: _isLoading,
-                                    fetch: _isFetched,
-                                    errorText: 'No New Trip.',
-                                    listWidget: pendingRequests,
-                                    fetchData: fetchConnectionRequests(),
-                                    numberOfWidgets: 10,
-                                    showSeeAllButton: shouldShowSeeAllButton(
-                                        pendingRequests),
-                                    seeAllButtonText: '',
-                                    nextPage: null),
-                                /*Container(
-                                  //height: screenHeight*0.25,
-                                  child: FutureBuilder<void>(
-                                      future: _isLoading
-                                          ? null
-                                          : fetchConnectionRequests(),
-                                      builder: (context, snapshot) {
-                                        if (!_isFetched) {
-                                          // Return a loading indicator while waiting for data
-                                          return Container(
-                                            height:
-                                                200, // Adjust height as needed
-                                            width:
-                                                screenWidth, // Adjust width as needed
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ),
-                                          );
-                                        } else if (snapshot.hasError) {
-                                          // Handle errors
-                                          return buildNoRequestsWidget(
-                                              screenWidth,
-                                              'Error: ${snapshot.error}');
-                                        } else if (_isFetched) {
-                                          if (pendingRequests.isNotEmpty) {
-                                            // If data is loaded successfully, display the ListView
-                                            return Container(
-                                              child: Column(
-                                                children: [
-                                                  ListView.separated(
-                                                    shrinkWrap: true,
-                                                    physics:
-                                                        NeverScrollableScrollPhysics(),
-                                                    itemCount:
-                                                        pendingRequests.length >
-                                                                10
-                                                            ? 10
-                                                            : pendingRequests
-                                                                .length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      // Display each connection request using ConnectionRequestInfoCard
-                                                      return pendingRequests[
-                                                          index];
-                                                    },
-                                                    separatorBuilder:
-                                                        (context, index) =>
-                                                            const SizedBox(
-                                                                height: 10),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  *//*if (shouldShowSeeAllButton(
-                                                    pendingRequests))
-                                                  buildSeeAllButtonRequestList(
-                                                      context)*//*
-                                                ],
-                                              ),
-                                            );
-                                          } else if (pendingRequests.isEmpty) {
-                                            // Handle the case when there are no pending connection requests
-                                            return buildNoRequestsWidget(
-                                                screenWidth, 'No New Trip.');
-                                          }
-                                        }
-                                        // Return a default widget if none of the conditions above are met
-                                        return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                      }),
-                                ),*/
-                              ] else if (acceptedRequests.isNotEmpty) ...[
-                                buildNoRequestsWidget(screenWidth,
-                                    'You Currently on a Trip. Please complete that trip to start a new trip.')
-                              ],
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.02),
-                              Text('Ongoing Trip',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30,
-                                    fontFamily: 'default',
-                                  )),
-                              SizedBox(height: screenHeight * 0.01),
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.01),
                               RequestsWidget(
                                   loading: _isLoading,
                                   fetch: _isFetched,
-                                  errorText: 'No trip onging.',
-                                  listWidget: acceptedRequests,
+                                  errorText: 'You haven\'t created any trip request yet.',
+                                  listWidget: pendingRequests,
                                   fetchData: fetchConnectionRequests(),
                                   numberOfWidgets: 10,
                                   showSeeAllButton: shouldShowSeeAllButton(
-                                      acceptedRequests),
+                                      pendingRequests),
                                   seeAllButtonText: '',
                                   nextPage: null),
-                              /*Container(
+                             /* Container(
                                 //height: screenHeight*0.25,
                                 child: FutureBuilder<void>(
                                     future: _isLoading
@@ -553,7 +434,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                             screenWidth,
                                             'Error: ${snapshot.error}');
                                       } else if (_isFetched) {
-                                        if (acceptedRequests.isNotEmpty) {
+                                        if (pendingRequests.isNotEmpty) {
                                           // If data is loaded successfully, display the ListView
                                           return Container(
                                             child: Column(
@@ -562,15 +443,15 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                                   shrinkWrap: true,
                                                   physics:
                                                       NeverScrollableScrollPhysics(),
-                                                  itemCount: acceptedRequests
+                                                  itemCount: pendingRequests
                                                               .length >
                                                           10
                                                       ? 10
-                                                      : acceptedRequests.length,
+                                                      : pendingRequests.length,
                                                   itemBuilder:
                                                       (context, index) {
                                                     // Display each connection request using ConnectionRequestInfoCard
-                                                    return acceptedRequests[
+                                                    return pendingRequests[
                                                         index];
                                                   },
                                                   separatorBuilder:
@@ -588,17 +469,39 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                               ],
                                             ),
                                           );
-                                        } else if (acceptedRequests.isEmpty) {
+                                        } else if (pendingRequests.isEmpty) {
                                           // Handle the case when there are no pending connection requests
                                           return buildNoRequestsWidget(
-                                              screenWidth, 'No trip onging.');
+                                              screenWidth,
+                                              'You haven\'t created any trip request yet.');
                                         }
                                       }
                                       // Return a default widget if none of the conditions above are met
                                       return SizedBox(); // You can return an empty SizedBox or any other default widget
                                     }),
                               ),*/
+                              Divider(),
+                              SizedBox(height: screenHeight * 0.02),
+                              Text('Approved Trip',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25,
+                                    fontFamily: 'default',
+                                  )),
                               SizedBox(height: screenHeight * 0.01),
+                              Divider(),
+                              RequestsWidget(
+                                  loading: _isLoading,
+                                  fetch: _isFetched,
+                                  errorText: 'No trip request reviewed yet.',
+                                  listWidget: acceptedRequests,
+                                  fetchData: fetchConnectionRequests(),
+                                  numberOfWidgets: 10,
+                                  showSeeAllButton: shouldShowSeeAllButton(
+                                      acceptedRequests),
+                                  seeAllButtonText: '',
+                                  nextPage: null),
                               Divider(),
                               SizedBox(height: screenHeight * 0.02),
                               Text('Recent Trip',
@@ -610,11 +513,10 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                   )),
                               SizedBox(height: screenHeight * 0.01),
                               Divider(),
-                              SizedBox(height: screenHeight * 0.01),
                               RequestsWidget(
                                   loading: _isLoading,
                                   fetch: _isFetched,
-                                  errorText: 'You haven\'t finished any trip yet.',
+                                  errorText: 'You haven\'t take any trip yet.',
                                   listWidget: recentRequests,
                                   fetchData: fetchConnectionRequests(),
                                   numberOfWidgets: 10,
@@ -622,81 +524,37 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                       recentRequests),
                                   seeAllButtonText: '',
                                   nextPage: null),
-                              /*Container(
-                                //height: screenHeight*0.25,
-                                child: FutureBuilder<void>(
-                                    future: _isLoading
-                                        ? null
-                                        : fetchConnectionRequests(),
-                                    builder: (context, snapshot) {
-                                      if (!_isFetched) {
-                                        // Return a loading indicator while waiting for data
-                                        return Container(
-                                          height:
-                                              200, // Adjust height as needed
-                                          width:
-                                              screenWidth, // Adjust width as needed
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        // Handle errors
-                                        return buildNoRequestsWidget(
-                                            screenWidth,
-                                            'Error: ${snapshot.error}');
-                                      } else if (_isFetched) {
-                                        if (recentRequests.isNotEmpty) {
-                                          // If data is loaded successfully, display the ListView
-                                          return Container(
-                                            child: Column(
-                                              children: [
-                                                ListView.separated(
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      NeverScrollableScrollPhysics(),
-                                                  itemCount:
-                                                      recentRequests.length > 10
-                                                          ? 10
-                                                          : recentRequests
-                                                              .length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    // Display each connection request using ConnectionRequestInfoCard
-                                                    return recentRequests[
-                                                        index];
-                                                  },
-                                                  separatorBuilder:
-                                                      (context, index) =>
-                                                          const SizedBox(
-                                                              height: 10),
-                                                ),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                *//*if (shouldShowSeeAllButton(
-                                                    pendingRequests))
-                                                  buildSeeAllButtonRequestList(
-                                                      context)*//*
-                                              ],
-                                            ),
-                                          );
-                                        } else if (recentRequests.isEmpty) {
-                                          // Handle the case when there are no pending connection requests
-                                          return buildNoRequestsWidget(
-                                              screenWidth,
-                                              'You haven\'t finished any trip yet.');
-                                        }
-                                      }
-                                      // Return a default widget if none of the conditions above are met
-                                      return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                    }),
-                              ),*/
+                              Divider(),
+                              SizedBox(height: screenHeight * 0.02),
+                              Center(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromRGBO(25, 192, 122, 1),
+                                    fixedSize: Size(
+                                        MediaQuery.of(context).size.width * 0.8,
+                                        MediaQuery.of(context).size.height *
+                                            0.1),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                TripRequestForm()));
+                                  },
+                                  child: const Text('New Trip Request',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'default',
+                                      )),
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -704,141 +562,136 @@ class _DriverDashboardState extends State<DriverDashboard> {
                     ),
                   ),
                 ),
-                bottomNavigationBar: BottomAppBar(
-                  color: Colors.transparent,
-                  elevation: 5,
+                bottomNavigationBar: Container(
                   height: screenHeight * 0.08,
-                  padding: EdgeInsets.all(0),
-                  notchMargin: 10.0,
-                  shape: CircularNotchedRectangle(),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(5),
-                      topRight: Radius.circular(5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DriverDashboard(
-                                          shouldRefresh: true,
-                                        )));
-                          },
-                          child: Container(
-                            width: screenWidth / 3,
-                            decoration: BoxDecoration(
-                              color: const Color.fromRGBO(25, 192, 122, 1),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.home,
-                                  size: 30,
+                  color: const Color.fromRGBO(25, 192, 122, 1),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => StaffDashboard(
+                                        shouldRefresh: true,
+                                      )));
+                        },
+                        child: Container(
+                          width: screenWidth / 3,
+                          padding: EdgeInsets.all(5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.home,
+                                size: 30,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                'Home',
+                                style: TextStyle(
                                   color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  fontFamily: 'default',
                                 ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  'Home',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    fontFamily: 'default',
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                        GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Profile(
-                                          shouldRefresh: true,
-                                        )));
-                          },
-                          child: Container(
-                            width: screenWidth / 3,
-                            decoration: BoxDecoration(
-                              color: const Color.fromRGBO(25, 192, 122, 1),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const TripRequestForm()));
+                        },
+                        behavior: HitTestBehavior.translucent,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border: Border(
+                            left: BorderSide(
+                              color: Colors.black,
+                              width: 1.0,
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.person,
-                                  size: 30,
+                          )),
+                          width: screenWidth / 3,
+                          padding: EdgeInsets.all(5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.add_circle_outlined,
+                                size: 30,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                'Trip Request',
+                                style: TextStyle(
                                   color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  fontFamily: 'default',
                                 ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  'Profile',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    fontFamily: 'default',
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            _showLogoutDialog(context);
-                          },
-                          behavior: HitTestBehavior.translucent,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: const Color.fromRGBO(25, 192, 122, 1),
-                                border: Border(
-                                  left: BorderSide(
-                                    color: Colors.black,
-                                    width: 1.0,
-                                  ),
-                                )),
-                            width: screenWidth / 3,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.logout,
-                                  size: 30,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  'Log Out',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    fontFamily: 'default',
-                                  ),
-                                ),
-                              ],
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Profile(shouldRefresh:  true,)));
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border: Border(
+                            left: BorderSide(
+                              color: Colors.black,
+                              width: 1.0,
                             ),
+                          )),
+                          width: screenWidth / 3,
+                          padding: EdgeInsets.all(5),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.person,
+                                size: 30,
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                'Profile',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  fontFamily: 'default',
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -971,9 +824,27 @@ class _DriverDashboardState extends State<DriverDashboard> {
                   width: 10,
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => const Login()));
+                  onPressed: () async {
+                    // Clear user data from SharedPreferences
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.remove('userName');
+                    await prefs.remove('organizationName');
+                    await prefs.remove('photoUrl');
+                    // Create an instance of LogOutApiService
+                    var logoutApiService = await LogOutApiService.create();
+
+                    // Wait for authToken to be initialized
+                    logoutApiService.authToken;
+
+                    // Call the signOut method on the instance
+                    if (await logoutApiService.signOut()) {
+                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  Login())); // Close the drawer
+                    }
                   },
                   child: Text(
                     'Logout',

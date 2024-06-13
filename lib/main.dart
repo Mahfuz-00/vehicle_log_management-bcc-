@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 
 import 'package:rename_app/rename_app.dart';
 
-import 'UI/Splashscreen UI/splashscreenUI.dart';
+import 'UI/Pages/Splashscreen UI/splashscreenUI.dart';
+
+
 
 void main() {
   runApp(const MyApp());

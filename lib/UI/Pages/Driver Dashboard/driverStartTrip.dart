@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../Data/API Service (Start Trip)/apiServiceStartTrip.dart';
-import '../../Data/Models/tripRequestModelApprovedStaff.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Start Trip)/apiServiceStartTrip.dart';
+import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
+import '../../Widgets/customclipperbottomnavbar.dart';
+import '../../Widgets/customnotchpainter.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
-import '../Widgets/customclipperbottomnavbar.dart';
-import '../Widgets/customnotchpainter.dart';
 import 'driverStopTrip.dart';
 import 'driverdashboardUI.dart';
 

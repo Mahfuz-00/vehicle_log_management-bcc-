@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Forgot Password)/apiServiceForgotPassword.dart';
 import '../Login UI/loginUI.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
-import '../../Data/API Service (Forgot Password)/apiServiceForgotPassword.dart';
 import 'otpverficationUI.dart';
 
 class ForgotPassword extends StatefulWidget {

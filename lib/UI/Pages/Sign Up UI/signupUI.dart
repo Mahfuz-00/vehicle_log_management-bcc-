@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
 
-import '../../Data/Models/registermodels.dart';
+import '../../../Data/Models/registermodels.dart';
+import '../../Widgets/dropdownfield.dart';
+import '../../Widgets/radiooptionSignUp.dart';
 import '../Login UI/loginUI.dart';
-import '../Widgets/dropdownfield.dart';
-import '../Widgets/radiooptionSignUp.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});

@@ -1,8 +1,8 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../Data/API Service (Forgot Password)/apiServiceCreateNewPassword.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Forgot Password)/apiServiceCreateNewPassword.dart';
 import 'passwordchangedUI.dart';
 
 class CreateNewPassword extends StatefulWidget {

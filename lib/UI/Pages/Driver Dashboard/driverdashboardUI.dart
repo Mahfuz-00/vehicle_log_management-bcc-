@@ -1,34 +1,33 @@
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 
-import '../../Data/API Service (Dashboard)/apiserviceDashboard.dart';
-import '../../Data/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../Data/API Service (Notification)/apiServiceNotificationRead.dart';
-import '../../Data/Models/tripRequestModel.dart';
-import '../../Data/Models/tripRequestModelApprovedStaff.dart';
-import '../../Data/Models/tripRequestModelRecent.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
+import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
+import '../../../Data/Models/tripRequestModel.dart';
+import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
+import '../../../Data/Models/tripRequestModelRecent.dart';
+import '../../Widgets/RecentTripDetails.dart';
+import '../../Widgets/staffTripTile.dart';
+import '../../Widgets/templateerrorcontainer.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
-import '../Trip Request Form(Staff)/triprequestformUI.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
-import '../Widgets/RecentTripDetails.dart';
-import '../Widgets/StaffApprovedTripDetails.dart';
-import '../Widgets/requestWidget.dart';
-import '../Widgets/staffPendingTripDetails.dart';
-import '../Widgets/staffTripTile.dart';
-import '../Widgets/templateerrorcontainer.dart';
+import 'driverStartTrip.dart';
+import 'driverStopTrip.dart';
 
-class StaffDashboard extends StatefulWidget {
+class DriverDashboard extends StatefulWidget {
   final bool shouldRefresh;
 
-  const StaffDashboard({Key? key, this.shouldRefresh = false})
+  const DriverDashboard({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<StaffDashboard> createState() => _StaffDashboardState();
+  State<DriverDashboard> createState() => _DriverDashboardState();
 }
 
-class _StaffDashboardState extends State<StaffDashboard> {
+class _DriverDashboardState extends State<DriverDashboard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -91,12 +90,12 @@ class _StaffDashboardState extends State<StaffDashboard> {
       // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
-      final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
+      final List<dynamic> pendingRequestsData = records['New_Trip'] ?? [];
       for (var index = 0; index < pendingRequestsData.length; index++) {
         print(
             'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
-      final List<dynamic> acceptedRequestsData = records['Accepted'] ?? [];
+      final List<dynamic> acceptedRequestsData = records['Ongoing'] ?? [];
       for (var index = 0; index < acceptedRequestsData.length; index++) {
         print(
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
@@ -135,18 +134,22 @@ class _StaffDashboardState extends State<StaffDashboard> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripStaff(
-                  staff: TripRequest(
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      time: request['time'],
-                      type: request['trip_type']),
+                builder: (context) => DriverStartTrip(
+                  staff: TripRequestApprovedStaff(
+                    driver: request['driver'],
+                    Car: request['car'],
+                    id: request['trip_id'],
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    time: request['time'],
+                    type: request['trip_type'],
+                  ),
                 ),
               ),
             );
@@ -169,10 +172,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
               time: request['time'],
               type: request['trip_type']),
           onPressed: () {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ApprovedTripStaff(
+                builder: (context) => DriverStopTrip(
                   staff: TripRequestApprovedStaff(
                     driver: request['driver'],
                     Car: request['car'],
@@ -190,6 +193,22 @@ class _StaffDashboardState extends State<StaffDashboard> {
                   ),
                 ),
               ),
+            );
+            DriverStopTrip(
+              staff: TripRequestApprovedStaff(
+                  driver: request['driver'],
+                  Car: request['car'],
+                  name: request['name'],
+                  designation: request['designation'],
+                  department: request['department'],
+                  purpose: request['purpose'],
+                  phone: request['phone'],
+                  destinationFrom: request['destination_from'],
+                  destinationTo: request['destination_to'],
+                  date: request['date'],
+                  time: request['time'],
+                  type: request['trip_type'],
+                  id: request['trip_id']),
             );
           },
         );
@@ -284,6 +303,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    double fabHeight =
+        56.0; // Default FAB height is 56, adjust if your FAB size is different
+    double containerHeight = screenHeight * 0.08; // Your container height
+
     return _pageLoading
         ? Scaffold(
             backgroundColor: Colors.white,
@@ -296,13 +319,14 @@ class _StaffDashboardState extends State<StaffDashboard> {
             child: PopScope(
               canPop: false,
               child: Scaffold(
+                extendBody: true,
                 key: _scaffoldKey,
                 appBar: AppBar(
                   backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                   titleSpacing: 5,
                   automaticallyImplyLeading: false,
                   title: const Text(
-                    'Staff Dashboard',
+                    'Driver Dashboard',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -352,21 +376,11 @@ class _StaffDashboardState extends State<StaffDashboard> {
                           ),
                       ],
                     ),
-                    IconButton(
-                      onPressed: () {
-                        _showLogoutDialog(context);
-                      },
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Colors.white,
-                      ),
-                    ),
                   ],
                 ),
                 body: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20.0, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
                     child: SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 15.0),
@@ -385,116 +399,48 @@ class _StaffDashboardState extends State<StaffDashboard> {
                               SizedBox(
                                 height: 20,
                               ),
-                              Text('Pending Trip',
+                              Text('New Trip',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 25,
+                                    fontSize: 30,
                                     fontFamily: 'default',
                                   )),
                               SizedBox(height: screenHeight * 0.01),
                               Divider(),
-                              RequestsWidget(
-                                  loading: _isLoading,
-                                  fetch: _isFetched,
-                                  errorText: 'You haven\'t created any trip request yet.',
-                                  listWidget: pendingRequests,
-                                  fetchData: fetchConnectionRequests(),
-                                  numberOfWidgets: 10,
-                                  showSeeAllButton: shouldShowSeeAllButton(
-                                      pendingRequests),
-                                  seeAllButtonText: '',
-                                  nextPage: null),
-                             /* Container(
-                                //height: screenHeight*0.25,
-                                child: FutureBuilder<void>(
-                                    future: _isLoading
-                                        ? null
-                                        : fetchConnectionRequests(),
-                                    builder: (context, snapshot) {
-                                      if (!_isFetched) {
-                                        // Return a loading indicator while waiting for data
-                                        return Container(
-                                          height:
-                                              200, // Adjust height as needed
-                                          width:
-                                              screenWidth, // Adjust width as needed
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        // Handle errors
-                                        return buildNoRequestsWidget(
-                                            screenWidth,
-                                            'Error: ${snapshot.error}');
-                                      } else if (_isFetched) {
-                                        if (pendingRequests.isNotEmpty) {
-                                          // If data is loaded successfully, display the ListView
-                                          return Container(
-                                            child: Column(
-                                              children: [
-                                                ListView.separated(
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      NeverScrollableScrollPhysics(),
-                                                  itemCount: pendingRequests
-                                                              .length >
-                                                          10
-                                                      ? 10
-                                                      : pendingRequests.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    // Display each connection request using ConnectionRequestInfoCard
-                                                    return pendingRequests[
-                                                        index];
-                                                  },
-                                                  separatorBuilder:
-                                                      (context, index) =>
-                                                          const SizedBox(
-                                                              height: 10),
-                                                ),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                *//*if (shouldShowSeeAllButton(
-                                                    pendingRequests))
-                                                  buildSeeAllButtonRequestList(
-                                                      context)*//*
-                                              ],
-                                            ),
-                                          );
-                                        } else if (pendingRequests.isEmpty) {
-                                          // Handle the case when there are no pending connection requests
-                                          return buildNoRequestsWidget(
-                                              screenWidth,
-                                              'You haven\'t created any trip request yet.');
-                                        }
-                                      }
-                                      // Return a default widget if none of the conditions above are met
-                                      return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                    }),
-                              ),*/
+                              SizedBox(height: screenHeight * 0.01),
+                              if (acceptedRequests.isEmpty) ...[
+                                RequestsWidget(
+                                    loading: _isLoading,
+                                    fetch: _isFetched,
+                                    errorText: 'No New Trip.',
+                                    listWidget: pendingRequests,
+                                    fetchData: fetchConnectionRequests(),
+                                    numberOfWidgets: 10,
+                                    showSeeAllButton: shouldShowSeeAllButton(
+                                        pendingRequests),
+                                    seeAllButtonText: '',
+                                    nextPage: null),
+                              ] else if (acceptedRequests.isNotEmpty) ...[
+                                buildNoRequestsWidget(screenWidth,
+                                    'You Currently on a Trip. Please complete that trip to start a new trip.')
+                              ],
                               Divider(),
                               SizedBox(height: screenHeight * 0.02),
-                              Text('Approved Trip',
+                              Text('Ongoing Trip',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 25,
+                                    fontSize: 30,
                                     fontFamily: 'default',
                                   )),
                               SizedBox(height: screenHeight * 0.01),
                               Divider(),
+                              SizedBox(height: screenHeight * 0.01),
                               RequestsWidget(
                                   loading: _isLoading,
                                   fetch: _isFetched,
-                                  errorText: 'No trip request reviewed yet.',
+                                  errorText: 'No trip onging.',
                                   listWidget: acceptedRequests,
                                   fetchData: fetchConnectionRequests(),
                                   numberOfWidgets: 10,
@@ -502,7 +448,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                       acceptedRequests),
                                   seeAllButtonText: '',
                                   nextPage: null),
-                           /*   Container(
+                              /*Container(
                                 //height: screenHeight*0.25,
                                 child: FutureBuilder<void>(
                                     future: _isLoading
@@ -569,14 +515,14 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                         } else if (acceptedRequests.isEmpty) {
                                           // Handle the case when there are no pending connection requests
                                           return buildNoRequestsWidget(
-                                              screenWidth,
-                                              'No trip request reviewed yet.');
+                                              screenWidth, 'No trip onging.');
                                         }
                                       }
                                       // Return a default widget if none of the conditions above are met
                                       return SizedBox(); // You can return an empty SizedBox or any other default widget
                                     }),
                               ),*/
+                              SizedBox(height: screenHeight * 0.01),
                               Divider(),
                               SizedBox(height: screenHeight * 0.02),
                               Text('Recent Trip',
@@ -588,10 +534,11 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                   )),
                               SizedBox(height: screenHeight * 0.01),
                               Divider(),
+                              SizedBox(height: screenHeight * 0.01),
                               RequestsWidget(
                                   loading: _isLoading,
                                   fetch: _isFetched,
-                                  errorText: 'You haven\'t take any trip yet.',
+                                  errorText: 'You haven\'t finished any trip yet.',
                                   listWidget: recentRequests,
                                   fetchData: fetchConnectionRequests(),
                                   numberOfWidgets: 10,
@@ -599,7 +546,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                       recentRequests),
                                   seeAllButtonText: '',
                                   nextPage: null),
-                        /*      Container(
+                              /*Container(
                                 //height: screenHeight*0.25,
                                 child: FutureBuilder<void>(
                                     future: _isLoading
@@ -667,44 +614,13 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                           // Handle the case when there are no pending connection requests
                                           return buildNoRequestsWidget(
                                               screenWidth,
-                                              'You haven\'t take any trip yet.');
+                                              'You haven\'t finished any trip yet.');
                                         }
                                       }
                                       // Return a default widget if none of the conditions above are met
                                       return SizedBox(); // You can return an empty SizedBox or any other default widget
                                     }),
                               ),*/
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.02),
-                              Center(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromRGBO(25, 192, 122, 1),
-                                    fixedSize: Size(
-                                        MediaQuery.of(context).size.width * 0.8,
-                                        MediaQuery.of(context).size.height *
-                                            0.1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                TripRequestForm()));
-                                  },
-                                  child: const Text('New Trip Request',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'default',
-                                      )),
-                                ),
-                              )
                             ],
                           ),
                         ),
@@ -712,136 +628,141 @@ class _StaffDashboardState extends State<StaffDashboard> {
                     ),
                   ),
                 ),
-                bottomNavigationBar: Container(
+                bottomNavigationBar: BottomAppBar(
+                  color: Colors.transparent,
+                  elevation: 5,
                   height: screenHeight * 0.08,
-                  color: const Color.fromRGBO(25, 192, 122, 1),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => StaffDashboard(
-                                        shouldRefresh: true,
-                                      )));
-                        },
-                        child: Container(
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.home,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Home',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const TripRequestForm()));
-                        },
-                        behavior: HitTestBehavior.translucent,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                            left: BorderSide(
-                              color: Colors.black,
-                              width: 1.0,
+                  padding: EdgeInsets.all(0),
+                  notchMargin: 10.0,
+                  shape: CircularNotchedRectangle(),
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(5),
+                      topRight: Radius.circular(5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DriverDashboard(
+                                          shouldRefresh: true,
+                                        )));
+                          },
+                          child: Container(
+                            width: screenWidth / 3,
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(25, 192, 122, 1),
                             ),
-                          )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.add_circle_outlined,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Trip Request',
-                                style: TextStyle(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.home,
+                                  size: 30,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Profile(shouldRefresh:  true,)));
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                            left: BorderSide(
-                              color: Colors.black,
-                              width: 1.0,
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  'Home',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    fontFamily: 'default',
+                                  ),
+                                ),
+                              ],
                             ),
-                          )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Profile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
                           ),
                         ),
-                      ),
-                    ],
+                        GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Profile(
+                                          shouldRefresh: true,
+                                        )));
+                          },
+                          child: Container(
+                            width: screenWidth / 3,
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(25, 192, 122, 1),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.person,
+                                  size: 30,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  'Profile',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    fontFamily: 'default',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            _showLogoutDialog(context);
+                          },
+                          behavior: HitTestBehavior.translucent,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: const Color.fromRGBO(25, 192, 122, 1),
+                                border: Border(
+                                  left: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                )),
+                            width: screenWidth / 3,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.logout,
+                                  size: 30,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Text(
+                                  'Log Out',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    fontFamily: 'default',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -974,27 +895,9 @@ class _StaffDashboardState extends State<StaffDashboard> {
                   width: 10,
                 ),
                 ElevatedButton(
-                  onPressed: () async {
-                    // Clear user data from SharedPreferences
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.remove('userName');
-                    await prefs.remove('organizationName');
-                    await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
-                    var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
-                    logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
-                    if (await logoutApiService.signOut()) {
-                      Navigator.pop(context);
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  Login())); // Close the drawer
-                    }
+                  onPressed: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => const Login()));
                   },
                   child: Text(
                     'Logout',

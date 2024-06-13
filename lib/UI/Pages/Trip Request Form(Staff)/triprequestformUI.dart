@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import '../../Data/API Service (Trip Request)/apiServiceTripRequest.dart';
-import '../../Data/Models/tripRequestModel.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Trip Request)/apiServiceTripRequest.dart';
+import '../../../Data/Models/tripRequestModel.dart';
+import '../../Widgets/radiooption.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
-import '../Widgets/radiooption.dart';
+
 
 class TripRequestForm extends StatefulWidget {
   const TripRequestForm({super.key});

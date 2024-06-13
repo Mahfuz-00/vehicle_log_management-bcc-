@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../Data/API Service (Stop Trip)/apiServiceStopTrip.dart';
-import '../../Data/Models/tripRequestModelApprovedStaff.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Stop Trip)/apiServiceStopTrip.dart';
+import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
+import '../../Widgets/customclipperbottomnavbar.dart';
+import '../../Widgets/customnotchpainter.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
-import '../Widgets/customclipperbottomnavbar.dart';
-import '../Widgets/customnotchpainter.dart';
 import 'driverdashboardUI.dart';
 
 class DriverStopTrip extends StatefulWidget {

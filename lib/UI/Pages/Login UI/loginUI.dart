@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../Data/API Service (Login)/apiservicelogin.dart';
-import '../../Data/API Service (Profile)/apiserviceprofile.dart';
-import '../../Data/Models/loginmodels.dart';
-import '../../Data/Models/profilemodel.dart';
+import '../../../Data/Data Sources/API Service (Login)/apiservicelogin.dart';
+import '../../../Data/Data Sources/API Service (Profile)/apiserviceprofile.dart';
+import '../../../Data/Models/loginmodels.dart';
+import '../../../Data/Models/profilemodel.dart';
 import '../Admin Dashboard/admindashboardUI.dart';
 import '../Driver Dashboard/driverdashboardUI.dart';
 import '../Forgot Password UI/forgotpasswordUI.dart';

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../Data/API Service (Auth SR Officer)/apiServiceSROfficerAuth.dart';
+import '../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../Data/Data Sources/API Service (Auth SR Officer)/apiServiceSROfficerAuth.dart';
 import '../../Data/Models/tripRequestModelSROfficer.dart';
-import '../Senior Officer Dashboard/srofficerdashboardUI.dart';
-import 'Connection Checker/internetconnectioncheck.dart';
+import '../Pages/Senior Officer Dashboard/srofficerdashboardUI.dart';
+
 
 class PendingTripSROfficer extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();

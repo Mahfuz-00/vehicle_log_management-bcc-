@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../Data/API Service (Fetch Drivers)/apiServiceFetchDrivers.dart';
-import '../../Data/Api Service (Assign Driver)/apiServiceAssignDriver.dart';
+import '../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../Data/Data Sources/API Service (Fetch Drivers)/apiServiceFetchDrivers.dart';
+import '../../Data/Data Sources/Api Service (Assign Driver)/apiServiceAssignDriver.dart';
 import '../../Data/Models/tripRequestModelSROfficer.dart';
-import '../Admin Dashboard/admindashboardUI.dart';
+import '../Pages/Admin Dashboard/admindashboardUI.dart';
 import 'AvailableDriverDetails.dart';
-import 'Connection Checker/internetconnectioncheck.dart';
 import 'dropdownmodel.dart';
 
 class PendingTripAdmin extends StatefulWidget {

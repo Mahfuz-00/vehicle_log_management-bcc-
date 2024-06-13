@@ -1,39 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 
-import '../../Data/API Service (Dashboard)/apiserviceDashboard.dart';
-import '../../Data/API Service (Notification)/apiServiceNotificationRead.dart';
-import '../../Data/Models/tripRequestModel.dart';
-import '../../Data/Models/tripRequestModelOngingTrip.dart';
-import '../../Data/Models/tripRequestModelRecent.dart';
-import '../../Data/Models/tripRequestModelSROfficer.dart';
+import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
+import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
+import '../../../Data/Models/tripRequestModel.dart';
+import '../../../Data/Models/tripRequestModelOngingTrip.dart';
+import '../../../Data/Models/tripRequestModelSROfficer.dart';
+import '../../Widgets/OngoingTripDetails.dart';
+import '../../Widgets/SrOfficerPendingTripDetails.dart';
+import '../../Widgets/requestWidget.dart';
+import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
-import '../Widgets/AdminPendingTripDetails.dart';
-import '../Widgets/AvailableDriverDetails.dart';
-import '../Widgets/Connection Checker/internetconnectioncheck.dart';
-import '../Widgets/OngoingTripDetails.dart';
-import '../Widgets/RecentTripDetails.dart';
-import '../Widgets/staffTripTile.dart';
-import '../Widgets/templateerrorcontainer.dart';
 
-class AdminDashboard extends StatefulWidget {
+
+
+class SROfficerDashboard extends StatefulWidget {
   final bool shouldRefresh;
 
-  const AdminDashboard({Key? key, this.shouldRefresh = false})
+  const SROfficerDashboard({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  State<SROfficerDashboard> createState() => _SROfficerDashboardState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
+class _SROfficerDashboardState extends State<SROfficerDashboard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
-  List<Widget> recentRequests = [];
-  List<Widget> drivers = [];
   bool _isFetched = false;
   bool _isLoading = false;
   bool _pageLoading = true;
@@ -92,33 +88,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
       // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
-      final List<dynamic> driverData = records['Available_Driver'] ?? [];
-      for (var index = 0; index < driverData.length; index++) {
-        print('Pending Request at index $index: ${driverData[index]}\n');
-      }
-
-      // Map pending requests to widgets
-      final List<Widget> driverWidgets = driverData.map((request) {
-        return DriverInfoCard(
-          Name: request['name'],
-          MobileNo: request['phone'],
-          CarName: request['car_name'],
-        );
-      }).toList();
-
-      final List<dynamic> pendingRequestsData = records['New_Trip'] ?? [];
+      final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
       for (var index = 0; index < pendingRequestsData.length; index++) {
         print(
             'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
-      final List<dynamic> acceptedRequestsData = records['Ongoing'] ?? [];
+      final List<dynamic> acceptedRequestsData = records['Accepted'] ?? [];
       for (var index = 0; index < acceptedRequestsData.length; index++) {
         print(
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
-      }
-      final List<dynamic> recentTripData = records['Recent'] ?? [];
-      for (var index = 0; index < recentTripData.length; index++) {
-        print('Pending Request at index $index: ${recentTripData[index]}\n');
       }
 
       // Map pending requests to widgets
@@ -150,8 +128,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripAdmin(
-                  shouldRefresh: true,
+                builder: (context) => PendingTripSROfficer(
                   staff: TripRequestSROfficer(
                       id: request['trip_id'],
                       name: request['name'],
@@ -211,51 +188,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         );
       }).toList();
 
-      final List<Widget> recentWidgets = recentTripData.map((request) {
-        return StaffTile(
-          staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              time: request['time'],
-              type: request['trip_type']),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RecentTripDetails(
-                  staff: TripRecent(
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      time: request['time'],
-                      type: request['trip_type'],
-                      driver: request['driver'],
-                      Car: request['car'],
-                      id: request['trip_id'],
-                      Duration: request['duration']),
-                ),
-              ),
-            );
-          },
-        );
-      }).toList();
-
       setState(() {
-        drivers = driverWidgets;
         pendingRequests = pendingWidgets;
         acceptedRequests = acceptedWidgets;
-        recentRequests = recentWidgets;
         _isFetched = true;
       });
     } catch (e) {
@@ -318,7 +253,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   titleSpacing: 5,
                   automaticallyImplyLeading: false,
                   title: const Text(
-                    'Admin Dashboard',
+                    'Sr Officer Dashboard',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -338,7 +273,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           onPressed: () async {
                             _showNotificationsOverlay(context);
                             var notificationApiService =
-                                await NotificationReadApiService.create();
+                            await NotificationReadApiService.create();
                             notificationApiService.readNotification();
                           },
                         ),
@@ -389,87 +324,190 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             SizedBox(
                               height: 20,
                             ),
-                            Text('Available Drivers',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 30,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No Available Driver.',
-                                listWidget: drivers,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
-                                showSeeAllButton:
-                                    (shouldShowSeeAllButton(drivers)),
-                                seeAllButtonText: '',
-                                nextPage: null),
-                            SizedBox(height: screenHeight * 0.02),
                             Text('New Trip',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 30,
+                                  fontSize: 25,
                                   fontFamily: 'default',
                                 )),
                             SizedBox(height: screenHeight * 0.01),
+                            Divider(),
                             RequestsWidget(
                                 loading: _isLoading,
                                 fetch: _isFetched,
-                                errorText: 'There aren\'t any trip request yet.',
+                                errorText: 'No new trip request.',
                                 listWidget: pendingRequests,
                                 fetchData: fetchConnectionRequests(),
                                 numberOfWidgets: 10,
-                                showSeeAllButton: (shouldShowSeeAllButton(pendingRequests)),
+                                showSeeAllButton: shouldShowSeeAllButton(
+                                    pendingRequests),
                                 seeAllButtonText: '',
                                 nextPage: null),
+                           /* Container(
+                              //height: screenHeight*0.25,
+                              child: FutureBuilder<void>(
+                                  future: _isLoading
+                                      ? null
+                                      : fetchConnectionRequests(),
+                                  builder: (context, snapshot) {
+                                    if (!_isFetched) {
+                                      // Return a loading indicator while waiting for data
+                                      return Container(
+                                        height: 200, // Adjust height as needed
+                                        width:
+                                            screenWidth, // Adjust width as needed
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      // Handle errors
+                                      return buildNoRequestsWidget(screenWidth,
+                                          'Error: ${snapshot.error}');
+                                    } else if (_isFetched) {
+                                      if (pendingRequests.isNotEmpty) {
+                                        // If data is loaded successfully, display the ListView
+                                        return Container(
+                                          child: Column(
+                                            children: [
+                                              ListView.separated(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    NeverScrollableScrollPhysics(),
+                                                itemCount:
+                                                    pendingRequests.length > 10
+                                                        ? 10
+                                                        : pendingRequests
+                                                            .length,
+                                                itemBuilder: (context, index) {
+                                                  // Display each connection request using ConnectionRequestInfoCard
+                                                  return pendingRequests[index];
+                                                },
+                                                separatorBuilder: (context,
+                                                        index) =>
+                                                    const SizedBox(height: 10),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              *//*if (shouldShowSeeAllButton(
+                                                    pendingRequests))
+                                                  buildSeeAllButtonRequestList(
+                                                      context)*//*
+                                            ],
+                                          ),
+                                        );
+                                      } else if (pendingRequests.isEmpty) {
+                                        // Handle the case when there are no pending connection requests
+                                        return buildNoRequestsWidget(
+                                            screenWidth,
+                                            'No new trip request.');
+                                      }
+                                    }
+                                    // Return a default widget if none of the conditions above are met
+                                    return SizedBox(); // You can return an empty SizedBox or any other default widget
+                                  }),
+                            ),*/
+                            Divider(),
                             SizedBox(height: screenHeight * 0.02),
                             Text('Ongoing Trip',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 30,
+                                  fontSize: 25,
                                   fontFamily: 'default',
                                 )),
                             SizedBox(height: screenHeight * 0.01),
+                            Divider(),
                             RequestsWidget(
                                 loading: _isLoading,
                                 fetch: _isFetched,
-                                errorText: 'No trip onging.',
+                                errorText: 'No trip request reviewed yet.',
                                 listWidget: acceptedRequests,
                                 fetchData: fetchConnectionRequests(),
                                 numberOfWidgets: 10,
-                                showSeeAllButton: (shouldShowSeeAllButton(acceptedRequests)),
+                                showSeeAllButton: shouldShowSeeAllButton(
+                                    acceptedRequests),
                                 seeAllButtonText: '',
                                 nextPage: null),
-                            Divider(),
-                           /* SizedBox(height: screenHeight * 0.02),
-                            Text('Recent Trip',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 30,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            Divider(),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No Recent Trip.',
-                                listWidget: recentRequests,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
-                                showSeeAllButton: (shouldShowSeeAllButton(recentRequests)),
-                                seeAllButtonText: '',
-                                nextPage: null),*/
-                            SizedBox(
-                              height: 20,
-                            )
+                        /*    Container(
+                              //height: screenHeight*0.25,
+                              child: FutureBuilder<void>(
+                                  future: _isLoading
+                                      ? null
+                                      : fetchConnectionRequests(),
+                                  builder: (context, snapshot) {
+                                    if (!_isFetched) {
+                                      // Return a loading indicator while waiting for data
+                                      return Container(
+                                        height: 200, // Adjust height as needed
+                                        width:
+                                            screenWidth, // Adjust width as needed
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      // Handle errors
+                                      return buildNoRequestsWidget(screenWidth,
+                                          'Error: ${snapshot.error}');
+                                    } else if (_isFetched) {
+                                      if (acceptedRequests.isNotEmpty) {
+                                        // If data is loaded successfully, display the ListView
+                                        return Container(
+                                          child: Column(
+                                            children: [
+                                              ListView.separated(
+                                                shrinkWrap: true,
+                                                physics:
+                                                    NeverScrollableScrollPhysics(),
+                                                itemCount:
+                                                    acceptedRequests.length > 10
+                                                        ? 10
+                                                        : acceptedRequests
+                                                            .length,
+                                                itemBuilder: (context, index) {
+                                                  // Display each connection request using ConnectionRequestInfoCard
+                                                  return acceptedRequests[
+                                                      index];
+                                                },
+                                                separatorBuilder: (context,
+                                                        index) =>
+                                                    const SizedBox(height: 10),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              *//*if (shouldShowSeeAllButton(
+                                                    pendingRequests))
+                                                  buildSeeAllButtonRequestList(
+                                                      context)*//*
+                                            ],
+                                          ),
+                                        );
+                                      } else if (acceptedRequests.isEmpty) {
+                                        // Handle the case when there are no pending connection requests
+                                        return buildNoRequestsWidget(
+                                            screenWidth,
+                                            'No trip request reviewed yet.');
+                                      }
+                                    }
+                                    // Return a default widget if none of the conditions above are met
+                                    return SizedBox(); // You can return an empty SizedBox or any other default widget
+                                  }),
+                            ),*/
+                            Divider()
                           ],
                         ),
                       ),
@@ -488,8 +526,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      AdminDashboard(shouldRefresh: true)));
+                                  builder: (context) => SROfficerDashboard()));
                         },
                         child: Container(
                           width: screenWidth / 3,
@@ -524,9 +561,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const Profile(
-                                        shouldRefresh: true,
-                                      )));
+                                  builder: (context) => const Profile(shouldRefresh: true,)));
                         },
                         behavior: HitTestBehavior.translucent,
                         child: Container(
@@ -590,7 +625,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 height: 5,
                               ),
                               Text(
-                                'Logout',
+                                'Log Out',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -635,41 +670,40 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
             child: notifications.isEmpty
                 ? Container(
-                    height: 50,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.notifications_off),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          'No new notifications',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(8),
-                    shrinkWrap: true,
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.info_outline),
-                            title: Text(notifications[index]),
-                            onTap: () {
-                              // Handle notification tap if necessary
-                              overlayEntry.remove();
-                            },
-                          ),
-                          if (index < notifications.length - 1) Divider()
-                        ],
-                      );
-                    },
+              height: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.notifications_off),
+                  SizedBox(width: 10,),
+                  Text(
+                    'No new notifications',
+                    style: TextStyle(fontSize: 16),
                   ),
+                ],
+              ),
+            )
+                : ListView.builder(
+              padding: EdgeInsets.all(8),
+              shrinkWrap: true,
+              itemCount: notifications.length,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.info_outline),
+                      title: Text(notifications[index]),
+                      onTap: () {
+                        // Handle notification tap if necessary
+                        overlayEntry.remove();
+                      },
+                    ),
+                    if (index < notifications.length - 1)
+                      Divider()
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
