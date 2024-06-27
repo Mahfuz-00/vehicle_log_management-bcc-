@@ -252,23 +252,27 @@ class _LoginState extends State<Login> {
                                         MaterialPageRoute(builder: (context) => StaffDashboard(shouldRefresh: true)),
                                       );
                                     }
-                                    if (userType == 'vlm_driver') {
+                                    else if (userType == 'vlm_driver') {
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(builder: (context) => DriverDashboard(shouldRefresh: true)),
                                       );
                                     }
-                                    if (userType == 'vlm_senior_officer') {
+                                    else if (userType == 'vlm_senior_officer') {
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(builder: (context) => SROfficerDashboard(shouldRefresh: true)),
                                       );
                                     }
-                                    if (userType == 'vlm_admin') {
+                                    else if (userType == 'vlm_admin') {
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(builder: (context) => AdminDashboard(shouldRefresh: true)),
                                       );
+                                    }
+                                    else{
+                                      String errorMessage = 'Invalid User!, Please enter a valid email address.';
+                                      showTopToast(context, errorMessage);
                                     }
                                   }
                                 }
@@ -376,7 +380,7 @@ class _LoginState extends State<Login> {
         // Handle login error
         String errorMessage = 'Incorrect Email and Password.';
         if (e.toString().contains('Invalid User')) {
-          errorMessage = 'Please enter a valid email address.';
+          errorMessage = 'Invalid User!, Please enter a valid email address.';
         }
         else if (e.toString().contains('Invalid Credentials')) {
           errorMessage = 'Incorrect Password. Try again.';
