@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/ongoingtriprequestfull.dart';
+import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/pendingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
+import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
 import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelOngingTrip.dart';
 import '../../../Data/Models/tripRequestModelRecent.dart';
 import '../../../Data/Models/tripRequestModelSROfficer.dart';
+import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/AdminPendingTripDetails.dart';
 import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/OngoingTripDetails.dart';
@@ -276,7 +281,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     super.initState();
     print('initState called');
     loadUserProfile();
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(Duration(seconds: 2), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
         // Refresh logic here, e.g., fetch data again
@@ -308,7 +313,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
               child: CircularProgressIndicator(),
             ),
           )
-        : InternetChecker(
+        : BlocBuilder<AuthCubit, AuthState>(
+      builder: (context, state) {
+        if (state is AuthAuthenticated) {
+          final userProfile = state.userProfile;
+          return InternetChecker(
             child: PopScope(
               canPop: false,
               child: Scaffold(
@@ -338,7 +347,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           onPressed: () async {
                             _showNotificationsOverlay(context);
                             var notificationApiService =
-                                await NotificationReadApiService.create();
+                            await NotificationReadApiService.create();
                             notificationApiService.readNotification();
                           },
                         ),
@@ -378,7 +387,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         child: Column(
                           children: [
                             Center(
-                              child: Text('Welcome, $userName',
+                              child: Text('Welcome, ${userProfile.name}',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
@@ -405,7 +414,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 fetchData: fetchConnectionRequests(),
                                 numberOfWidgets: 10,
                                 showSeeAllButton:
-                                    (shouldShowSeeAllButton(drivers)),
+                                (shouldShowSeeAllButton(drivers)),
                                 seeAllButtonText: '',
                                 nextPage: null),
                             SizedBox(height: screenHeight * 0.02),
@@ -425,8 +434,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 fetchData: fetchConnectionRequests(),
                                 numberOfWidgets: 10,
                                 showSeeAllButton: (shouldShowSeeAllButton(pendingRequests)),
-                                seeAllButtonText: '',
-                                nextPage: null),
+                                seeAllButtonText: 'See all New Trips',
+                                nextPage: AdminDashboardPending(shouldRefresh: true,)),
                             SizedBox(height: screenHeight * 0.02),
                             Text('Ongoing Trip',
                                 style: TextStyle(
@@ -444,10 +453,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 fetchData: fetchConnectionRequests(),
                                 numberOfWidgets: 10,
                                 showSeeAllButton: (shouldShowSeeAllButton(acceptedRequests)),
-                                seeAllButtonText: '',
-                                nextPage: null),
+                                seeAllButtonText: 'See all Ongoing Trips',
+                                nextPage: AdminDashboardOngoing(shouldRefresh: true,)),
                             Divider(),
-                           /* SizedBox(height: screenHeight * 0.02),
+                            /* SizedBox(height: screenHeight * 0.02),
                             Text('Recent Trip',
                                 style: TextStyle(
                                   color: Colors.black,
@@ -465,8 +474,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 fetchData: fetchConnectionRequests(),
                                 numberOfWidgets: 10,
                                 showSeeAllButton: (shouldShowSeeAllButton(recentRequests)),
-                                seeAllButtonText: '',
-                                nextPage: null),*/
+                                seeAllButtonText: 'Seel all recent trips',
+                                nextPage: AdminDashboardRecent(shouldRefresh: true,)),*/
                             SizedBox(
                               height: 20,
                             )
@@ -525,18 +534,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => const Profile(
-                                        shouldRefresh: true,
-                                      )));
+                                    shouldRefresh: true,
+                                  )));
                         },
                         behavior: HitTestBehavior.translucent,
                         child: Container(
                           decoration: BoxDecoration(
                               border: Border(
-                            left: BorderSide(
-                              color: Colors.black,
-                              width: 1.0,
-                            ),
-                          )),
+                                left: BorderSide(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                              )),
                           width: screenWidth / 3,
                           padding: EdgeInsets.all(5),
                           child: Column(
@@ -571,11 +580,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         child: Container(
                           decoration: BoxDecoration(
                               border: Border(
-                            left: BorderSide(
-                              color: Colors.black,
-                              width: 1.0,
-                            ),
-                          )),
+                                left: BorderSide(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                              )),
                           width: screenWidth / 3,
                           padding: EdgeInsets.all(5),
                           child: Column(
@@ -608,6 +617,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
             ),
           );
+        } else {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+      },
+    );
   }
 
   void _showNotificationsOverlay(BuildContext context) {
@@ -735,9 +751,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   width: 10,
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => const Login()));
+                  onPressed: () async {
+                    // Clear user data from SharedPreferences
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.remove('userName');
+                    await prefs.remove('organizationName');
+                    await prefs.remove('photoUrl');
+                    // Create an instance of LogOutApiService
+                    var logoutApiService = await LogOutApiService.create();
+
+                    // Wait for authToken to be initialized
+                    logoutApiService.authToken;
+
+                    // Call the signOut method on the instance
+                    if (await logoutApiService.signOut()) {
+                      Navigator.pop(context);
+                      context.read<AuthCubit>().logout();
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  Login())); // Close the drawer
+                    }
                   },
                   child: Text(
                     'Logout',

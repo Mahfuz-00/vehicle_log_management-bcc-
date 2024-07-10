@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vehicle_log_management/UI/Pages/Senior%20Officer%20Dashboard%20(Full)/ongoingtriprequestsfull.dart';
-import 'package:vehicle_log_management/UI/Pages/Senior%20Officer%20Dashboard%20(Full)/pendingtriprequestfull.dart';
+import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
 
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
-import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
 import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelOngingTrip.dart';
 import '../../../Data/Models/tripRequestModelSROfficer.dart';
-import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/OngoingTripDetails.dart';
 import '../../Widgets/SrOfficerPendingTripDetails.dart';
 import '../../Widgets/requestWidget.dart';
@@ -21,17 +17,17 @@ import '../Profile UI/profileUI.dart';
 
 
 
-class SROfficerDashboard extends StatefulWidget {
+class SROfficerDashboardNewTrip extends StatefulWidget {
   final bool shouldRefresh;
 
-  const SROfficerDashboard({Key? key, this.shouldRefresh = false})
+  const SROfficerDashboardNewTrip({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<SROfficerDashboard> createState() => _SROfficerDashboardState();
+  State<SROfficerDashboardNewTrip> createState() => _SROfficerDashboardNewTripState();
 }
 
-class _SROfficerDashboardState extends State<SROfficerDashboard> {
+class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -65,7 +61,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
-          await apiService.fetchDashboardItems();
+      await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
         // No data available or an error occurred
         print(
@@ -216,7 +212,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
     super.initState();
     print('initState called');
     loadUserProfile();
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
         // Refresh logic here, e.g., fetch data again
@@ -242,118 +238,110 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
 
     return _pageLoading
         ? Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              // Show circular loading indicator while waiting
-              child: CircularProgressIndicator(),
+      backgroundColor: Colors.white,
+      body: Center(
+        // Show circular loading indicator while waiting
+        child: CircularProgressIndicator(),
+      ),
+    )
+        : InternetChecker(
+      child: PopScope(
+        canPop: false,
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+            titleSpacing: 5,
+            automaticallyImplyLeading: false,
+            title: const Text(
+              'Sr Officer Dashboard',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontFamily: 'default',
+              ),
             ),
-          )
-        : BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        if (state is AuthAuthenticated) {
-          final userProfile = state.userProfile;
-          return InternetChecker(
-            child: PopScope(
-              canPop: false,
-              child: Scaffold(
-                key: _scaffoldKey,
-                appBar: AppBar(
-                  backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
-                  titleSpacing: 5,
-                  automaticallyImplyLeading: false,
-                  title: const Text(
-                    'Sr Officer Dashboard',
-                    style: TextStyle(
+            centerTitle: true,
+            actions: [
+              Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.notifications,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      fontFamily: 'default',
                     ),
+                    onPressed: () async {
+                      _showNotificationsOverlay(context);
+                      var notificationApiService =
+                      await NotificationReadApiService.create();
+                      notificationApiService.readNotification();
+                    },
                   ),
-                  centerTitle: true,
-                  actions: [
-                    Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.notifications,
-                            color: Colors.white,
-                          ),
-                          onPressed: () async {
-                            _showNotificationsOverlay(context);
-                            var notificationApiService =
-                            await NotificationReadApiService.create();
-                            notificationApiService.readNotification();
-                          },
+                  if (notifications.isNotEmpty)
+                    Positioned(
+                      right: 11,
+                      top: 11,
+                      child: Container(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        if (notifications.isNotEmpty)
-                          Positioned(
-                            right: 11,
-                            top: 11,
-                            child: Container(
-                              padding: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 12,
-                                minHeight: 12,
-                              ),
-                              child: Text(
-                                '${notifications.length}',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 8,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
+                        constraints: BoxConstraints(
+                          minWidth: 12,
+                          minHeight: 12,
+                        ),
+                        child: Text(
+                          '${notifications.length}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
                           ),
-                      ],
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-                body: SingleChildScrollView(
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 30.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Center(
-                              child: Text('Welcome, ${userProfile.name}',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25,
-                                    fontFamily: 'default',
-                                  )),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Text('New Trip',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            Divider(),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No new trip request.',
-                                listWidget: pendingRequests,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
-                                showSeeAllButton: shouldShowSeeAllButton(
-                                    pendingRequests),
-                                seeAllButtonText: 'See all New Trips',
-                                nextPage: SROfficerDashboardNewTrip(shouldRefresh: true,)),
-                            /* Container(
+                ],
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 30.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Center(
+                        child: Text('Welcome, $userName',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25,
+                              fontFamily: 'default',
+                            )),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text('New Trip',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            fontFamily: 'default',
+                          )),
+                      SizedBox(height: screenHeight * 0.01),
+                      Divider(),
+                      RequestsWidgetShowAll(
+                          loading: _isLoading,
+                          fetch: _isFetched,
+                          errorText: 'No new trip request.',
+                          listWidget: pendingRequests,
+                          fetchData: fetchConnectionRequests(),
+                      ),
+                      /* Container(
                               //height: screenHeight*0.25,
                               child: FutureBuilder<void>(
                                   future: _isLoading
@@ -423,29 +411,29 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                     return SizedBox(); // You can return an empty SizedBox or any other default widget
                                   }),
                             ),*/
-                            Divider(),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text('Ongoing Trip',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            Divider(),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No trip request reviewed yet.',
-                                listWidget: acceptedRequests,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
-                                showSeeAllButton: shouldShowSeeAllButton(
-                                    acceptedRequests),
-                                seeAllButtonText: 'See all Ongoing Trips',
-                                nextPage: SROfficerDashboardOngoing(shouldRefresh: true,)),
-                            /*    Container(
+                   /*   Divider(),
+                      SizedBox(height: screenHeight * 0.02),
+                      Text('Ongoing Trip',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            fontFamily: 'default',
+                          )),
+                      SizedBox(height: screenHeight * 0.01),
+                      Divider(),
+                      RequestsWidget(
+                          loading: _isLoading,
+                          fetch: _isFetched,
+                          errorText: 'No trip request reviewed yet.',
+                          listWidget: acceptedRequests,
+                          fetchData: fetchConnectionRequests(),
+                          numberOfWidgets: 10,
+                          showSeeAllButton: shouldShowSeeAllButton(
+                              acceptedRequests),
+                          seeAllButtonText: '',
+                          nextPage: null),*/
+                      /*    Container(
                               //height: screenHeight*0.25,
                               child: FutureBuilder<void>(
                                   future: _isLoading
@@ -516,148 +504,141 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                     return SizedBox(); // You can return an empty SizedBox or any other default widget
                                   }),
                             ),*/
-                            Divider()
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                bottomNavigationBar: Container(
-                  height: screenHeight * 0.08,
-                  color: const Color.fromRGBO(25, 192, 122, 1),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SROfficerDashboard()));
-                        },
-                        child: Container(
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.home,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Home',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Profile(shouldRefresh: true,)));
-                        },
-                        behavior: HitTestBehavior.translucent,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: Colors.black,
-                                  width: 1.0,
-                                ),
-                              )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Profile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          _showLogoutDialog(context);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: Colors.black,
-                                  width: 1.0,
-                                ),
-                              )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.logout,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Log Out',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      //Divider()
                     ],
                   ),
                 ),
               ),
             ),
-          );
-        } else {
-          return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-      },
+          ),
+          bottomNavigationBar: Container(
+            height: screenHeight * 0.08,
+            color: const Color.fromRGBO(25, 192, 122, 1),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SROfficerDashboardNewTrip()));
+                  },
+                  child: Container(
+                    width: screenWidth / 3,
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.home,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          'Home',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            fontFamily: 'default',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Profile(shouldRefresh: true,)));
+                  },
+                  behavior: HitTestBehavior.translucent,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        border: Border(
+                          left: BorderSide(
+                            color: Colors.black,
+                            width: 1.0,
+                          ),
+                        )),
+                    width: screenWidth / 3,
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.person,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          'Profile',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            fontFamily: 'default',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    _showLogoutDialog(context);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        border: Border(
+                          left: BorderSide(
+                            color: Colors.black,
+                            width: 1.0,
+                          ),
+                        )),
+                    width: screenWidth / 3,
+                    padding: EdgeInsets.all(5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.logout,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          'Log Out',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            fontFamily: 'default',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -785,28 +766,9 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                   width: 10,
                 ),
                 ElevatedButton(
-                  onPressed: () async {
-                    // Clear user data from SharedPreferences
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.remove('userName');
-                    await prefs.remove('organizationName');
-                    await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
-                    var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
-                    logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
-                    if (await logoutApiService.signOut()) {
-                      Navigator.pop(context);
-                      context.read<AuthCubit>().logout();
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  Login())); // Close the drawer
-                    }
+                  onPressed: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => const Login()));
                   },
                   child: Text(
                     'Logout',

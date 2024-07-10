@@ -11,7 +11,7 @@ class AuthCubit extends Cubit<AuthState> {
   void login(UserProfile userProfile, String token) {
     emit(AuthAuthenticated(userProfile: userProfile, token: token));
     print('User profile and token saved in Cubit:');
-    print('User Profile: ${userProfile.Id}, ${userProfile.name}, ${userProfile.organization}, ${userProfile.photo}');
+    print('User Profile: ${userProfile.Id}, ${userProfile.name}, ${userProfile.photo}');
     print('Token: $token');
   }
 
@@ -23,7 +23,7 @@ class AuthCubit extends Cubit<AuthState> {
         token: currentState.token,
       ));
       print('User profile updated in Cubit:');
-      print('User Profile: ${userProfile.Id}, ${userProfile.name}, ${userProfile.organization}, ${userProfile.photo}');
+      print('User Profile: ${userProfile.Id}, ${userProfile.name}, ${userProfile.photo}');
     }
   }
 

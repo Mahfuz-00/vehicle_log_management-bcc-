@@ -22,6 +22,12 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace "com.bcc.vehicle_log_management"
     compileSdkVersion 34
@@ -40,15 +46,24 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.bcc.vehicle_log_management"
+        applicationId "com.tns.vehicle_log_management"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode 1
-        versionName '0.15'
+        versionName '0.18'
     }
 
     buildTypes {
@@ -59,6 +74,7 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
                     //outputFileName = "npo-final-v${versionCode}($versionName).apk"

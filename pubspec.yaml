@@ -65,7 +65,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "Assets/Images/BCC-Logo-Textless-1024.png"
+  image_path: "Assets/Images/VMS-Logo.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
 # For information on the generic Dart part of this file, see the
@@ -88,6 +88,7 @@ flutter:
     - Assets/Images/Powered by TNS.png
     - Assets/Images/BCC-Logo-Textless-1024.png
     - Assets/Images/Success-Mark.png
+    - Assets/Images/VMS-Logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

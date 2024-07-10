@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vehicle_log_management/UI/Pages/Staff%20Dashboard%20(Full)/acceptedrequesttripfull.dart';
+import 'package:vehicle_log_management/UI/Pages/Staff%20Dashboard%20(Full)/pendingtriprequestfull.dart';
+import 'package:vehicle_log_management/UI/Pages/Staff%20Dashboard%20(Full)/recenttriprequestfull.dart';
 
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
@@ -8,6 +12,7 @@ import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotifica
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../../Data/Models/tripRequestModelRecent.dart';
+import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/StaffApprovedTripDetails.dart';
 import '../../Widgets/requestWidget.dart';
@@ -16,7 +21,6 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import '../Trip Request Form(Staff)/triprequestformUI.dart';
-
 
 class StaffDashboard extends StatefulWidget {
   final bool shouldRefresh;
@@ -260,7 +264,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
     super.initState();
     print('initState called');
     loadUserProfile();
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(Duration(seconds: 2), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
         // Refresh logic here, e.g., fetch data again
@@ -292,120 +296,129 @@ class _StaffDashboardState extends State<StaffDashboard> {
               child: CircularProgressIndicator(),
             ),
           )
-        : InternetChecker(
-            child: PopScope(
-              canPop: false,
-              child: Scaffold(
-                key: _scaffoldKey,
-                appBar: AppBar(
-                  backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
-                  titleSpacing: 5,
-                  automaticallyImplyLeading: false,
-                  title: const Text(
-                    'Staff Dashboard',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                  centerTitle: true,
-                  actions: [
-                    Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.notifications,
+        : BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, state) {
+              if (state is AuthAuthenticated) {
+                final userProfile = state.userProfile;
+                return InternetChecker(
+                  child: PopScope(
+                    canPop: false,
+                    child: Scaffold(
+                      key: _scaffoldKey,
+                      appBar: AppBar(
+                        backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+                        titleSpacing: 5,
+                        automaticallyImplyLeading: false,
+                        title: const Text(
+                          'Staff Dashboard',
+                          style: TextStyle(
                             color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'default',
                           ),
-                          onPressed: () async {
-                            _showNotificationsOverlay(context);
-                            var notificationApiService =
-                                await NotificationReadApiService.create();
-                            notificationApiService.readNotification();
-                          },
                         ),
-                        if (notifications.isNotEmpty)
-                          Positioned(
-                            right: 11,
-                            top: 11,
-                            child: Container(
-                              padding: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 12,
-                                minHeight: 12,
-                              ),
-                              child: Text(
-                                '${notifications.length}',
-                                style: TextStyle(
+                        centerTitle: true,
+                        actions: [
+                          Stack(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.notifications,
                                   color: Colors.white,
-                                  fontSize: 8,
                                 ),
-                                textAlign: TextAlign.center,
+                                onPressed: () async {
+                                  _showNotificationsOverlay(context);
+                                  var notificationApiService =
+                                      await NotificationReadApiService.create();
+                                  notificationApiService.readNotification();
+                                },
                               ),
+                              if (notifications.isNotEmpty)
+                                Positioned(
+                                  right: 11,
+                                  top: 11,
+                                  child: Container(
+                                    padding: EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 12,
+                                      minHeight: 12,
+                                    ),
+                                    child: Text(
+                                      '${notifications.length}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              _showLogoutDialog(context);
+                            },
+                            icon: const Icon(
+                              Icons.logout,
+                              color: Colors.white,
                             ),
                           ),
-                      ],
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        _showLogoutDialog(context);
-                      },
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Colors.white,
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                body: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 20.0, horizontal: 20),
-                    child: SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 15.0),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Center(
-                                child: Text('Welcome, $userName',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 25,
-                                      fontFamily: 'default',
-                                    )),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Text('Pending Trip',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25,
-                                    fontFamily: 'default',
-                                  )),
-                              SizedBox(height: screenHeight * 0.01),
-                              Divider(),
-                              RequestsWidget(
-                                  loading: _isLoading,
-                                  fetch: _isFetched,
-                                  errorText: 'You haven\'t created any trip request yet.',
-                                  listWidget: pendingRequests,
-                                  fetchData: fetchConnectionRequests(),
-                                  numberOfWidgets: 10,
-                                  showSeeAllButton: shouldShowSeeAllButton(
-                                      pendingRequests),
-                                  seeAllButtonText: '',
-                                  nextPage: null),
-                             /* Container(
+                      body: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 20.0, horizontal: 20),
+                          child: SafeArea(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 15.0),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Center(
+                                      child: Text('Welcome, ${userProfile.name}',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 25,
+                                            fontFamily: 'default',
+                                          )),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Text('Pending Trip',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25,
+                                          fontFamily: 'default',
+                                        )),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Divider(),
+                                    RequestsWidget(
+                                        loading: _isLoading,
+                                        fetch: _isFetched,
+                                        errorText:
+                                            'You haven\'t created any trip request yet.',
+                                        listWidget: pendingRequests,
+                                        fetchData: fetchConnectionRequests(),
+                                        numberOfWidgets: 10,
+                                        showSeeAllButton:
+                                            shouldShowSeeAllButton(
+                                                pendingRequests),
+                                        seeAllButtonText:
+                                            'See all pending trips',
+                                        nextPage: StaffDashboardPending(
+                                          shouldRefresh: true,
+                                        )),
+                                    /* Container(
                                 //height: screenHeight*0.25,
                                 child: FutureBuilder<void>(
                                     future: _isLoading
@@ -462,10 +475,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                                 SizedBox(
                                                   height: 10,
                                                 ),
-                                                *//*if (shouldShowSeeAllButton(
+                                                */ /*if (shouldShowSeeAllButton(
                                                     pendingRequests))
                                                   buildSeeAllButtonRequestList(
-                                                      context)*//*
+                                                      context)*/ /*
                                               ],
                                             ),
                                           );
@@ -480,222 +493,247 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                       return SizedBox(); // You can return an empty SizedBox or any other default widget
                                     }),
                               ),*/
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.02),
-                              Text('Approved Trip',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25,
-                                    fontFamily: 'default',
-                                  )),
-                              SizedBox(height: screenHeight * 0.01),
-                              Divider(),
-                              RequestsWidget(
-                                  loading: _isLoading,
-                                  fetch: _isFetched,
-                                  errorText: 'No trip request reviewed yet.',
-                                  listWidget: acceptedRequests,
-                                  fetchData: fetchConnectionRequests(),
-                                  numberOfWidgets: 10,
-                                  showSeeAllButton: shouldShowSeeAllButton(
-                                      acceptedRequests),
-                                  seeAllButtonText: '',
-                                  nextPage: null),
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.02),
-                              Text('Recent Trip',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30,
-                                    fontFamily: 'default',
-                                  )),
-                              SizedBox(height: screenHeight * 0.01),
-                              Divider(),
-                              RequestsWidget(
-                                  loading: _isLoading,
-                                  fetch: _isFetched,
-                                  errorText: 'You haven\'t take any trip yet.',
-                                  listWidget: recentRequests,
-                                  fetchData: fetchConnectionRequests(),
-                                  numberOfWidgets: 10,
-                                  showSeeAllButton: shouldShowSeeAllButton(
-                                      recentRequests),
-                                  seeAllButtonText: '',
-                                  nextPage: null),
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.02),
-                              Center(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color.fromRGBO(25, 192, 122, 1),
-                                    fixedSize: Size(
-                                        MediaQuery.of(context).size.width * 0.8,
-                                        MediaQuery.of(context).size.height *
-                                            0.1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                                    Divider(),
+                                    SizedBox(height: screenHeight * 0.02),
+                                    Text('Approved Trip',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25,
+                                          fontFamily: 'default',
+                                        )),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Divider(),
+                                    RequestsWidget(
+                                        loading: _isLoading,
+                                        fetch: _isFetched,
+                                        errorText:
+                                            'No trip request reviewed yet.',
+                                        listWidget: acceptedRequests,
+                                        fetchData: fetchConnectionRequests(),
+                                        numberOfWidgets: 10,
+                                        showSeeAllButton:
+                                            shouldShowSeeAllButton(
+                                                acceptedRequests),
+                                        seeAllButtonText:
+                                            'See all Approved Trips',
+                                        nextPage: StaffDashboardAccepted(
+                                          shouldRefresh: true,
+                                        )),
+                                    Divider(),
+                                    SizedBox(height: screenHeight * 0.02),
+                                    Text('Recent Trip',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          fontFamily: 'default',
+                                        )),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Divider(),
+                                    RequestsWidget(
+                                        loading: _isLoading,
+                                        fetch: _isFetched,
+                                        errorText:
+                                            'You haven\'t take any trip yet.',
+                                        listWidget: recentRequests,
+                                        fetchData: fetchConnectionRequests(),
+                                        numberOfWidgets: 10,
+                                        showSeeAllButton:
+                                            shouldShowSeeAllButton(
+                                                recentRequests),
+                                        seeAllButtonText:
+                                            'See all recent trips',
+                                        nextPage: StaffDashboardRecent(
+                                          shouldRefresh: true,
+                                        )),
+                                    Divider(),
+                                    SizedBox(height: screenHeight * 0.02),
+                                    Center(
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color.fromRGBO(
+                                              25, 192, 122, 1),
+                                          fixedSize: Size(
+                                              MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.8,
+                                              MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.1),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TripRequestForm()));
+                                        },
+                                        child: const Text('New Trip Request',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'default',
+                                            )),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      bottomNavigationBar: Container(
+                        height: screenHeight * 0.08,
+                        color: const Color.fromRGBO(25, 192, 122, 1),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => StaffDashboard(
+                                              shouldRefresh: true,
+                                            )));
+                              },
+                              child: Container(
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.home,
+                                      size: 30,
+                                      color: Colors.white,
                                     ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                TripRequestForm()));
-                                  },
-                                  child: const Text('New Trip Request',
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Home',
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
+                                        fontSize: 14,
                                         fontFamily: 'default',
-                                      )),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              )
-                            ],
-                          ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const TripRequestForm()));
+                              },
+                              behavior: HitTestBehavior.translucent,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                  left: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                )),
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.add_circle_outlined,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Trip Request',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'default',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Profile(
+                                              shouldRefresh: true,
+                                            )));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                  left: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                )),
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.person,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Profile',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'default',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                ),
-                bottomNavigationBar: Container(
-                  height: screenHeight * 0.08,
-                  color: const Color.fromRGBO(25, 192, 122, 1),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => StaffDashboard(
-                                        shouldRefresh: true,
-                                      )));
-                        },
-                        child: Container(
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.home,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Home',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const TripRequestForm()));
-                        },
-                        behavior: HitTestBehavior.translucent,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                            left: BorderSide(
-                              color: Colors.black,
-                              width: 1.0,
-                            ),
-                          )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.add_circle_outlined,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Trip Request',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Profile(shouldRefresh:  true,)));
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                            left: BorderSide(
-                              color: Colors.black,
-                              width: 1.0,
-                            ),
-                          )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Profile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+                );
+              } else {
+                return Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+            },
           );
   }
 
@@ -839,6 +877,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
                     // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
+                      context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
