@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vehicle_log_management/UI/Bloc/auth_cubit.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
 
@@ -14,28 +15,26 @@ import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelOngingTrip.dart';
 import '../../../Data/Models/tripRequestModelRecent.dart';
 import '../../../Data/Models/tripRequestModelSROfficer.dart';
-import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/AdminPendingTripDetails.dart';
 import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/OngoingTripDetails.dart';
 import '../../Widgets/RecentTripDetails.dart';
-import '../../Widgets/staffPendingTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
 
-class AdminDashboardOngoing extends StatefulWidget {
+class AdminDashboardDriver extends StatefulWidget {
   final bool shouldRefresh;
 
-  const AdminDashboardOngoing({Key? key, this.shouldRefresh = false})
+  const AdminDashboardDriver({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<AdminDashboardOngoing> createState() => _AdminDashboardOngoingState();
+  State<AdminDashboardDriver> createState() => _AdminDashboardDriverState();
 }
 
-class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
+class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -50,11 +49,11 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
   late String organizationName = '';
   late String photoUrl = '';
   List<String> notifications = [];
-  late Pagination acceptedPagination;
-  bool canFetchMoreAccepted = false;
+  late Pagination driverPagination;
+  bool canFetchMoreDriver = false;
 
-  late String acceptedNext = '';
-  late String acceptedPrev = '';
+  late String driverNext = '';
+  late String driverPrev = '';
 
   Future<void> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
@@ -101,18 +100,18 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
 
-      acceptedPagination = Pagination.fromJson(pagination['ongoing']);
-      print(acceptedPagination.nextPage);
+      driverPagination = Pagination.fromJson(pagination['driver']);
+      print(driverPagination.nextPage);
       setState(() {
-        acceptedNext = acceptedPagination.nextPage as String;
+        driverNext = driverPagination.nextPage as String;
       });
-      print(acceptedPagination.previousPage);
+      print(driverPagination.previousPage);
       setState(() {
-        acceptedPrev = acceptedPagination.previousPage as String;
+        driverPrev = driverPagination.previousPage as String;
       });
 
-      canFetchMoreAccepted = acceptedPagination.canFetchNext;
-      print(canFetchMoreAccepted);
+      canFetchMoreDriver = driverPagination.canFetchNext;
+      print(canFetchMoreDriver);
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -134,56 +133,8 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
         );
       }).toList();
 
-
-      final List<dynamic> acceptedRequestsData = records['Ongoing'] ?? [];
-      for (var index = 0; index < acceptedRequestsData.length; index++) {
-        print(
-            'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
-      }
-
-      // Map accepted requests to widgets
-      final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
-        return StaffTile(
-          staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              time: request['time'],
-              type: request['trip_type']),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
-                      driver: request['driver'],
-                      Car: request['car'],
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      time: request['time'],
-                      type: request['trip_type'],
-                      id: request['trip_id']),
-                ),
-              ),
-            );
-          },
-        );
-      }).toList();
-
       setState(() {
         drivers = driverWidgets;
-        acceptedRequests = acceptedWidgets;
         _isFetched = true;
       });
     } catch (e) {
@@ -225,18 +176,18 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
 
-      acceptedPagination = Pagination.fromJson(pagination['ongoing']);
-      print(acceptedPagination.nextPage);
+      driverPagination = Pagination.fromJson(pagination['driver']);
+      print(driverPagination.nextPage);
       setState(() {
-        acceptedNext = acceptedPagination.nextPage as String;
+        driverNext = driverPagination.nextPage as String;
       });
-      print(acceptedPagination.previousPage);
+      print(driverPagination.previousPage);
       setState(() {
-        acceptedPrev = acceptedPagination.previousPage as String;
+        driverPrev = driverPagination.previousPage as String;
       });
 
-      canFetchMoreAccepted = acceptedPagination.canFetchNext;
-      print(canFetchMoreAccepted);
+      canFetchMoreDriver = driverPagination.canFetchNext;
+      print(canFetchMoreDriver);
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -259,56 +210,9 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
       }).toList();
 
 
-      final List<dynamic> acceptedRequestsData = records['Ongoing'] ?? [];
-      for (var index = 0; index < acceptedRequestsData.length; index++) {
-        print(
-            'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
-      }
-
-      // Map accepted requests to widgets
-      final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
-        return StaffTile(
-          staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              time: request['time'],
-              type: request['trip_type']),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
-                      driver: request['driver'],
-                      Car: request['car'],
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      time: request['time'],
-                      type: request['trip_type'],
-                      id: request['trip_id']),
-                ),
-              ),
-            );
-          },
-        );
-      }).toList();
-
       setState(() {
         drivers = driverWidgets;
-        acceptedRequests = acceptedWidgets;
-        _isFetchedFull = true;
+        _isFetched = true;
       });
     } catch (e) {
       print('Error fetching trip requests: $e');
@@ -326,8 +230,8 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
   @override
   void initState() {
     super.initState();
-    acceptedPagination = Pagination(nextPage: null, previousPage: null);
     print('initState called');
+    driverPagination = Pagination(nextPage: null, previousPage: null);
     loadUserProfile();
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
@@ -361,7 +265,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
         child: CircularProgressIndicator(),
       ),
     )
-        : BlocBuilder<AuthCubit, AuthState>(
+        :BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final userProfile = state.userProfile;
@@ -402,7 +306,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                           SizedBox(
                             height: 20,
                           ),
-                          /*     Text('New Trip',
+                          /*           Text('New Trip',
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -417,8 +321,25 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                       listWidget: pendingRequests,
                       fetchData: fetchConnectionRequests(),
                     ),*/
+                          /*   SizedBox(height: screenHeight * 0.02),
+                    Text('Ongoing Trip',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30,
+                          fontFamily: 'default',
+                        )),
+                    SizedBox(height: screenHeight * 0.01),
+                    RequestsWidgetShowAll(
+                        loading: _isLoading,
+                        fetch: _isFetched,
+                        errorText: 'No trip onging.',
+                        listWidget: acceptedRequests,
+                        fetchData: fetchConnectionRequests(),
+                     ),
+                    Divider(),*/
                           // SizedBox(height: screenHeight * 0.02),
-                          Text('Ongoing Trip',
+                          Text('Driver List',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -426,11 +347,12 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                                 fontFamily: 'default',
                               )),
                           SizedBox(height: screenHeight * 0.01),
+                          Divider(),
                           RequestsWidgetShowAll(
                             loading: _isLoading,
                             fetch: _isFetched,
-                            errorText: 'No trip onging.',
-                            listWidget: acceptedRequests,
+                            errorText: 'No driver Available.',
+                            listWidget: drivers,
                             fetchData: fetchConnectionRequests(),
                           ),
                           Row(
@@ -438,7 +360,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                             children: [
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: (acceptedPrev.isNotEmpty && acceptedPrev != 'None' && _isLoading)
+                                  backgroundColor: (driverPrev.isNotEmpty && driverPrev != 'None' && _isLoading)
                                       ? const Color.fromRGBO(25, 192, 122, 1)
                                       : Colors.grey, // Disabled color
                                   fixedSize: Size(
@@ -448,13 +370,13 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: (acceptedPrev.isNotEmpty && acceptedPrev != 'None' && _isLoading)
+                                onPressed: (driverPrev.isNotEmpty && driverPrev != 'None' && _isLoading)
                                     ? () {
-                                  print('Prev: $acceptedPrev');
+                                  print('Prev: $driverPrev');
                                   setState(() {
                                     _isFetchedFull = false;
-                                    fetchConnectionRequestsPagination(acceptedPrev);
-                                    acceptedPrev = '';
+                                    fetchConnectionRequestsPagination(driverPrev);
+                                    driverPrev = '';
                                   });
                                 }
                                     : null,
@@ -468,7 +390,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                               ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: (acceptedNext.isNotEmpty && acceptedNext != 'None' && _isLoading)
+                                  backgroundColor: (driverNext.isNotEmpty && driverNext != 'None' && _isLoading)
                                       ? const Color.fromRGBO(25, 192, 122, 1)
                                       : Colors.grey, // Disabled color
                                   fixedSize: Size(
@@ -478,13 +400,13 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: (acceptedNext.isNotEmpty && acceptedNext != 'None' && _isLoading)
+                                onPressed: (driverNext.isNotEmpty && driverNext != 'None' && _isLoading)
                                     ? () {
-                                  print('Next: $acceptedNext');
+                                  print('Next: $driverNext');
                                   setState(() {
                                     _isFetchedFull = false;
-                                    fetchConnectionRequestsPagination(acceptedNext);
-                                    acceptedNext = '';
+                                    fetchConnectionRequestsPagination(driverNext);
+                                    driverNext = '';
                                   });
                                 }
                                     : null,
@@ -498,30 +420,6 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                               ),
                             ],
                           ),
-                          //Divider(),
-                          /* SizedBox(height: screenHeight * 0.02),
-                          Text('Recent Trip',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 30,
-                                fontFamily: 'default',
-                              )),
-                          SizedBox(height: screenHeight * 0.01),
-                          Divider(),
-                          RequestsWidget(
-                              loading: _isLoading,
-                              fetch: _isFetched,
-                              errorText: 'No Recent Trip.',
-                              listWidget: recentRequests,
-                              fetchData: fetchConnectionRequests(),
-                              numberOfWidgets: 10,
-                              showSeeAllButton: (shouldShowSeeAllButton(recentRequests)),
-                              seeAllButtonText: '',
-                              nextPage: null),*/
-                          SizedBox(
-                            height: 20,
-                          )
                         ],
                       ),
                     ),
@@ -541,7 +439,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    AdminDashboardOngoing(shouldRefresh: true)));
+                                    AdminDashboardDriver(shouldRefresh: true)));
                       },
                       child: Container(
                         width: screenWidth / 3,

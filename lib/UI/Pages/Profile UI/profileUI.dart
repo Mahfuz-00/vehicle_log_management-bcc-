@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -204,9 +205,7 @@ class _ProfileState extends State<Profile> {
                                             color: Colors.white,
                                             image: DecorationImage(
                                               fit: BoxFit.cover,
-                                              image: NetworkImage(
-                                                  'https://bcc.touchandsolve.com' +
-                                                      userProfile!.photo),
+                                              image: CachedNetworkImageProvider('https://bcc.touchandsolve.com${userProfile!.photo}'),
                                             ),
                                           ),
                                         ),

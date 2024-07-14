@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vehicle_log_management/UI/Pages/Senior%20Officer%20Dashboard%20(Full)/ongoingtriprequestsfull.dart';
-import 'package:vehicle_log_management/UI/Pages/Senior%20Officer%20Dashboard%20(Full)/pendingtriprequestfull.dart';
+import 'package:vehicle_log_management/UI/Pages/Senior%20Officer%20Dashboard%20(Full)/newtriprequestfull.dart';
 
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
 import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
+import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelOngingTrip.dart';
 import '../../../Data/Models/tripRequestModelSROfficer.dart';
@@ -43,6 +44,12 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
   late String organizationName = '';
   late String photoUrl = '';
   List<String> notifications = [];
+  late Pagination pendingPagination;
+  late Pagination acceptedPagination;
+
+  // Example to check if more data can be fetched
+  bool canFetchMorePending = false;
+  bool canFetchMoreAccepted = false;
 
   Future<void> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
@@ -86,6 +93,18 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
       setState(() {
         _isLoading = true;
       });
+
+
+      final Map<String, dynamic> pagination = records['pagination'] ?? {};
+      print(pagination);
+
+      pendingPagination = Pagination.fromJson(pagination['pending']);
+      acceptedPagination = Pagination.fromJson(pagination['ongoing']);
+
+
+      canFetchMorePending = pendingPagination.canFetchNext;
+      canFetchMoreAccepted = acceptedPagination.canFetchNext;
+
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -215,6 +234,9 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
   void initState() {
     super.initState();
     print('initState called');
+    // Initialize the pagination with default values
+    pendingPagination = Pagination(nextPage: null, previousPage: null);
+    acceptedPagination = Pagination(nextPage: null, previousPage: null);
     loadUserProfile();
     Future.delayed(Duration(seconds: 2), () {
       if (widget.shouldRefresh && !_isFetched) {
@@ -348,11 +370,11 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                 errorText: 'No new trip request.',
                                 listWidget: pendingRequests,
                                 fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
+                                numberOfWidgets: 5,
                                 showSeeAllButton: shouldShowSeeAllButton(
                                     pendingRequests),
-                                seeAllButtonText: 'See all New Trips',
-                                nextPage: SROfficerDashboardNewTrip(shouldRefresh: true,)),
+                                seeAllButtonText: 'See All New Trips',
+                                nextView: SROfficerDashboardNewTrip(shouldRefresh: true,), pagination: canFetchMorePending,),
                             /* Container(
                               //height: screenHeight*0.25,
                               child: FutureBuilder<void>(
@@ -440,11 +462,11 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                 errorText: 'No trip request reviewed yet.',
                                 listWidget: acceptedRequests,
                                 fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
+                                numberOfWidgets: 5,
                                 showSeeAllButton: shouldShowSeeAllButton(
                                     acceptedRequests),
-                                seeAllButtonText: 'See all Ongoing Trips',
-                                nextPage: SROfficerDashboardOngoing(shouldRefresh: true,)),
+                                seeAllButtonText: 'See All Ongoing Trips',
+                                nextView: SROfficerDashboardOngoing(shouldRefresh: true,), pagination: canFetchMoreAccepted,),
                             /*    Container(
                               //height: screenHeight*0.25,
                               child: FutureBuilder<void>(

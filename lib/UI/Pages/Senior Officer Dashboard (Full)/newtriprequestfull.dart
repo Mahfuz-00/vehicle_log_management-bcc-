@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
 
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
@@ -12,35 +11,31 @@ import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotifica
 import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelOngingTrip.dart';
-import '../../../Data/Models/tripRequestModelRecent.dart';
 import '../../../Data/Models/tripRequestModelSROfficer.dart';
 import '../../Bloc/auth_cubit.dart';
-import '../../Widgets/AdminPendingTripDetails.dart';
-import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/OngoingTripDetails.dart';
-import '../../Widgets/RecentTripDetails.dart';
-import '../../Widgets/staffPendingTripDetails.dart';
+import '../../Widgets/SrOfficerPendingTripDetails.dart';
+import '../../Widgets/requestWidget.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
 
-class AdminDashboardOngoing extends StatefulWidget {
+
+class SROfficerDashboardNewTrip extends StatefulWidget {
   final bool shouldRefresh;
 
-  const AdminDashboardOngoing({Key? key, this.shouldRefresh = false})
+  const SROfficerDashboardNewTrip({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<AdminDashboardOngoing> createState() => _AdminDashboardOngoingState();
+  State<SROfficerDashboardNewTrip> createState() => _SROfficerDashboardNewTripState();
 }
 
-class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
+class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
-  List<Widget> recentRequests = [];
-  List<Widget> drivers = [];
   bool _isFetched = false;
   bool _isFetchedFull = false;
   bool _isLoading = false;
@@ -50,11 +45,21 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
   late String organizationName = '';
   late String photoUrl = '';
   List<String> notifications = [];
+  late Pagination pendingPagination;
   late Pagination acceptedPagination;
-  bool canFetchMoreAccepted = false;
+  late Pagination recentPagination;
 
+  // Example to check if more data can be fetched
+  bool canFetchMorePending = false;
+  bool canFetchMoreAccepted = false;
+  bool canFetchMoreRecent = false;
+
+  late String pendingNext = '';
   late String acceptedNext = '';
+  late String recentNext = '';
+  late String pendingPrev = '';
   late String acceptedPrev = '';
+  late String recentPrev = '';
 
   Future<void> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
@@ -101,18 +106,20 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
 
-      acceptedPagination = Pagination.fromJson(pagination['ongoing']);
-      print(acceptedPagination.nextPage);
+      pendingPagination = Pagination.fromJson(pagination['pending']);
+
+      print(pendingPagination.nextPage);
       setState(() {
-        acceptedNext = acceptedPagination.nextPage as String;
+        pendingNext = pendingPagination.nextPage as String;
       });
-      print(acceptedPagination.previousPage);
+      print(pendingPagination.previousPage);
       setState(() {
-        acceptedPrev = acceptedPagination.previousPage as String;
+        pendingPrev = pendingPagination.previousPage as String;
       });
 
-      canFetchMoreAccepted = acceptedPagination.canFetchNext;
-      print(canFetchMoreAccepted);
+      canFetchMorePending = pendingPagination.canFetchNext;
+      print(canFetchMorePending);
+
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -120,29 +127,25 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
       // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
-      final List<dynamic> driverData = records['Available_Driver'] ?? [];
-      for (var index = 0; index < driverData.length; index++) {
-        print('Pending Request at index $index: ${driverData[index]}\n');
+      final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
+      for (var index = 0; index < pendingRequestsData.length; index++) {
+        print(
+            'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
 
       // Map pending requests to widgets
-      final List<Widget> driverWidgets = driverData.map((request) {
-        return DriverInfoCard(
-          Name: request['name'],
-          MobileNo: request['phone'],
-          CarName: request['car_name'],
-        );
-      }).toList();
-
-
-      final List<dynamic> acceptedRequestsData = records['Ongoing'] ?? [];
-      for (var index = 0; index < acceptedRequestsData.length; index++) {
-        print(
-            'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
-      }
-
-      // Map accepted requests to widgets
-      final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
+      final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
+        print('Pending Trip');
+        print(request['name']);
+        print(request['designation']);
+        print(request['department']);
+        print(request['purpose']);
+        print(request['phone']);
+        print(request['destination_from']);
+        print(request['destination_to']);
+        print(request['date']);
+        print(request['time']);
+        print(request['trip_type']);
         return StaffTile(
           staff: TripRequest(
               name: request['name'],
@@ -159,10 +162,9 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
-                      driver: request['driver'],
-                      Car: request['car'],
+                builder: (context) => PendingTripSROfficer(
+                  staff: TripRequestSROfficer(
+                      id: request['trip_id'],
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -172,8 +174,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                       destinationTo: request['destination_to'],
                       date: request['date'],
                       time: request['time'],
-                      type: request['trip_type'],
-                      id: request['trip_id']),
+                      type: request['trip_type']),
                 ),
               ),
             );
@@ -182,8 +183,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
       }).toList();
 
       setState(() {
-        drivers = driverWidgets;
-        acceptedRequests = acceptedWidgets;
+        pendingRequests = pendingWidgets;
         _isFetched = true;
       });
     } catch (e) {
@@ -225,18 +225,20 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
 
-      acceptedPagination = Pagination.fromJson(pagination['ongoing']);
-      print(acceptedPagination.nextPage);
+      pendingPagination = Pagination.fromJson(pagination['pending']);
+
+      print(pendingPagination.nextPage);
       setState(() {
-        acceptedNext = acceptedPagination.nextPage as String;
+        pendingNext = pendingPagination.nextPage as String;
       });
-      print(acceptedPagination.previousPage);
+      print(pendingPagination.previousPage);
       setState(() {
-        acceptedPrev = acceptedPagination.previousPage as String;
+        pendingPrev = pendingPagination.previousPage as String;
       });
 
-      canFetchMoreAccepted = acceptedPagination.canFetchNext;
-      print(canFetchMoreAccepted);
+      canFetchMorePending = pendingPagination.canFetchNext;
+      print(canFetchMorePending);
+
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -244,29 +246,25 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
       // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
-      final List<dynamic> driverData = records['Available_Driver'] ?? [];
-      for (var index = 0; index < driverData.length; index++) {
-        print('Pending Request at index $index: ${driverData[index]}\n');
+      final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
+      for (var index = 0; index < pendingRequestsData.length; index++) {
+        print(
+            'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
 
       // Map pending requests to widgets
-      final List<Widget> driverWidgets = driverData.map((request) {
-        return DriverInfoCard(
-          Name: request['name'],
-          MobileNo: request['phone'],
-          CarName: request['car_name'],
-        );
-      }).toList();
-
-
-      final List<dynamic> acceptedRequestsData = records['Ongoing'] ?? [];
-      for (var index = 0; index < acceptedRequestsData.length; index++) {
-        print(
-            'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
-      }
-
-      // Map accepted requests to widgets
-      final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
+      final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
+        print('Pending Trip');
+        print(request['name']);
+        print(request['designation']);
+        print(request['department']);
+        print(request['purpose']);
+        print(request['phone']);
+        print(request['destination_from']);
+        print(request['destination_to']);
+        print(request['date']);
+        print(request['time']);
+        print(request['trip_type']);
         return StaffTile(
           staff: TripRequest(
               name: request['name'],
@@ -283,10 +281,9 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
-                      driver: request['driver'],
-                      Car: request['car'],
+                builder: (context) => PendingTripSROfficer(
+                  staff: TripRequestSROfficer(
+                      id: request['trip_id'],
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -296,8 +293,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                       destinationTo: request['destination_to'],
                       date: request['date'],
                       time: request['time'],
-                      type: request['trip_type'],
-                      id: request['trip_id']),
+                      type: request['trip_type']),
                 ),
               ),
             );
@@ -306,8 +302,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
       }).toList();
 
       setState(() {
-        drivers = driverWidgets;
-        acceptedRequests = acceptedWidgets;
+        pendingRequests = pendingWidgets;
         _isFetchedFull = true;
       });
     } catch (e) {
@@ -326,7 +321,8 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
   @override
   void initState() {
     super.initState();
-    acceptedPagination = Pagination(nextPage: null, previousPage: null);
+    // Initialize the pagination with default values
+    pendingPagination = Pagination(nextPage: null, previousPage: null);
     print('initState called');
     loadUserProfile();
     Future.delayed(Duration(seconds: 5), () {
@@ -373,7 +369,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                 titleSpacing: 5,
                 automaticallyImplyLeading: false,
                 title: const Text(
-                  'Admin Dashboard',
+                  'Sr Officer Dashboard',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -386,7 +382,8 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
               body: SingleChildScrollView(
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20.0, horizontal: 20),
                     child: Center(
                       child: Column(
                         children: [
@@ -402,35 +399,20 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                           SizedBox(
                             height: 20,
                           ),
-                          /*     Text('New Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    RequestsWidgetShowAll(
-                      loading: _isLoading,
-                      fetch: _isFetched,
-                      errorText: 'There aren\'t any trip request yet.',
-                      listWidget: pendingRequests,
-                      fetchData: fetchConnectionRequests(),
-                    ),*/
-                          // SizedBox(height: screenHeight * 0.02),
-                          Text('Ongoing Trip',
+                          Text('New Trip',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 30,
+                                fontSize: 25,
                                 fontFamily: 'default',
                               )),
                           SizedBox(height: screenHeight * 0.01),
+                          Divider(),
                           RequestsWidgetShowAll(
                             loading: _isLoading,
                             fetch: _isFetched,
-                            errorText: 'No trip onging.',
-                            listWidget: acceptedRequests,
+                            errorText: 'No new trip request.',
+                            listWidget: pendingRequests,
                             fetchData: fetchConnectionRequests(),
                           ),
                           Row(
@@ -438,7 +420,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                             children: [
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: (acceptedPrev.isNotEmpty && acceptedPrev != 'None' && _isLoading)
+                                  backgroundColor: (pendingPrev.isNotEmpty && pendingPrev != 'None' && _isLoading)
                                       ? const Color.fromRGBO(25, 192, 122, 1)
                                       : Colors.grey, // Disabled color
                                   fixedSize: Size(
@@ -448,13 +430,13 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: (acceptedPrev.isNotEmpty && acceptedPrev != 'None' && _isLoading)
+                                onPressed: (pendingPrev.isNotEmpty && pendingPrev != 'None' && _isLoading)
                                     ? () {
-                                  print('Prev: $acceptedPrev');
+                                  print('Prev: $pendingPrev');
                                   setState(() {
                                     _isFetchedFull = false;
-                                    fetchConnectionRequestsPagination(acceptedPrev);
-                                    acceptedPrev = '';
+                                    fetchConnectionRequestsPagination(pendingPrev);
+                                    pendingPrev = '';
                                   });
                                 }
                                     : null,
@@ -468,7 +450,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                               ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: (acceptedNext.isNotEmpty && acceptedNext != 'None' && _isLoading)
+                                  backgroundColor: (pendingNext.isNotEmpty && pendingNext != 'None' && _isLoading)
                                       ? const Color.fromRGBO(25, 192, 122, 1)
                                       : Colors.grey, // Disabled color
                                   fixedSize: Size(
@@ -478,13 +460,13 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: (acceptedNext.isNotEmpty && acceptedNext != 'None' && _isLoading)
+                                onPressed: (pendingNext.isNotEmpty && pendingNext != 'None' && _isLoading)
                                     ? () {
-                                  print('Next: $acceptedNext');
+                                  print('Next: $pendingNext');
                                   setState(() {
                                     _isFetchedFull = false;
-                                    fetchConnectionRequestsPagination(acceptedNext);
-                                    acceptedNext = '';
+                                    fetchConnectionRequestsPagination(pendingNext);
+                                    pendingNext = '';
                                   });
                                 }
                                     : null,
@@ -498,30 +480,170 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                               ),
                             ],
                           ),
-                          //Divider(),
-                          /* SizedBox(height: screenHeight * 0.02),
-                          Text('Recent Trip',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 30,
-                                fontFamily: 'default',
-                              )),
-                          SizedBox(height: screenHeight * 0.01),
-                          Divider(),
-                          RequestsWidget(
-                              loading: _isLoading,
-                              fetch: _isFetched,
-                              errorText: 'No Recent Trip.',
-                              listWidget: recentRequests,
-                              fetchData: fetchConnectionRequests(),
-                              numberOfWidgets: 10,
-                              showSeeAllButton: (shouldShowSeeAllButton(recentRequests)),
-                              seeAllButtonText: '',
-                              nextPage: null),*/
-                          SizedBox(
-                            height: 20,
-                          )
+                          /* Container(
+                            //height: screenHeight*0.25,
+                            child: FutureBuilder<void>(
+                                future: _isLoading
+                                    ? null
+                                    : fetchConnectionRequests(),
+                                builder: (context, snapshot) {
+                                  if (!_isFetched) {
+                                    // Return a loading indicator while waiting for data
+                                    return Container(
+                                      height: 200, // Adjust height as needed
+                                      width:
+                                          screenWidth, // Adjust width as needed
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    // Handle errors
+                                    return buildNoRequestsWidget(screenWidth,
+                                        'Error: ${snapshot.error}');
+                                  } else if (_isFetched) {
+                                    if (pendingRequests.isNotEmpty) {
+                                      // If data is loaded successfully, display the ListView
+                                      return Container(
+                                        child: Column(
+                                          children: [
+                                            ListView.separated(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              itemCount:
+                                                  pendingRequests.length > 10
+                                                      ? 10
+                                                      : pendingRequests
+                                                          .length,
+                                              itemBuilder: (context, index) {
+                                                // Display each connection request using ConnectionRequestInfoCard
+                                                return pendingRequests[index];
+                                              },
+                                              separatorBuilder: (context,
+                                                      index) =>
+                                                  const SizedBox(height: 10),
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            *//*if (shouldShowSeeAllButton(
+                                                  pendingRequests))
+                                                buildSeeAllButtonRequestList(
+                                                    context)*//*
+                                          ],
+                                        ),
+                                      );
+                                    } else if (pendingRequests.isEmpty) {
+                                      // Handle the case when there are no pending connection requests
+                                      return buildNoRequestsWidget(
+                                          screenWidth,
+                                          'No new trip request.');
+                                    }
+                                  }
+                                  // Return a default widget if none of the conditions above are met
+                                  return SizedBox(); // You can return an empty SizedBox or any other default widget
+                                }),
+                          ),*/
+                          /*   Divider(),
+                    SizedBox(height: screenHeight * 0.02),
+                    Text('Ongoing Trip',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                          fontFamily: 'default',
+                        )),
+                    SizedBox(height: screenHeight * 0.01),
+                    Divider(),
+                    RequestsWidget(
+                        loading: _isLoading,
+                        fetch: _isFetched,
+                        errorText: 'No trip request reviewed yet.',
+                        listWidget: acceptedRequests,
+                        fetchData: fetchConnectionRequests(),
+                        numberOfWidgets: 10,
+                        showSeeAllButton: shouldShowSeeAllButton(
+                            acceptedRequests),
+                        seeAllButtonText: '',
+                        nextPage: null),*/
+                          /*    Container(
+                            //height: screenHeight*0.25,
+                            child: FutureBuilder<void>(
+                                future: _isLoading
+                                    ? null
+                                    : fetchConnectionRequests(),
+                                builder: (context, snapshot) {
+                                  if (!_isFetched) {
+                                    // Return a loading indicator while waiting for data
+                                    return Container(
+                                      height: 200, // Adjust height as needed
+                                      width:
+                                          screenWidth, // Adjust width as needed
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  } else if (snapshot.hasError) {
+                                    // Handle errors
+                                    return buildNoRequestsWidget(screenWidth,
+                                        'Error: ${snapshot.error}');
+                                  } else if (_isFetched) {
+                                    if (acceptedRequests.isNotEmpty) {
+                                      // If data is loaded successfully, display the ListView
+                                      return Container(
+                                        child: Column(
+                                          children: [
+                                            ListView.separated(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              itemCount:
+                                                  acceptedRequests.length > 10
+                                                      ? 10
+                                                      : acceptedRequests
+                                                          .length,
+                                              itemBuilder: (context, index) {
+                                                // Display each connection request using ConnectionRequestInfoCard
+                                                return acceptedRequests[
+                                                    index];
+                                              },
+                                              separatorBuilder: (context,
+                                                      index) =>
+                                                  const SizedBox(height: 10),
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            *//*if (shouldShowSeeAllButton(
+                                                  pendingRequests))
+                                                buildSeeAllButtonRequestList(
+                                                    context)*//*
+                                          ],
+                                        ),
+                                      );
+                                    } else if (acceptedRequests.isEmpty) {
+                                      // Handle the case when there are no pending connection requests
+                                      return buildNoRequestsWidget(
+                                          screenWidth,
+                                          'No trip request reviewed yet.');
+                                    }
+                                  }
+                                  // Return a default widget if none of the conditions above are met
+                                  return SizedBox(); // You can return an empty SizedBox or any other default widget
+                                }),
+                          ),*/
+                          //Divider()
                         ],
                       ),
                     ),
@@ -540,8 +662,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    AdminDashboardOngoing(shouldRefresh: true)));
+                                builder: (context) => SROfficerDashboardNewTrip()));
                       },
                       child: Container(
                         width: screenWidth / 3,
@@ -576,9 +697,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Profile(
-                                  shouldRefresh: true,
-                                )));
+                                builder: (context) => const Profile(shouldRefresh: true,)));
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Container(
@@ -642,7 +761,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                               height: 5,
                             ),
                             Text(
-                              'Logout',
+                              'Log Out',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -666,6 +785,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
         }
       },
     );
+
   }
 
   void _showNotificationsOverlay(BuildContext context) {
@@ -698,9 +818,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.notifications_off),
-                  SizedBox(
-                    width: 10,
-                  ),
+                  SizedBox(width: 10,),
                   Text(
                     'No new notifications',
                     style: TextStyle(fontSize: 16),
@@ -723,7 +841,8 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                         overlayEntry.remove();
                       },
                     ),
-                    if (index < notifications.length - 1) Divider()
+                    if (index < notifications.length - 1)
+                      Divider()
                   ],
                 );
               },

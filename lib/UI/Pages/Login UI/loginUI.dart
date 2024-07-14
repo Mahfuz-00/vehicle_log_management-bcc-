@@ -213,7 +213,7 @@ class _LoginState extends State<Login> {
                           ),
                           Container(
                             child: Padding(
-                              padding: const EdgeInsets.only(right: 30.0),
+                              padding: EdgeInsets.only(right: (screenWidth*0.1-20)),
                               child: Container(
                                 alignment: Alignment.centerRight,
                                 child: InkWell(

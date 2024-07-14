@@ -9,6 +9,7 @@ import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
 import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
+import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../../Data/Models/tripRequestModelRecent.dart';
@@ -45,6 +46,19 @@ class _StaffDashboardState extends State<StaffDashboard> {
   late String organizationName = '';
   late String photoUrl = '';
   List<String> notifications = [];
+
+  late Pagination pendingPagination;
+  late Pagination acceptedPagination;
+  late Pagination recentPagination;
+
+  late String pendingurl = '';
+  late String acceptedurl = '';
+  late String recenturl = '';
+
+  // Example to check if more data can be fetched
+  bool canFetchMorePending = false;
+  bool canFetchMoreAccepted = false;
+  bool canFetchMoreRecent = false;
 
   Future<void> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
@@ -88,6 +102,25 @@ class _StaffDashboardState extends State<StaffDashboard> {
       setState(() {
         _isLoading = true;
       });
+
+      final Map<String, dynamic> pagination = records['pagination'] ?? {};
+
+      pendingPagination = Pagination.fromJson(pagination['pending']);
+      acceptedPagination = Pagination.fromJson(pagination['accepted']);
+      recentPagination = Pagination.fromJson(pagination['recent']);
+      print(pendingPagination.nextPage);
+      print(acceptedPagination.nextPage);
+      print(recentPagination.nextPage);
+      pendingurl = pendingPagination.nextPage as String;
+      acceptedurl = acceptedPagination.nextPage as String;
+      recenturl = recentPagination.nextPage as String;
+
+      canFetchMorePending = pendingPagination.canFetchNext;
+      canFetchMoreAccepted = acceptedPagination.canFetchNext;
+      canFetchMoreRecent = recentPagination.canFetchNext;
+      print(canFetchMorePending);
+      print(canFetchMoreAccepted);
+      print(canFetchMoreRecent);
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -263,6 +296,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
   void initState() {
     super.initState();
     print('initState called');
+    // Initialize the pagination with default values
+    pendingPagination = Pagination(nextPage: null, previousPage: null);
+    acceptedPagination = Pagination(nextPage: null, previousPage: null);
+    recentPagination = Pagination(nextPage: null, previousPage: null);
     loadUserProfile();
     Future.delayed(Duration(seconds: 2), () {
       if (widget.shouldRefresh && !_isFetched) {
@@ -382,13 +419,14 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                 child: Column(
                                   children: [
                                     Center(
-                                      child: Text('Welcome, ${userProfile.name}',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 25,
-                                            fontFamily: 'default',
-                                          )),
+                                      child:
+                                          Text('Welcome, ${userProfile.name}',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25,
+                                                fontFamily: 'default',
+                                              )),
                                     ),
                                     SizedBox(
                                       height: 20,
@@ -403,21 +441,21 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                     SizedBox(height: screenHeight * 0.01),
                                     Divider(),
                                     RequestsWidget(
-                                        loading: _isLoading,
-                                        fetch: _isFetched,
-                                        errorText:
-                                            'You haven\'t created any trip request yet.',
-                                        listWidget: pendingRequests,
-                                        fetchData: fetchConnectionRequests(),
-                                        numberOfWidgets: 10,
-                                        showSeeAllButton:
-                                            shouldShowSeeAllButton(
-                                                pendingRequests),
-                                        seeAllButtonText:
-                                            'See all pending trips',
-                                        nextPage: StaffDashboardPending(
-                                          shouldRefresh: true,
-                                        )),
+                                      loading: _isLoading,
+                                      fetch: _isFetched,
+                                      errorText:
+                                          'You haven\'t created any trip request yet.',
+                                      listWidget: pendingRequests,
+                                      fetchData: fetchConnectionRequests(),
+                                      numberOfWidgets: 5,
+                                      showSeeAllButton: shouldShowSeeAllButton(
+                                          pendingRequests),
+                                      seeAllButtonText: 'See All Pending Trips',
+                                      nextView: StaffDashboardPending(
+                                        shouldRefresh: true,
+                                      ),
+                                      pagination: canFetchMorePending,
+                                    ),
                                     /* Container(
                                 //height: screenHeight*0.25,
                                 child: FutureBuilder<void>(
@@ -511,15 +549,15 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                             'No trip request reviewed yet.',
                                         listWidget: acceptedRequests,
                                         fetchData: fetchConnectionRequests(),
-                                        numberOfWidgets: 10,
+                                        numberOfWidgets: 5,
                                         showSeeAllButton:
                                             shouldShowSeeAllButton(
                                                 acceptedRequests),
                                         seeAllButtonText:
-                                            'See all Approved Trips',
-                                        nextPage: StaffDashboardAccepted(
+                                            'See All Approved Trips',
+                                        nextView: StaffDashboardAccepted(
                                           shouldRefresh: true,
-                                        )),
+                                        ), pagination: canFetchMoreAccepted,),
                                     Divider(),
                                     SizedBox(height: screenHeight * 0.02),
                                     Text('Recent Trip',
@@ -538,15 +576,15 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                             'You haven\'t take any trip yet.',
                                         listWidget: recentRequests,
                                         fetchData: fetchConnectionRequests(),
-                                        numberOfWidgets: 10,
+                                        numberOfWidgets: 5,
                                         showSeeAllButton:
                                             shouldShowSeeAllButton(
                                                 recentRequests),
                                         seeAllButtonText:
-                                            'See all recent trips',
-                                        nextPage: StaffDashboardRecent(
+                                            'See All Recent Trips',
+                                        nextView: StaffDashboardRecent(
                                           shouldRefresh: true,
-                                        )),
+                                        ), pagination: canFetchMoreRecent,),
                                     Divider(),
                                     SizedBox(height: screenHeight * 0.02),
                                     Center(

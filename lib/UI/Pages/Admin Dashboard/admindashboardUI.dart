@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/availabledriverlistfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/ongoingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/pendingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
@@ -9,6 +10,7 @@ import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
 import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
+import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelOngingTrip.dart';
 import '../../../Data/Models/tripRequestModelRecent.dart';
@@ -21,7 +23,6 @@ import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
-
 
 class AdminDashboard extends StatefulWidget {
   final bool shouldRefresh;
@@ -47,6 +48,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
   late String organizationName = '';
   late String photoUrl = '';
   List<String> notifications = [];
+  late Pagination pendingPagination;
+  late Pagination acceptedPagination;
+  late Pagination recentPagination;
+  late Pagination driversPagination;
+
+  // Example to check if more data can be fetched
+  bool canFetchMorePending = false;
+  bool canFetchMoreAccepted = false;
+  bool canFetchMoreRecent = false;
+  bool canFetchMoreDrivers = false;
 
   Future<void> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
@@ -90,6 +101,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
       setState(() {
         _isLoading = true;
       });
+
+      final Map<String, dynamic> pagination = records['pagination'] ?? {};
+      print(pagination);
+
+      pendingPagination = Pagination.fromJson(pagination['new_trip']);
+      acceptedPagination = Pagination.fromJson(pagination['ongoing']);
+      driversPagination = Pagination.fromJson(pagination['driver']);
+      //recentPagination = Pagination.fromJson(pagination['recent']);
+
+      canFetchMorePending = pendingPagination.canFetchNext;
+      canFetchMoreAccepted = acceptedPagination.canFetchNext;
+      canFetchMoreDrivers = driversPagination.canFetchNext;
+      //canFetchMoreRecent = recentPagination.canFetchNext;
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -279,6 +303,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
+    // Initialize the pagination with default values
+    pendingPagination = Pagination(nextPage: null, previousPage: null);
+    acceptedPagination = Pagination(nextPage: null, previousPage: null);
+    recentPagination = Pagination(nextPage: null, previousPage: null);
     print('initState called');
     loadUserProfile();
     Future.delayed(Duration(seconds: 2), () {
@@ -314,149 +342,163 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
           )
         : BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        if (state is AuthAuthenticated) {
-          final userProfile = state.userProfile;
-          return InternetChecker(
-            child: PopScope(
-              canPop: false,
-              child: Scaffold(
-                key: _scaffoldKey,
-                appBar: AppBar(
-                  backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
-                  titleSpacing: 5,
-                  automaticallyImplyLeading: false,
-                  title: const Text(
-                    'Admin Dashboard',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                  centerTitle: true,
-                  actions: [
-                    Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.notifications,
+            builder: (context, state) {
+              if (state is AuthAuthenticated) {
+                final userProfile = state.userProfile;
+                return InternetChecker(
+                  child: PopScope(
+                    canPop: false,
+                    child: Scaffold(
+                      key: _scaffoldKey,
+                      appBar: AppBar(
+                        backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+                        titleSpacing: 5,
+                        automaticallyImplyLeading: false,
+                        title: const Text(
+                          'Admin Dashboard',
+                          style: TextStyle(
                             color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'default',
                           ),
-                          onPressed: () async {
-                            _showNotificationsOverlay(context);
-                            var notificationApiService =
-                            await NotificationReadApiService.create();
-                            notificationApiService.readNotification();
-                          },
                         ),
-                        if (notifications.isNotEmpty)
-                          Positioned(
-                            right: 11,
-                            top: 11,
-                            child: Container(
-                              padding: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 12,
-                                minHeight: 12,
-                              ),
-                              child: Text(
-                                '${notifications.length}',
-                                style: TextStyle(
+                        centerTitle: true,
+                        actions: [
+                          Stack(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.notifications,
                                   color: Colors.white,
-                                  fontSize: 8,
                                 ),
-                                textAlign: TextAlign.center,
+                                onPressed: () async {
+                                  _showNotificationsOverlay(context);
+                                  var notificationApiService =
+                                      await NotificationReadApiService.create();
+                                  notificationApiService.readNotification();
+                                },
                               ),
-                            ),
+                              if (notifications.isNotEmpty)
+                                Positioned(
+                                  right: 11,
+                                  top: 11,
+                                  child: Container(
+                                    padding: EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 12,
+                                      minHeight: 12,
+                                    ),
+                                    child: Text(
+                                      '${notifications.length}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                      ],
-                    ),
-                  ],
-                ),
-                body: SingleChildScrollView(
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 30.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Center(
-                              child: Text('Welcome, ${userProfile.name}',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25,
-                                    fontFamily: 'default',
-                                  )),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Text('Available Drivers',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 30,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No Available Driver.',
-                                listWidget: drivers,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
-                                showSeeAllButton:
-                                (shouldShowSeeAllButton(drivers)),
-                                seeAllButtonText: '',
-                                nextPage: null),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text('New Trip',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 30,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'There aren\'t any trip request yet.',
-                                listWidget: pendingRequests,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
-                                showSeeAllButton: (shouldShowSeeAllButton(pendingRequests)),
-                                seeAllButtonText: 'See all New Trips',
-                                nextPage: AdminDashboardPending(shouldRefresh: true,)),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text('Ongoing Trip',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 30,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No trip onging.',
-                                listWidget: acceptedRequests,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
-                                showSeeAllButton: (shouldShowSeeAllButton(acceptedRequests)),
-                                seeAllButtonText: 'See all Ongoing Trips',
-                                nextPage: AdminDashboardOngoing(shouldRefresh: true,)),
-                            Divider(),
-                            /* SizedBox(height: screenHeight * 0.02),
+                        ],
+                      ),
+                      body: SingleChildScrollView(
+                        child: SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 30.0),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Center(
+                                    child: Text('Welcome, ${userProfile.name}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25,
+                                          fontFamily: 'default',
+                                        )),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text('Available Drivers',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 30,
+                                        fontFamily: 'default',
+                                      )),
+                                  SizedBox(height: screenHeight * 0.01),
+                                  RequestsWidget(
+                                    loading: _isLoading,
+                                    fetch: _isFetched,
+                                    errorText: 'No Available Driver.',
+                                    listWidget: drivers,
+                                    fetchData: fetchConnectionRequests(),
+                                    numberOfWidgets: 3,
+                                    showSeeAllButton:
+                                        (shouldShowSeeAllButton(drivers)),
+                                    seeAllButtonText: 'See All Drivers',
+                                    nextView: AdminDashboardDriver(
+                                      shouldRefresh: true,
+                                    ),
+                                    pagination: canFetchMoreDrivers,
+                                  ),
+                                  SizedBox(height: screenHeight * 0.025),
+                                  Text('New Trip',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 30,
+                                        fontFamily: 'default',
+                                      )),
+                                  SizedBox(height: screenHeight * 0.01),
+                                  RequestsWidget(
+                                    loading: _isLoading,
+                                    fetch: _isFetched,
+                                    errorText:
+                                        'There aren\'t any trip request yet.',
+                                    listWidget: pendingRequests,
+                                    fetchData: fetchConnectionRequests(),
+                                    numberOfWidgets: 5,
+                                    showSeeAllButton: (shouldShowSeeAllButton(
+                                        pendingRequests)),
+                                    seeAllButtonText: 'See All New Trips',
+                                    nextView: AdminDashboardPending(
+                                      shouldRefresh: true,
+                                    ),
+                                    pagination: canFetchMorePending,
+                                  ),
+                                  SizedBox(height: screenHeight * 0.025),
+                                  Text('Ongoing Trip',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 30,
+                                        fontFamily: 'default',
+                                      )),
+                                  SizedBox(height: screenHeight * 0.01),
+                                  RequestsWidget(
+                                    loading: _isLoading,
+                                    fetch: _isFetched,
+                                    errorText: 'No trip onging.',
+                                    listWidget: acceptedRequests,
+                                    fetchData: fetchConnectionRequests(),
+                                    numberOfWidgets: 5,
+                                    showSeeAllButton: (shouldShowSeeAllButton(
+                                        acceptedRequests)),
+                                    seeAllButtonText: 'See All Ongoing Trips',
+                                    nextView: AdminDashboardOngoing(
+                                      shouldRefresh: true,
+                                    ),
+                                    pagination: canFetchMoreAccepted,
+                                  ),
+                                  /* SizedBox(height: screenHeight * 0.02),
                             Text('Recent Trip',
                                 style: TextStyle(
                                   color: Colors.black,
@@ -476,154 +518,154 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 showSeeAllButton: (shouldShowSeeAllButton(recentRequests)),
                                 seeAllButtonText: 'Seel all recent trips',
                                 nextPage: AdminDashboardRecent(shouldRefresh: true,)),*/
-                            SizedBox(
-                              height: 20,
-                            )
+                                  SizedBox(
+                                    height: 20,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      bottomNavigationBar: Container(
+                        height: screenHeight * 0.08,
+                        color: const Color.fromRGBO(25, 192, 122, 1),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AdminDashboard(
+                                            shouldRefresh: true)));
+                              },
+                              child: Container(
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.home,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Home',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'default',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Profile(
+                                              shouldRefresh: true,
+                                            )));
+                              },
+                              behavior: HitTestBehavior.translucent,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                  left: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                )),
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.person,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Profile',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'default',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                _showLogoutDialog(context);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                  left: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                )),
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.logout,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Logout',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'default',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                ),
-                bottomNavigationBar: Container(
-                  height: screenHeight * 0.08,
-                  color: const Color.fromRGBO(25, 192, 122, 1),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      AdminDashboard(shouldRefresh: true)));
-                        },
-                        child: Container(
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.home,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Home',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Profile(
-                                    shouldRefresh: true,
-                                  )));
-                        },
-                        behavior: HitTestBehavior.translucent,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: Colors.black,
-                                  width: 1.0,
-                                ),
-                              )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Profile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          _showLogoutDialog(context);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: Colors.black,
-                                  width: 1.0,
-                                ),
-                              )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.logout,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Logout',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+                );
+              } else {
+                return Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+            },
           );
-        } else {
-          return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-      },
-    );
   }
 
   void _showNotificationsOverlay(BuildContext context) {

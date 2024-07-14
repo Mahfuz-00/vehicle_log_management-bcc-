@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vehicle_log_management/UI/Widgets/templateerrorcontainer.dart';
 
+import '../../Data/Models/paginationModel.dart';
+
 
 class RequestsWidget extends StatelessWidget {
   final bool loading;
@@ -11,7 +13,8 @@ class RequestsWidget extends StatelessWidget {
   final int numberOfWidgets;
   final bool showSeeAllButton;
   final String seeAllButtonText;
-  final Widget? nextPage;
+  final Widget? nextView;
+  final bool pagination;
 
   const RequestsWidget({
     Key? key,
@@ -23,7 +26,8 @@ class RequestsWidget extends StatelessWidget {
     required this.numberOfWidgets,
     required this.showSeeAllButton,
     required this.seeAllButtonText,
-    required this.nextPage,
+    required this.nextView,
+    required this.pagination,
   }) : super(key: key);
 
   @override
@@ -70,8 +74,8 @@ class RequestsWidget extends StatelessWidget {
                       separatorBuilder: (context, index) => const SizedBox(height: 10),
                     ),
                     SizedBox(height: 10),
-                    if (showSeeAllButton)
-                      buildSeeAllButtonReviewedList(context),
+                    if (pagination)
+                      buildSeeAllButton(context),
                   ],
                 ),
               );
@@ -83,16 +87,16 @@ class RequestsWidget extends StatelessWidget {
     );
   }
 
-  Widget buildSeeAllButtonReviewedList(BuildContext context) {
+  Widget buildSeeAllButton(BuildContext context) {
     return Center(
       child: Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(10),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromRGBO(13, 70, 127, 1),
+            backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
             fixedSize: Size(
-              MediaQuery.of(context).size.width * 0.9,
+              MediaQuery.of(context).size.width * 0.7,
               MediaQuery.of(context).size.height * 0.08,
             ),
             shape: RoundedRectangleBorder(
@@ -100,7 +104,7 @@ class RequestsWidget extends StatelessWidget {
             ),
           ),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => nextPage!));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => nextView!));
           },
           child: Text(
             seeAllButtonText,

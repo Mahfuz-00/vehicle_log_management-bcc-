@@ -10,6 +10,7 @@ import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
 import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
+import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../../Data/Models/tripRequestModelRecent.dart';
@@ -45,6 +46,14 @@ class _DriverDashboardState extends State<DriverDashboard> {
   late String organizationName = '';
   late String photoUrl = '';
   List<String> notifications = [];
+  late Pagination pendingPagination;
+  late Pagination acceptedPagination;
+  late Pagination recentPagination;
+
+  // Example to check if more data can be fetched
+  bool canFetchMorePending = false;
+  bool canFetchMoreAccepted = false;
+  bool canFetchMoreRecent = false;
 
   Future<void> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
@@ -88,6 +97,20 @@ class _DriverDashboardState extends State<DriverDashboard> {
       setState(() {
         _isLoading = true;
       });
+
+      final Map<String, dynamic> pagination = records['pagination'] ?? {};
+      print(pagination);
+
+      pendingPagination = Pagination.fromJson(pagination['new_trip']);
+      //acceptedPagination = Pagination.fromJson(pagination['Ongoing']);
+      recentPagination = Pagination.fromJson(pagination['recent']);
+      print(pendingPagination.nextPage);
+      print(acceptedPagination.previousPage);
+      print(recentPagination);
+
+      canFetchMorePending = pendingPagination.canFetchNext;
+      //canFetchMoreAccepted = acceptedPagination.canFetchNext;
+      canFetchMoreRecent = recentPagination.canFetchNext;
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -283,6 +306,10 @@ class _DriverDashboardState extends State<DriverDashboard> {
   void initState() {
     super.initState();
     print('initState called');
+    // Initialize the pagination with default values
+    pendingPagination = Pagination(nextPage: null, previousPage: null);
+    acceptedPagination = Pagination(nextPage: null, previousPage: null);
+    recentPagination = Pagination(nextPage: null, previousPage: null);
     loadUserProfile();
     Future.delayed(Duration(seconds: 2), () {
       if (widget.shouldRefresh && !_isFetched) {
@@ -321,143 +348,151 @@ class _DriverDashboardState extends State<DriverDashboard> {
             ),
           )
         : BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        if (state is AuthAuthenticated) {
-          final userProfile = state.userProfile;
-          return  InternetChecker(
-            child: PopScope(
-              canPop: false,
-              child: Scaffold(
-                extendBody: true,
-                key: _scaffoldKey,
-                appBar: AppBar(
-                  backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
-                  titleSpacing: 5,
-                  automaticallyImplyLeading: false,
-                  title: const Text(
-                    'Driver Dashboard',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                  centerTitle: true,
-                  actions: [
-                    Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.notifications,
+            builder: (context, state) {
+              if (state is AuthAuthenticated) {
+                final userProfile = state.userProfile;
+                return InternetChecker(
+                  child: PopScope(
+                    canPop: false,
+                    child: Scaffold(
+                      extendBody: true,
+                      key: _scaffoldKey,
+                      appBar: AppBar(
+                        backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+                        titleSpacing: 5,
+                        automaticallyImplyLeading: false,
+                        title: const Text(
+                          'Driver Dashboard',
+                          style: TextStyle(
                             color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'default',
                           ),
-                          onPressed: () async {
-                            _showNotificationsOverlay(context);
-                            var notificationApiService =
-                            await NotificationReadApiService.create();
-                            notificationApiService.readNotification();
-                          },
                         ),
-                        if (notifications.isNotEmpty)
-                          Positioned(
-                            right: 11,
-                            top: 11,
-                            child: Container(
-                              padding: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 12,
-                                minHeight: 12,
-                              ),
-                              child: Text(
-                                '${notifications.length}',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 8,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-                body: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 15.0),
-                        child: Center(
-                          child: Column(
+                        centerTitle: true,
+                        actions: [
+                          Stack(
                             children: [
-                              Center(
-                                child: Text('Welcome, ${userProfile.name}',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 25,
-                                      fontFamily: 'default',
-                                    )),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.notifications,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () async {
+                                  _showNotificationsOverlay(context);
+                                  var notificationApiService =
+                                      await NotificationReadApiService.create();
+                                  notificationApiService.readNotification();
+                                },
                               ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Text('New Trip',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30,
-                                    fontFamily: 'default',
-                                  )),
-                              SizedBox(height: screenHeight * 0.01),
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.01),
-                              if (acceptedRequests.isEmpty) ...[
-                                RequestsWidget(
-                                    loading: _isLoading,
-                                    fetch: _isFetched,
-                                    errorText: 'No New Trip.',
-                                    listWidget: pendingRequests,
-                                    fetchData: fetchConnectionRequests(),
-                                    numberOfWidgets: 10,
-                                    showSeeAllButton: shouldShowSeeAllButton(
-                                        pendingRequests),
-                                    seeAllButtonText: 'See all New Trips',
-                                    nextPage: DriverDashboardPending(shouldRefresh: true,)),
-                              ] else if (acceptedRequests.isNotEmpty) ...[
-                                buildNoRequestsWidget(screenWidth,
-                                    'You Currently on a Trip. Please complete that trip to start a new trip.')
-                              ],
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.02),
-                              Text('Ongoing Trip',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30,
-                                    fontFamily: 'default',
-                                  )),
-                              SizedBox(height: screenHeight * 0.01),
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.01),
-                              RequestsWidget(
-                                  loading: _isLoading,
-                                  fetch: _isFetched,
-                                  errorText: 'No trip onging.',
-                                  listWidget: acceptedRequests,
-                                  fetchData: fetchConnectionRequests(),
-                                  numberOfWidgets: 10,
-                                  showSeeAllButton: shouldShowSeeAllButton(
-                                      acceptedRequests),
-                                  seeAllButtonText: '',
-                                  nextPage: null),
-                              /*Container(
+                              if (notifications.isNotEmpty)
+                                Positioned(
+                                  right: 11,
+                                  top: 11,
+                                  child: Container(
+                                    padding: EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 12,
+                                      minHeight: 12,
+                                    ),
+                                    child: Text(
+                                      '${notifications.length}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      body: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 20.0),
+                          child: SafeArea(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 15.0),
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Center(
+                                      child:
+                                          Text('Welcome, ${userProfile.name}',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25,
+                                                fontFamily: 'default',
+                                              )),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Text('New Trip',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          fontFamily: 'default',
+                                        )),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Divider(),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    if (acceptedRequests.isEmpty) ...[
+                                      RequestsWidget(
+                                        loading: _isLoading,
+                                        fetch: _isFetched,
+                                        errorText: 'No New Trip.',
+                                        listWidget: pendingRequests,
+                                        fetchData: fetchConnectionRequests(),
+                                        numberOfWidgets: 5,
+                                        showSeeAllButton:
+                                            shouldShowSeeAllButton(
+                                                pendingRequests),
+                                        seeAllButtonText: 'See All New Trips',
+                                        nextView: DriverDashboardPending(
+                                          shouldRefresh: true,
+                                        ),
+                                        pagination: canFetchMorePending,
+                                      ),
+                                    ] else if (acceptedRequests.isNotEmpty) ...[
+                                      buildNoRequestsWidget(screenWidth,
+                                          'You Currently on a Trip. Please complete that trip to start a new trip.')
+                                    ],
+                                    Divider(),
+                                    SizedBox(height: screenHeight * 0.02),
+                                    Text('Ongoing Trip',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          fontFamily: 'default',
+                                        )),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Divider(),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    RequestsWidget(
+                                      loading: _isLoading,
+                                      fetch: _isFetched,
+                                      errorText: 'No trip onging.',
+                                      listWidget: acceptedRequests,
+                                      fetchData: fetchConnectionRequests(),
+                                      numberOfWidgets: 10,
+                                      showSeeAllButton: shouldShowSeeAllButton(
+                                          acceptedRequests),
+                                      seeAllButtonText: '',
+                                      nextView: null,
+                                      pagination: canFetchMoreAccepted,
+                                    ),
+                                    /*Container(
                                 //height: screenHeight*0.25,
                                 child: FutureBuilder<void>(
                                     future: _isLoading
@@ -514,10 +549,10 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                                 SizedBox(
                                                   height: 10,
                                                 ),
-                                                *//*if (shouldShowSeeAllButton(
+                                                */ /*if (shouldShowSeeAllButton(
                                                     pendingRequests))
                                                   buildSeeAllButtonRequestList(
-                                                      context)*//*
+                                                      context)*/ /*
                                               ],
                                             ),
                                           );
@@ -531,31 +566,36 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                       return SizedBox(); // You can return an empty SizedBox or any other default widget
                                     }),
                               ),*/
-                              SizedBox(height: screenHeight * 0.01),
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.02),
-                              Text('Recent Trip',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30,
-                                    fontFamily: 'default',
-                                  )),
-                              SizedBox(height: screenHeight * 0.01),
-                              Divider(),
-                              SizedBox(height: screenHeight * 0.01),
-                              RequestsWidget(
-                                  loading: _isLoading,
-                                  fetch: _isFetched,
-                                  errorText: 'You haven\'t finished any trip yet.',
-                                  listWidget: recentRequests,
-                                  fetchData: fetchConnectionRequests(),
-                                  numberOfWidgets: 10,
-                                  showSeeAllButton: shouldShowSeeAllButton(
-                                      recentRequests),
-                                  seeAllButtonText: 'See all Recent Trips',
-                                  nextPage: DriverDashboardRecent(shouldRefresh: true,)),
-                              /*Container(
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Divider(),
+                                    SizedBox(height: screenHeight * 0.02),
+                                    Text('Recent Trip',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          fontFamily: 'default',
+                                        )),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    Divider(),
+                                    SizedBox(height: screenHeight * 0.01),
+                                    RequestsWidget(
+                                      loading: _isLoading,
+                                      fetch: _isFetched,
+                                      errorText:
+                                          'You haven\'t finished any trip yet.',
+                                      listWidget: recentRequests,
+                                      fetchData: fetchConnectionRequests(),
+                                      numberOfWidgets: 5,
+                                      showSeeAllButton: shouldShowSeeAllButton(
+                                          recentRequests),
+                                      seeAllButtonText: 'See All Recent Trips',
+                                      nextView: DriverDashboardRecent(
+                                        shouldRefresh: true,
+                                      ),
+                                      pagination: canFetchMoreRecent,
+                                    ),
+                                    /*Container(
                                 //height: screenHeight*0.25,
                                 child: FutureBuilder<void>(
                                     future: _isLoading
@@ -612,10 +652,10 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                                 SizedBox(
                                                   height: 10,
                                                 ),
-                                                *//*if (shouldShowSeeAllButton(
+                                                */ /*if (shouldShowSeeAllButton(
                                                     pendingRequests))
                                                   buildSeeAllButtonRequestList(
-                                                      context)*//*
+                                                      context)*/ /*
                                               ],
                                             ),
                                           );
@@ -630,160 +670,163 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                       return SizedBox(); // You can return an empty SizedBox or any other default widget
                                     }),
                               ),*/
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      bottomNavigationBar: BottomAppBar(
+                        color: Colors.transparent,
+                        elevation: 5,
+                        height: screenHeight * 0.08,
+                        padding: EdgeInsets.all(0),
+                        notchMargin: 10.0,
+                        shape: CircularNotchedRectangle(),
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(5),
+                            topRight: Radius.circular(5),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => DriverDashboard(
+                                                shouldRefresh: true,
+                                              )));
+                                },
+                                child: Container(
+                                  width: screenWidth / 3,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        const Color.fromRGBO(25, 192, 122, 1),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.home,
+                                        size: 30,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        'Home',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                          fontFamily: 'default',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => Profile(
+                                                shouldRefresh: true,
+                                              )));
+                                },
+                                child: Container(
+                                  width: screenWidth / 3,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        const Color.fromRGBO(25, 192, 122, 1),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.person,
+                                        size: 30,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        'Profile',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                          fontFamily: 'default',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  _showLogoutDialog(context);
+                                },
+                                behavior: HitTestBehavior.translucent,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color:
+                                          const Color.fromRGBO(25, 192, 122, 1),
+                                      border: Border(
+                                        left: BorderSide(
+                                          color: Colors.black,
+                                          width: 1.0,
+                                        ),
+                                      )),
+                                  width: screenWidth / 3,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.logout,
+                                        size: 30,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        'Log Out',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                          fontFamily: 'default',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                bottomNavigationBar: BottomAppBar(
-                  color: Colors.transparent,
-                  elevation: 5,
-                  height: screenHeight * 0.08,
-                  padding: EdgeInsets.all(0),
-                  notchMargin: 10.0,
-                  shape: CircularNotchedRectangle(),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(5),
-                      topRight: Radius.circular(5),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DriverDashboard(
-                                      shouldRefresh: true,
-                                    )));
-                          },
-                          child: Container(
-                            width: screenWidth / 3,
-                            decoration: BoxDecoration(
-                              color: const Color.fromRGBO(25, 192, 122, 1),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.home,
-                                  size: 30,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  'Home',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    fontFamily: 'default',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Profile(
-                                      shouldRefresh: true,
-                                    )));
-                          },
-                          child: Container(
-                            width: screenWidth / 3,
-                            decoration: BoxDecoration(
-                              color: const Color.fromRGBO(25, 192, 122, 1),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.person,
-                                  size: 30,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  'Profile',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    fontFamily: 'default',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            _showLogoutDialog(context);
-                          },
-                          behavior: HitTestBehavior.translucent,
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: const Color.fromRGBO(25, 192, 122, 1),
-                                border: Border(
-                                  left: BorderSide(
-                                    color: Colors.black,
-                                    width: 1.0,
-                                  ),
-                                )),
-                            width: screenWidth / 3,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.logout,
-                                  size: 30,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  'Log Out',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    fontFamily: 'default',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+                );
+              } else {
+                return Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+            },
           );
-        } else {
-          return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-      },
-    );
   }
 
   void _showNotificationsOverlay(BuildContext context) {
