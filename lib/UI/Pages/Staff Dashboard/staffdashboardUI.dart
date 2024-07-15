@@ -448,8 +448,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                       listWidget: pendingRequests,
                                       fetchData: fetchConnectionRequests(),
                                       numberOfWidgets: 5,
-                                      showSeeAllButton: shouldShowSeeAllButton(
-                                          pendingRequests),
+                                      showSeeAllButton: canFetchMorePending,
                                       seeAllButtonText: 'See All Pending Trips',
                                       nextView: StaffDashboardPending(
                                         shouldRefresh: true,
@@ -543,21 +542,21 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                     SizedBox(height: screenHeight * 0.01),
                                     Divider(),
                                     RequestsWidget(
-                                        loading: _isLoading,
-                                        fetch: _isFetched,
-                                        errorText:
-                                            'No trip request reviewed yet.',
-                                        listWidget: acceptedRequests,
-                                        fetchData: fetchConnectionRequests(),
-                                        numberOfWidgets: 5,
-                                        showSeeAllButton:
-                                            shouldShowSeeAllButton(
-                                                acceptedRequests),
-                                        seeAllButtonText:
-                                            'See All Approved Trips',
-                                        nextView: StaffDashboardAccepted(
-                                          shouldRefresh: true,
-                                        ), pagination: canFetchMoreAccepted,),
+                                      loading: _isLoading,
+                                      fetch: _isFetched,
+                                      errorText:
+                                          'No trip request reviewed yet.',
+                                      listWidget: acceptedRequests,
+                                      fetchData: fetchConnectionRequests(),
+                                      numberOfWidgets: 5,
+                                      showSeeAllButton: canFetchMoreAccepted,
+                                      seeAllButtonText:
+                                          'See All Approved Trips',
+                                      nextView: StaffDashboardAccepted(
+                                        shouldRefresh: true,
+                                      ),
+                                      pagination: canFetchMoreAccepted,
+                                    ),
                                     Divider(),
                                     SizedBox(height: screenHeight * 0.02),
                                     Text('Recent Trip',
@@ -570,21 +569,20 @@ class _StaffDashboardState extends State<StaffDashboard> {
                                     SizedBox(height: screenHeight * 0.01),
                                     Divider(),
                                     RequestsWidget(
-                                        loading: _isLoading,
-                                        fetch: _isFetched,
-                                        errorText:
-                                            'You haven\'t take any trip yet.',
-                                        listWidget: recentRequests,
-                                        fetchData: fetchConnectionRequests(),
-                                        numberOfWidgets: 5,
-                                        showSeeAllButton:
-                                            shouldShowSeeAllButton(
-                                                recentRequests),
-                                        seeAllButtonText:
-                                            'See All Recent Trips',
-                                        nextView: StaffDashboardRecent(
-                                          shouldRefresh: true,
-                                        ), pagination: canFetchMoreRecent,),
+                                      loading: _isLoading,
+                                      fetch: _isFetched,
+                                      errorText:
+                                          'You haven\'t take any trip yet.',
+                                      listWidget: recentRequests,
+                                      fetchData: fetchConnectionRequests(),
+                                      numberOfWidgets: 5,
+                                      showSeeAllButton: canFetchMoreRecent,
+                                      seeAllButtonText: 'See All Recent Trips',
+                                      nextView: StaffDashboardRecent(
+                                        shouldRefresh: true,
+                                      ),
+                                      pagination: canFetchMoreRecent,
+                                    ),
                                     Divider(),
                                     SizedBox(height: screenHeight * 0.02),
                                     Center(

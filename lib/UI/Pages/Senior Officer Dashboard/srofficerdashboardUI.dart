@@ -20,8 +20,6 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-
-
 class SROfficerDashboard extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -94,17 +92,14 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
         _isLoading = true;
       });
 
-
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
       print(pagination);
 
       pendingPagination = Pagination.fromJson(pagination['pending']);
       acceptedPagination = Pagination.fromJson(pagination['ongoing']);
 
-
       canFetchMorePending = pendingPagination.canFetchNext;
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
-
 
       // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
@@ -271,111 +266,114 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
             ),
           )
         : BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        if (state is AuthAuthenticated) {
-          final userProfile = state.userProfile;
-          return InternetChecker(
-            child: PopScope(
-              canPop: false,
-              child: Scaffold(
-                key: _scaffoldKey,
-                appBar: AppBar(
-                  backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
-                  titleSpacing: 5,
-                  automaticallyImplyLeading: false,
-                  title: const Text(
-                    'Sr Officer Dashboard',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                  centerTitle: true,
-                  actions: [
-                    Stack(
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.notifications,
+            builder: (context, state) {
+              if (state is AuthAuthenticated) {
+                final userProfile = state.userProfile;
+                return InternetChecker(
+                  child: PopScope(
+                    canPop: false,
+                    child: Scaffold(
+                      key: _scaffoldKey,
+                      appBar: AppBar(
+                        backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+                        titleSpacing: 5,
+                        automaticallyImplyLeading: false,
+                        title: const Text(
+                          'Sr Officer Dashboard',
+                          style: TextStyle(
                             color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'default',
                           ),
-                          onPressed: () async {
-                            _showNotificationsOverlay(context);
-                            var notificationApiService =
-                            await NotificationReadApiService.create();
-                            notificationApiService.readNotification();
-                          },
                         ),
-                        if (notifications.isNotEmpty)
-                          Positioned(
-                            right: 11,
-                            top: 11,
-                            child: Container(
-                              padding: EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 12,
-                                minHeight: 12,
-                              ),
-                              child: Text(
-                                '${notifications.length}',
-                                style: TextStyle(
+                        centerTitle: true,
+                        actions: [
+                          Stack(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.notifications,
                                   color: Colors.white,
-                                  fontSize: 8,
                                 ),
-                                textAlign: TextAlign.center,
+                                onPressed: () async {
+                                  _showNotificationsOverlay(context);
+                                  var notificationApiService =
+                                      await NotificationReadApiService.create();
+                                  notificationApiService.readNotification();
+                                },
                               ),
-                            ),
+                              if (notifications.isNotEmpty)
+                                Positioned(
+                                  right: 11,
+                                  top: 11,
+                                  child: Container(
+                                    padding: EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 12,
+                                      minHeight: 12,
+                                    ),
+                                    child: Text(
+                                      '${notifications.length}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                      ],
-                    ),
-                  ],
-                ),
-                body: SingleChildScrollView(
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 30.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Center(
-                              child: Text('Welcome, ${userProfile.name}',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25,
-                                    fontFamily: 'default',
-                                  )),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Text('New Trip',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            Divider(),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No new trip request.',
-                                listWidget: pendingRequests,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 5,
-                                showSeeAllButton: shouldShowSeeAllButton(
-                                    pendingRequests),
-                                seeAllButtonText: 'See All New Trips',
-                                nextView: SROfficerDashboardNewTrip(shouldRefresh: true,), pagination: canFetchMorePending,),
-                            /* Container(
+                        ],
+                      ),
+                      body: SingleChildScrollView(
+                        child: SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 30.0),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Center(
+                                    child: Text('Welcome, ${userProfile.name}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25,
+                                          fontFamily: 'default',
+                                        )),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text('New Trip',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25,
+                                        fontFamily: 'default',
+                                      )),
+                                  SizedBox(height: screenHeight * 0.01),
+                                  Divider(),
+                                  RequestsWidget(
+                                    loading: _isLoading,
+                                    fetch: _isFetched,
+                                    errorText: 'No new trip request.',
+                                    listWidget: pendingRequests,
+                                    fetchData: fetchConnectionRequests(),
+                                    numberOfWidgets: 5,
+                                    showSeeAllButton: canFetchMorePending,
+                                    seeAllButtonText: 'See All New Trips',
+                                    nextView: SROfficerDashboardNewTrip(
+                                      shouldRefresh: true,
+                                    ),
+                                    pagination: canFetchMorePending,
+                                  ),
+                                  /* Container(
                               //height: screenHeight*0.25,
                               child: FutureBuilder<void>(
                                   future: _isLoading
@@ -427,10 +425,10 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                               SizedBox(
                                                 height: 10,
                                               ),
-                                              *//*if (shouldShowSeeAllButton(
+                                              */ /*if (shouldShowSeeAllButton(
                                                     pendingRequests))
                                                   buildSeeAllButtonRequestList(
-                                                      context)*//*
+                                                      context)*/ /*
                                             ],
                                           ),
                                         );
@@ -445,29 +443,32 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                     return SizedBox(); // You can return an empty SizedBox or any other default widget
                                   }),
                             ),*/
-                            Divider(),
-                            SizedBox(height: screenHeight * 0.02),
-                            Text('Ongoing Trip',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            Divider(),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No trip request reviewed yet.',
-                                listWidget: acceptedRequests,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 5,
-                                showSeeAllButton: shouldShowSeeAllButton(
-                                    acceptedRequests),
-                                seeAllButtonText: 'See All Ongoing Trips',
-                                nextView: SROfficerDashboardOngoing(shouldRefresh: true,), pagination: canFetchMoreAccepted,),
-                            /*    Container(
+                                  Divider(),
+                                  SizedBox(height: screenHeight * 0.02),
+                                  Text('Ongoing Trip',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25,
+                                        fontFamily: 'default',
+                                      )),
+                                  SizedBox(height: screenHeight * 0.01),
+                                  Divider(),
+                                  RequestsWidget(
+                                    loading: _isLoading,
+                                    fetch: _isFetched,
+                                    errorText: 'No trip request reviewed yet.',
+                                    listWidget: acceptedRequests,
+                                    fetchData: fetchConnectionRequests(),
+                                    numberOfWidgets: 5,
+                                    showSeeAllButton: canFetchMoreAccepted,
+                                    seeAllButtonText: 'See All Ongoing Trips',
+                                    nextView: SROfficerDashboardOngoing(
+                                      shouldRefresh: true,
+                                    ),
+                                    pagination: canFetchMoreAccepted,
+                                  ),
+                                  /*    Container(
                               //height: screenHeight*0.25,
                               child: FutureBuilder<void>(
                                   future: _isLoading
@@ -520,10 +521,10 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                               SizedBox(
                                                 height: 10,
                                               ),
-                                              *//*if (shouldShowSeeAllButton(
+                                              */ /*if (shouldShowSeeAllButton(
                                                     pendingRequests))
                                                   buildSeeAllButtonRequestList(
-                                                      context)*//*
+                                                      context)*/ /*
                                             ],
                                           ),
                                         );
@@ -538,149 +539,152 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                     return SizedBox(); // You can return an empty SizedBox or any other default widget
                                   }),
                             ),*/
-                            Divider()
+                                  Divider()
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      bottomNavigationBar: Container(
+                        height: screenHeight * 0.08,
+                        color: const Color.fromRGBO(25, 192, 122, 1),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            SROfficerDashboard()));
+                              },
+                              child: Container(
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.home,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Home',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'default',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Profile(
+                                              shouldRefresh: true,
+                                            )));
+                              },
+                              behavior: HitTestBehavior.translucent,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                  left: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                )),
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.person,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Profile',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'default',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                _showLogoutDialog(context);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                  left: BorderSide(
+                                    color: Colors.black,
+                                    width: 1.0,
+                                  ),
+                                )),
+                                width: screenWidth / 3,
+                                padding: EdgeInsets.all(5),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.logout,
+                                      size: 30,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      'Log Out',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        fontFamily: 'default',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                ),
-                bottomNavigationBar: Container(
-                  height: screenHeight * 0.08,
-                  color: const Color.fromRGBO(25, 192, 122, 1),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SROfficerDashboard()));
-                        },
-                        child: Container(
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.home,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Home',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Profile(shouldRefresh: true,)));
-                        },
-                        behavior: HitTestBehavior.translucent,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: Colors.black,
-                                  width: 1.0,
-                                ),
-                              )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Profile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          _showLogoutDialog(context);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(
-                                  color: Colors.black,
-                                  width: 1.0,
-                                ),
-                              )),
-                          width: screenWidth / 3,
-                          padding: EdgeInsets.all(5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.logout,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                'Log Out',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  fontFamily: 'default',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+                );
+              } else {
+                return Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+            },
           );
-        } else {
-          return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-      },
-    );
   }
 
   void _showNotificationsOverlay(BuildContext context) {
@@ -708,40 +712,41 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
             ),
             child: notifications.isEmpty
                 ? Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.notifications_off),
-                  SizedBox(width: 10,),
-                  Text(
-                    'No new notifications',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            )
-                : ListView.builder(
-              padding: EdgeInsets.all(8),
-              shrinkWrap: true,
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.info_outline),
-                      title: Text(notifications[index]),
-                      onTap: () {
-                        // Handle notification tap if necessary
-                        overlayEntry.remove();
-                      },
+                    height: 50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.notifications_off),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          'No new notifications',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
                     ),
-                    if (index < notifications.length - 1)
-                      Divider()
-                  ],
-                );
-              },
-            ),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.all(8),
+                    shrinkWrap: true,
+                    itemCount: notifications.length,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.info_outline),
+                            title: Text(notifications[index]),
+                            onTap: () {
+                              // Handle notification tap if necessary
+                              overlayEntry.remove();
+                            },
+                          ),
+                          if (index < notifications.length - 1) Divider()
+                        ],
+                      );
+                    },
+                  ),
           ),
         ),
       ),

@@ -53,7 +53,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
   late Pagination recentPagination;
   late Pagination driversPagination;
 
-  // Example to check if more data can be fetched
   bool canFetchMorePending = false;
   bool canFetchMoreAccepted = false;
   bool canFetchMoreRecent = false;
@@ -442,7 +441,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     fetchData: fetchConnectionRequests(),
                                     numberOfWidgets: 3,
                                     showSeeAllButton:
-                                        (shouldShowSeeAllButton(drivers)),
+                                        canFetchMoreDrivers,
                                     seeAllButtonText: 'See All Drivers',
                                     nextView: AdminDashboardDriver(
                                       shouldRefresh: true,

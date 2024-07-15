@@ -455,8 +455,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                         fetchData: fetchConnectionRequests(),
                                         numberOfWidgets: 5,
                                         showSeeAllButton:
-                                            shouldShowSeeAllButton(
-                                                pendingRequests),
+                                            canFetchMorePending,
                                         seeAllButtonText: 'See All New Trips',
                                         nextView: DriverDashboardPending(
                                           shouldRefresh: true,
@@ -486,8 +485,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                       listWidget: acceptedRequests,
                                       fetchData: fetchConnectionRequests(),
                                       numberOfWidgets: 10,
-                                      showSeeAllButton: shouldShowSeeAllButton(
-                                          acceptedRequests),
+                                      showSeeAllButton: canFetchMoreAccepted,
                                       seeAllButtonText: '',
                                       nextView: null,
                                       pagination: canFetchMoreAccepted,
@@ -587,8 +585,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                       listWidget: recentRequests,
                                       fetchData: fetchConnectionRequests(),
                                       numberOfWidgets: 5,
-                                      showSeeAllButton: shouldShowSeeAllButton(
-                                          recentRequests),
+                                      showSeeAllButton: canFetchMoreRecent,
                                       seeAllButtonText: 'See All Recent Trips',
                                       nextView: DriverDashboardRecent(
                                         shouldRefresh: true,
