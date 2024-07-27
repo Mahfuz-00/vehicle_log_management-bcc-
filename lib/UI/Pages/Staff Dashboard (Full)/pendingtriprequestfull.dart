@@ -336,6 +336,10 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
     pendingPagination = Pagination(nextPage: null, previousPage: null);
     acceptedPagination = Pagination(nextPage: null, previousPage: null);
     recentPagination = Pagination(nextPage: null, previousPage: null);
+    if (!_isFetched) {
+      fetchConnectionRequests();
+      //_isFetched = true; // Set _isFetched to true after the first call
+    }
     print('initState called');
     loadUserProfile();
     Future.delayed(Duration(seconds: 2), () {
@@ -344,10 +348,6 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
         // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
         // connectionRequests = [];
-        if (!_isFetched) {
-          fetchConnectionRequests();
-          //_isFetched = true; // Set _isFetched to true after the first call
-        }
       }
       // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {

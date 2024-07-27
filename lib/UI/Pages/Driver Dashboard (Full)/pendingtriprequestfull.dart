@@ -318,6 +318,10 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
   void initState() {
     super.initState();
     print('initState called');
+    if (!_isFetched) {
+      fetchConnectionRequests();
+      //_isFetched = true; // Set _isFetched to true after the first call
+    }
     acceptedPagination = Pagination(nextPage: null, previousPage: null);
     loadUserProfile();
     Future.delayed(Duration(seconds: 5), () {
@@ -326,10 +330,6 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
         // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
         // connectionRequests = [];
-        if (!_isFetched) {
-          fetchConnectionRequests();
-          //_isFetched = true; // Set _isFetched to true after the first call
-        }
       }
       // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {

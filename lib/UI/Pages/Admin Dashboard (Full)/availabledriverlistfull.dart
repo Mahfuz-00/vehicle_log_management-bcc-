@@ -232,6 +232,10 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
     super.initState();
     print('initState called');
     driverPagination = Pagination(nextPage: null, previousPage: null);
+    if (!_isFetched) {
+      fetchConnectionRequests();
+      //_isFetched = true; // Set _isFetched to true after the first call
+    }
     loadUserProfile();
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
@@ -239,10 +243,6 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
         // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
         // connectionRequests = [];
-        if (!_isFetched) {
-          fetchConnectionRequests();
-          //_isFetched = true; // Set _isFetched to true after the first call
-        }
       }
       // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {

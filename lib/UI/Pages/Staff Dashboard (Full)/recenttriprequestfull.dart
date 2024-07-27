@@ -289,6 +289,10 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
   @override
   void initState() {
     super.initState();
+    if (!_isFetched) {
+      fetchConnectionRequests();
+      //_isFetched = true; // Set _isFetched to true after the first call
+    }
     recentPagination = Pagination(nextPage: null, previousPage: null);
     print('initState called');
     loadUserProfile();
@@ -298,10 +302,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
         // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
         // connectionRequests = [];
-        if (!_isFetched) {
-          fetchConnectionRequests();
-          //_isFetched = true; // Set _isFetched to true after the first call
-        }
+
       }
       // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {

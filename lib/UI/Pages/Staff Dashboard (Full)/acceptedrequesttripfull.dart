@@ -290,6 +290,10 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
     print('initState called');
     // Initialize the pagination with default values
     acceptedPagination = Pagination(nextPage: null, previousPage: null);
+    if (!_isFetched) {
+      fetchConnectionRequests();
+      //_isFetched = true; // Set _isFetched to true after the first call
+    }
     loadUserProfile();
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
@@ -297,10 +301,6 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
         // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
         // connectionRequests = [];
-        if (!_isFetched) {
-          fetchConnectionRequests();
-          //_isFetched = true; // Set _isFetched to true after the first call
-        }
       }
       // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
