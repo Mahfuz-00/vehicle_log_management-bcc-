@@ -133,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
                               //side: BorderSide(color: Colors.black, width: 2),
                             ),
                             //elevation: 3,
-                            fixedSize: Size(screenWidth*0.9, 70),
+                            fixedSize: Size(screenWidth*0.7, 70),
                           ),
                           child: const Text('Login',
                               textAlign: TextAlign.center,

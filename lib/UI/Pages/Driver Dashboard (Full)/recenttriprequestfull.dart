@@ -142,7 +142,10 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -158,7 +161,10 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type'],
                       driver: request['driver'],
                       Car: request['car'],
@@ -248,7 +254,10 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -264,7 +273,10 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type'],
                       driver: request['driver'],
                       Car: request['car'],
@@ -540,6 +552,12 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
                                   ),
                                   onPressed: (recentPrev.isNotEmpty && recentPrev != 'None' && _isLoading)
                                       ? () {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(
+                                      SnackBar(
+                                        content: Text('Loading...'),
+                                      ),
+                                    );
                                     print('Prev: $recentPrev');
                                     setState(() {
                                       _isFetchedFull = false;
@@ -570,6 +588,12 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
                                   ),
                                   onPressed: (recentNext.isNotEmpty && recentNext != 'None' && _isLoading)
                                       ? () {
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(
+                                      SnackBar(
+                                        content: Text('Loading...'),
+                                      ),
+                                    );
                                     print('Next: $recentNext');
                                     setState(() {
                                       _isFetchedFull = false;

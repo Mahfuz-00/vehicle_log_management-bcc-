@@ -164,7 +164,10 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -182,7 +185,10 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type']),
                 ),
               ),
@@ -300,7 +306,10 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -318,7 +327,10 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type']),
                 ),
               ),
@@ -458,6 +470,12 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
                                 ),
                                 onPressed: (pendingPrev.isNotEmpty && pendingPrev != 'None' && _isLoading)
                                     ? () {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Loading...'),
+                                    ),
+                                  );
                                   print('Prev: $pendingPrev');
                                   setState(() {
                                     _isFetchedFull = false;
@@ -488,6 +506,12 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
                                 ),
                                 onPressed: (pendingNext.isNotEmpty && pendingNext != 'None' && _isLoading)
                                     ? () {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Loading...'),
+                                    ),
+                                  );
                                   print('Next: $pendingNext');
                                   setState(() {
 

@@ -12,7 +12,10 @@ class TripRecent {
   String destinationFrom;
   String destinationTo;
   String date;
-  String time;
+  String startTime;
+  String endTime;
+  String distance;
+  String category;
   String type;
   int Duration;
   DateTime? startTrip;
@@ -30,7 +33,10 @@ class TripRecent {
     required this.destinationFrom,
     required this.destinationTo,
     required this.date,
-    required this.time,
+    required this.startTime,
+    required this.endTime,
+    required this.distance,
+    required this.category,
     required this.type,
     required this.Duration,
     this.startTrip,
@@ -51,7 +57,10 @@ class TripRecent {
       destinationFrom: json['destination_from'],
       destinationTo: json['destination_to'],
       date: json['date'],
-      time: json['time'],
+      startTime: json['start_time'],
+      endTime: json['end_time'],
+      distance: json['approx_distance'],
+      category: json['trip_category'],
       type: json['type'],
       Duration: json['duration'],
 
@@ -74,7 +83,10 @@ class TripRecent {
     data['destination_from'] = this.destinationFrom;
     data['destination_to'] = this.destinationTo;
     data['date'] = this.date;
-    data['time'] = this.time;
+    data['start_time'] = this.startTime;
+    data['end_time'] = this.endTime;
+    data['approx_distance'] = this.distance;
+    data['trip_category'] = this.category;
     data['type'] = this.type;
     /*  if (this.startTrip != null) {
       data['start_trip'] = this.startTrip!.toIso8601String();

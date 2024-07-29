@@ -23,7 +23,6 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-
 class AdminDashboardRecent extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -76,7 +75,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
-      await apiService.fetchDashboardItems();
+          await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
         // No data available or an error occurred
         print(
@@ -149,7 +148,10 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -165,7 +167,10 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type'],
                       driver: request['driver'],
                       Car: request['car'],
@@ -198,7 +203,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
-      await apiService.fetchDashboardItemsFull(url);
+          await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
         // No data available or an error occurred
         print(
@@ -271,7 +276,10 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -287,7 +295,10 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type'],
                       driver: request['driver'],
                       Car: request['car'],
@@ -350,54 +361,55 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
 
     return _pageLoading
         ? Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        // Show circular loading indicator while waiting
-        child: CircularProgressIndicator(),
-      ),
-    )
-        :BlocBuilder<AuthCubit, AuthState>(
-      builder: (context, state) {
-        if (state is AuthAuthenticated) {
-          final userProfile = state.userProfile;
-          return InternetChecker(
-            child: Scaffold(
-              key: _scaffoldKey,
-              appBar: AppBar(
-                backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
-                titleSpacing: 5,
-                automaticallyImplyLeading: false,
-                title: const Text(
-                  'Admin Dashboard',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    fontFamily: 'default',
-                  ),
-                ),
-                centerTitle: true,
-              ),
-              body: SingleChildScrollView(
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Center(
-                            child: Text('Welcome, ${userProfile.name}',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25,
-                                  fontFamily: 'default',
-                                )),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          /*           Text('New Trip',
+            backgroundColor: Colors.white,
+            body: Center(
+              // Show circular loading indicator while waiting
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, state) {
+              if (state is AuthAuthenticated) {
+                final userProfile = state.userProfile;
+                return InternetChecker(
+                  child: Scaffold(
+                    key: _scaffoldKey,
+                    appBar: AppBar(
+                      backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+                      titleSpacing: 5,
+                      automaticallyImplyLeading: false,
+                      title: const Text(
+                        'Admin Dashboard',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          fontFamily: 'default',
+                        ),
+                      ),
+                      centerTitle: true,
+                    ),
+                    body: SingleChildScrollView(
+                      child: SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 20),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Text('Welcome, ${userProfile.name}',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25,
+                                        fontFamily: 'default',
+                                      )),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                /*           Text('New Trip',
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -412,7 +424,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                       listWidget: pendingRequests,
                       fetchData: fetchConnectionRequests(),
                     ),*/
-                          /*   SizedBox(height: screenHeight * 0.02),
+                                /*   SizedBox(height: screenHeight * 0.02),
                     Text('Ongoing Trip',
                         style: TextStyle(
                           color: Colors.black,
@@ -429,232 +441,266 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                         fetchData: fetchConnectionRequests(),
                      ),
                     Divider(),*/
-                          // SizedBox(height: screenHeight * 0.02),
-                          Text('Recent Trip',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 30,
-                                fontFamily: 'default',
-                              )),
-                          SizedBox(height: screenHeight * 0.01),
-                          Divider(),
-                          RequestsWidgetShowAll(
-                            loading: _isLoading,
-                            fetch: _isFetched,
-                            errorText: 'No Recent Trip.',
-                            listWidget: recentRequests,
-                            fetchData: fetchConnectionRequests(),
+                                // SizedBox(height: screenHeight * 0.02),
+                                Text('Recent Trip',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 30,
+                                      fontFamily: 'default',
+                                    )),
+                                SizedBox(height: screenHeight * 0.01),
+                                Divider(),
+                                RequestsWidgetShowAll(
+                                  loading: _isLoading,
+                                  fetch: _isFetched,
+                                  errorText: 'No Recent Trip.',
+                                  listWidget: recentRequests,
+                                  fetchData: fetchConnectionRequests(),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            (recentPrev.isNotEmpty &&
+                                                    recentPrev != 'None' &&
+                                                    _isLoading)
+                                                ? const Color.fromRGBO(
+                                                    25, 192, 122, 1)
+                                                : Colors.grey, // Disabled color
+                                        fixedSize: Size(
+                                            MediaQuery.of(context).size.width *
+                                                0.3,
+                                            MediaQuery.of(context).size.height *
+                                                0.05),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      onPressed: (recentPrev.isNotEmpty &&
+                                              recentPrev != 'None' &&
+                                              _isLoading)
+                                          ? () {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text('Loading...'),
+                                                ),
+                                              );
+                                              print('Prev: $recentPrev');
+                                              setState(() {
+                                                _isFetchedFull = false;
+                                                fetchConnectionRequestsPagination(
+                                                    recentPrev);
+                                                recentPrev = '';
+                                              });
+                                            }
+                                          : null,
+                                      child: Text('Previous',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'default',
+                                          )),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            (recentNext.isNotEmpty &&
+                                                    recentNext != 'None' &&
+                                                    _isLoading)
+                                                ? const Color.fromRGBO(
+                                                    25, 192, 122, 1)
+                                                : Colors.grey, // Disabled color
+                                        fixedSize: Size(
+                                            MediaQuery.of(context).size.width *
+                                                0.3,
+                                            MediaQuery.of(context).size.height *
+                                                0.05),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      onPressed: (recentNext.isNotEmpty &&
+                                              recentNext != 'None' &&
+                                              _isLoading)
+                                          ? () {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text('Loading...'),
+                                                ),
+                                              );
+                                              print('Next: $recentNext');
+                                              setState(() {
+                                                _isFetchedFull = false;
+                                                fetchConnectionRequestsPagination(
+                                                    recentNext);
+                                                recentNext = '';
+                                              });
+                                            }
+                                          : null,
+                                      child: Text('Next',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'default',
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: (recentPrev.isNotEmpty && recentPrev != 'None' && _isLoading)
-                                      ? const Color.fromRGBO(25, 192, 122, 1)
-                                      : Colors.grey, // Disabled color
-                                  fixedSize: Size(
-                                      MediaQuery.of(context).size.width * 0.3,
-                                      MediaQuery.of(context).size.height * 0.05),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    bottomNavigationBar: Container(
+                      height: screenHeight * 0.08,
+                      color: const Color.fromRGBO(25, 192, 122, 1),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          AdminDashboardRecent(
+                                              shouldRefresh: true)));
+                            },
+                            child: Container(
+                              width: screenWidth / 3,
+                              padding: EdgeInsets.all(5),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.home,
+                                    size: 30,
+                                    color: Colors.white,
                                   ),
-                                ),
-                                onPressed: (recentPrev.isNotEmpty && recentPrev != 'None' && _isLoading)
-                                    ? () {
-                                  print('Prev: $recentPrev');
-                                  setState(() {
-                                    _isFetchedFull = false;
-                                    fetchConnectionRequestsPagination(recentPrev);
-                                    recentPrev = '';
-                                  });
-                                }
-                                    : null,
-                                child: Text('Previous',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'default',
-                                    )),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: (recentNext.isNotEmpty && recentNext != 'None' && _isLoading)
-                                      ? const Color.fromRGBO(25, 192, 122, 1)
-                                      : Colors.grey, // Disabled color
-                                  fixedSize: Size(
-                                      MediaQuery.of(context).size.width * 0.3,
-                                      MediaQuery.of(context).size.height * 0.05),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                  SizedBox(
+                                    height: 5,
                                   ),
-                                ),
-                                onPressed: (recentNext.isNotEmpty && recentNext != 'None' && _isLoading)
-                                    ? () {
-                                  print('Next: $recentNext');
-                                  setState(() {
-                                    _isFetchedFull = false;
-                                    fetchConnectionRequestsPagination(recentNext);
-                                    recentNext = '';
-                                  });
-                                }
-                                    : null,
-                                child: Text('Next',
+                                  Text(
+                                    'Home',
                                     style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 20,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 14,
                                       fontFamily: 'default',
-                                    )),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Profile(
+                                            shouldRefresh: true,
+                                          )));
+                            },
+                            behavior: HitTestBehavior.translucent,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                left: BorderSide(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                              )),
+                              width: screenWidth / 3,
+                              padding: EdgeInsets.all(5),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.person,
+                                    size: 30,
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    'Profile',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      fontFamily: 'default',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              _showLogoutDialog(context);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                left: BorderSide(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                              )),
+                              width: screenWidth / 3,
+                              padding: EdgeInsets.all(5),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.logout,
+                                    size: 30,
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    'Logout',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      fontFamily: 'default',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ),
-              ),
-              bottomNavigationBar: Container(
-                height: screenHeight * 0.08,
-                color: const Color.fromRGBO(25, 192, 122, 1),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    AdminDashboardRecent(shouldRefresh: true)));
-                      },
-                      child: Container(
-                        width: screenWidth / 3,
-                        padding: EdgeInsets.all(5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.home,
-                              size: 30,
-                              color: Colors.white,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              'Home',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                fontFamily: 'default',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Profile(
-                                  shouldRefresh: true,
-                                )));
-                      },
-                      behavior: HitTestBehavior.translucent,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(
-                                color: Colors.black,
-                                width: 1.0,
-                              ),
-                            )),
-                        width: screenWidth / 3,
-                        padding: EdgeInsets.all(5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.person,
-                              size: 30,
-                              color: Colors.white,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              'Profile',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                fontFamily: 'default',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () {
-                        _showLogoutDialog(context);
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border(
-                              left: BorderSide(
-                                color: Colors.black,
-                                width: 1.0,
-                              ),
-                            )),
-                        width: screenWidth / 3,
-                        padding: EdgeInsets.all(5),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.logout,
-                              size: 30,
-                              color: Colors.white,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              'Logout',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                fontFamily: 'default',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                );
+              } else {
+                return Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+            },
           );
-        } else {
-          return Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-      },
-    );
   }
 
   void _showNotificationsOverlay(BuildContext context) {
@@ -682,41 +728,41 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
             ),
             child: notifications.isEmpty
                 ? Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.notifications_off),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'No new notifications',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            )
-                : ListView.builder(
-              padding: EdgeInsets.all(8),
-              shrinkWrap: true,
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.info_outline),
-                      title: Text(notifications[index]),
-                      onTap: () {
-                        // Handle notification tap if necessary
-                        overlayEntry.remove();
-                      },
+                    height: 50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.notifications_off),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          'No new notifications',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
                     ),
-                    if (index < notifications.length - 1) Divider()
-                  ],
-                );
-              },
-            ),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.all(8),
+                    shrinkWrap: true,
+                    itemCount: notifications.length,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          ListTile(
+                            leading: Icon(Icons.info_outline),
+                            title: Text(notifications[index]),
+                            onTap: () {
+                              // Handle notification tap if necessary
+                              overlayEntry.remove();
+                            },
+                          ),
+                          if (index < notifications.length - 1) Divider()
+                        ],
+                      );
+                    },
+                  ),
           ),
         ),
       ),

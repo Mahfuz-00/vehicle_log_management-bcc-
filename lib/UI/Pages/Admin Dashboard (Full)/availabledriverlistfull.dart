@@ -372,6 +372,12 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                                 ),
                                 onPressed: (driverPrev.isNotEmpty && driverPrev != 'None' && _isLoading)
                                     ? () {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Loading...'),
+                                    ),
+                                  );
                                   print('Prev: $driverPrev');
                                   setState(() {
                                     _isFetchedFull = false;
@@ -402,6 +408,12 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                                 ),
                                 onPressed: (driverNext.isNotEmpty && driverNext != 'None' && _isLoading)
                                     ? () {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Loading...'),
+                                    ),
+                                  );
                                   print('Next: $driverNext');
                                   setState(() {
                                     _isFetchedFull = false;

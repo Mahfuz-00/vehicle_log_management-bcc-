@@ -10,7 +10,10 @@ class TripRequest {
   String destinationFrom;
   String destinationTo;
   String date;
-  String time;
+  String startTime;
+  String endTime;
+  String distance;
+  String category;
   String type;
   //DateTime? startTrip;
   //DateTime? stopTrip;
@@ -25,7 +28,10 @@ class TripRequest {
     required this.destinationFrom,
     required this.destinationTo,
     required this.date,
-    required this.time,
+    required this.startTime,
+    required this.endTime,
+    required this.distance,
+    required this.category,
     required this.type,
    // this.startTrip,
    // this.stopTrip,
@@ -43,7 +49,10 @@ class TripRequest {
       destinationFrom: json['destination_from'],
       destinationTo: json['destination_to'],
       date: json['date'],
-      time: json['time'],
+      startTime: json['start_time'],
+      endTime: json['end_time'],
+      distance: json['approx_distance'],
+      category: json['trip_category'],
       type: json['type'],
      // startTrip: json['start_trip'] != null ? DateTime.parse(json['start_trip']) : null,
      // stopTrip: json['stop_trip'] != null ? DateTime.parse(json['stop_trip']) : null,
@@ -62,7 +71,10 @@ class TripRequest {
     data['destination_from'] = this.destinationFrom;
     data['destination_to'] = this.destinationTo;
     data['date'] = this.date;
-    data['time'] = this.time;
+    data['start_time'] = this.startTime;
+    data['end_time'] = this.endTime;
+    data['approx_distance'] = this.distance;
+    data['trip_category'] = this.category;
     data['type'] = this.type;
    /* if (this.startTrip != null) {
       data['start_trip'] = this.startTrip!.toIso8601String();

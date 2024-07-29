@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Trip Request)/apiServiceTripRequest.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../Widgets/radiooption.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
-
 
 class TripRequestForm extends StatefulWidget {
   const TripRequestForm({super.key});
@@ -17,10 +18,12 @@ class TripRequestForm extends StatefulWidget {
 }
 
 class _TripRequestFormState extends State<TripRequestForm> {
-  late TextEditingController _Clockcontroller = TextEditingController();
+  late TextEditingController _StartTimecontroller = TextEditingController();
+  late TextEditingController _EndTimecontroller = TextEditingController();
   late TextEditingController _Datecontroller = TextEditingController();
   late TextEditingController _nameController = TextEditingController();
   late TextEditingController _desinationController = TextEditingController();
+  late TextEditingController _distanceController = TextEditingController();
   late TextEditingController _departmentController = TextEditingController();
   late TextEditingController _purposeController = TextEditingController();
   late TextEditingController _phoneController = TextEditingController();
@@ -28,8 +31,10 @@ class _TripRequestFormState extends State<TripRequestForm> {
       TextEditingController();
   late TextEditingController _destinationtoController = TextEditingController();
   late String triptype = '';
+  late String tripCatagory = '';
   late TripRequest _tripRequest;
   late DateTime? Date;
+  File? _file;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -46,13 +51,17 @@ class _TripRequestFormState extends State<TripRequestForm> {
         destinationFrom: '',
         destinationTo: '',
         date: '',
-        time: '',
-        type: '');
+        startTime: '',
+        endTime: '',
+        distance: '',
+        type: '',
+        category: '');
   }
 
   @override
   void dispose() {
-    _Clockcontroller.dispose();
+    _StartTimecontroller.dispose();
+    _EndTimecontroller.dispose();
     _Datecontroller.dispose();
     super.dispose();
   }
@@ -349,11 +358,11 @@ class _TripRequestFormState extends State<TripRequestForm> {
                         child: Stack(
                           children: [
                             TextFormField(
-                              controller: _Clockcontroller,
+                              controller: _StartTimecontroller,
                               validator: (value) {
                                 // Check if the text field is empty or contains a valid time
                                 if (value == null || value.isEmpty) {
-                                  return 'Please select a time';
+                                  return 'Please select the start time';
                                 }
                                 // You can add more complex validation logic if needed
                                 return null;
@@ -369,7 +378,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                                 fontFamily: 'default',
                               ),
                               decoration: InputDecoration(
-                                labelText: 'Trip Time',
+                                labelText: 'Start Trip Time',
                                 labelStyle: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
@@ -417,7 +426,96 @@ class _TripRequestFormState extends State<TripRequestForm> {
                                         );
                                         print(formattedTime);
                                         // Set the formatted time to the controller
-                                        _Clockcontroller.text = formattedTime;
+                                        _StartTimecontroller.text =
+                                            formattedTime;
+                                        print(formattedTime);
+                                      } else {
+                                        print('No time selected');
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: screenWidth * 0.9,
+                        height: screenHeight * 0.075,
+                        child: Stack(
+                          children: [
+                            TextFormField(
+                              controller: _EndTimecontroller,
+                              validator: (value) {
+                                // Check if the text field is empty or contains a valid time
+                                if (value == null || value.isEmpty) {
+                                  return 'Please select the end time';
+                                }
+                                // You can add more complex validation logic if needed
+                                return null;
+                              },
+                              readOnly: true,
+                              // Make the text field readonly
+                              enableInteractiveSelection: false,
+                              // Disable interactive selection
+                              style: const TextStyle(
+                                color: Color.fromRGBO(143, 150, 158, 1),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'default',
+                              ),
+                              decoration: InputDecoration(
+                                labelText: 'Stop Trip Time',
+                                labelStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  fontFamily: 'default',
+                                ),
+                                border: const OutlineInputBorder(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5))),
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  // Adjust the padding as needed
+                                  child: Icon(
+                                    Icons.schedule_rounded,
+                                    size: 25,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    // Show the time picker dialog
+                                    showTimePicker(
+                                      context: context,
+                                      initialTime: TimeOfDay.now(),
+                                    ).then((selectedTime) {
+                                      // Check if a time is selected
+                                      if (selectedTime != null) {
+                                        // Convert selectedTime to a formatted string
+                                        /*String formattedTime =
+                                            selectedTime.hour.toString().padLeft(2, '0') +
+                                                ':' +
+                                                selectedTime.minute.toString().padLeft(2, '0');*/
+                                        String formattedTime =
+                                            DateFormat('h:mm a').format(
+                                          DateTime(
+                                              2020,
+                                              1,
+                                              1,
+                                              selectedTime.hour,
+                                              selectedTime.minute),
+                                        );
+                                        print(formattedTime);
+                                        // Set the formatted time to the controller
+                                        _EndTimecontroller.text = formattedTime;
                                         print(formattedTime);
                                       } else {
                                         print('No time selected');
@@ -510,6 +608,42 @@ class _TripRequestFormState extends State<TripRequestForm> {
                           ],
                         ),
                       ),
+                      SizedBox(height: 10),
+                      Container(
+                        width: screenWidth * 0.9,
+                        height: screenHeight * 0.075,
+                        child: TextFormField(
+                          controller: _distanceController,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: (input) {
+                            if (input == null || input.isEmpty) {
+                              return 'Please enter approximate distance(in KM)';
+                            }
+                            return null;
+                          },
+                          style: const TextStyle(
+                            color: Color.fromRGBO(143, 150, 158, 1),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'default',
+                          ),
+                          decoration: InputDecoration(
+                            labelText: 'Approximate Distance of the Trip (in KM)',
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontFamily: 'default',
+                            ),
+                            border: const OutlineInputBorder(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(5))),
+                          ),
+                        ),
+                      ),
                       SizedBox(height: 20),
                       Padding(
                         padding: EdgeInsets.symmetric(
@@ -531,15 +665,99 @@ class _TripRequestFormState extends State<TripRequestForm> {
                         padding: EdgeInsets.symmetric(
                             horizontal: screenWidth * 0.025),
                         child: RadioListTileGroup(
-                          options: ['One Way', 'Two Way'],
+                          options: ['Meeting', 'Official'],
+                          selectedOption: tripCatagory,
+                          onChanged: (String value) {
+                            print('Selected option: $value');
+                            tripCatagory = value;
+                            setState(() {
+                              tripCatagory = value;
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.05),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text('Trip Mode',
+                                //textAlign: TextAlign.left,
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'default')),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.025),
+                        child: RadioListTileGroup(
+                          options: ['One-Way', 'Round-Trip'],
                           selectedOption: triptype,
                           onChanged: (String value) {
                             print('Selected option: $value');
                             triptype = value;
-                            // You can perform any other actions here based on the selected option
                           },
                         ),
                       ),
+                      if (tripCatagory == 'Official') ...[
+                        SizedBox(height: 15,),
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromRGBO(25, 192, 122, 1),
+                                    fixedSize: Size(
+                                        MediaQuery.of(context).size.width * 0.8,
+                                        MediaQuery.of(context).size.height *
+                                            0.075),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                  onPressed: _pickFile,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (_file == null) ...[
+                                        Icon(
+                                          Icons.document_scanner,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text('Pick File Attachment (If Any)',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'default',
+                                            )),
+                                      ],
+                                      if (_file != null) ...[
+                                        Text('File Picked',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'default',
+                                            )),
+                                      ]
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ),
+                      ],
                       SizedBox(height: 20),
                       Center(
                         child: ElevatedButton(
@@ -579,6 +797,22 @@ class _TripRequestFormState extends State<TripRequestForm> {
     );
   }
 
+  Future<void> _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+      if (result != null) {
+        setState(() {
+          _file = File(result.files.single.path!);
+        });
+      } else {
+        // User canceled the picker
+      }
+    } catch (e) {
+      print('Error picking file: $e');
+    }
+  }
+
   void _tripRequestForm() {
     // Validate and save form data
     if (_validateAndSave()) {
@@ -588,17 +822,20 @@ class _TripRequestFormState extends State<TripRequestForm> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       print('triggered Validation');
 
-       // Print each field with its corresponding name
-        print('Name: ${_nameController.text}');
-        print('Designation: ${_desinationController.text}');
-        print('Department: ${_departmentController.text}');
-        print('Purpose: ${_purposeController.text}');
-        print('Phone: ${_phoneController.text}');
-        print('Destination From: ${_destinationfromController.text}');
-        print('Destination To: ${_destinationtoController.text}');
-        print('Date: ${_Datecontroller.text}');
-        print('Time: ${_Clockcontroller.text}');
-        print('Type: ${triptype}');
+      // Print each field with its corresponding name
+      print('Name: ${_nameController.text}');
+      print('Designation: ${_desinationController.text}');
+      print('Department: ${_departmentController.text}');
+      print('Purpose: ${_purposeController.text}');
+      print('Phone: ${_phoneController.text}');
+      print('Destination From: ${_destinationfromController.text}');
+      print('Destination To: ${_destinationtoController.text}');
+      print('Date: ${_Datecontroller.text}');
+      print('Start Time: ${_StartTimecontroller.text}');
+      print('End Time: ${_EndTimecontroller.text}');
+      print('Type: ${triptype}');
+      print('Distance: ${_distanceController.text}');
+      print('Trip Catagory: ${tripCatagory}');
       // Initialize connection request model
       _tripRequest = TripRequest(
           name: _nameController.text,
@@ -609,14 +846,18 @@ class _TripRequestFormState extends State<TripRequestForm> {
           destinationFrom: _destinationfromController.text,
           destinationTo: _destinationtoController.text,
           date: _Datecontroller.text,
-          time: _Clockcontroller.text,
-          type: triptype);
+          startTime: _StartTimecontroller.text,
+          endTime: _EndTimecontroller.text,
+          distance: _distanceController.text,
+          type: triptype,
+          category: tripCatagory);
 
       // Perform any additional actions before sending the request
       // Send the connection request using API service
-      APIServiceTripRequest().postTripRequest(_tripRequest).then((response) {
+      APIServiceTripRequest().postTripRequest(_tripRequest, _file).then((response) {
         // Handle successful request
         print('Trip request sent successfully!!');
+        print(response);
         if (response != null && response == "Trip request successfully") {
           Navigator.pushReplacement(
             context,
@@ -638,6 +879,13 @@ class _TripRequestFormState extends State<TripRequestForm> {
         // Handle error
         print('Error sending Trip request: $error');
       });
+    } else {
+      // Show error snackbar
+      const snackBar = SnackBar(
+        content: Text('Please fill all required fields'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return ;
     }
   }
 
@@ -650,8 +898,12 @@ class _TripRequestFormState extends State<TripRequestForm> {
     final PhoneIsValid = _phoneController.text.isNotEmpty;
     final DestinationFromIsValid = _destinationfromController.text.isNotEmpty;
     final DestinationToIsValid = _destinationtoController.text.isNotEmpty;
-    final TripTimeIsValid = _Clockcontroller.text.isNotEmpty;
-    final DateIsValid =  _Datecontroller.text.isNotEmpty;
+    final TripStartTimeIsValid = _StartTimecontroller.text.isNotEmpty;
+    final TripEndTimeIsValid = _EndTimecontroller.text.isNotEmpty;
+    final DistanceIsValid = _distanceController.text.isNotEmpty;
+    final TripCategoryIsValid = tripCatagory.isNotEmpty;
+    final TripTypeIsValid = triptype.isNotEmpty;
+    final DateIsValid = _Datecontroller.text.isNotEmpty;
 
     // Perform any additional validation logic if needed
 
@@ -663,7 +915,11 @@ class _TripRequestFormState extends State<TripRequestForm> {
         PhoneIsValid &&
         DestinationFromIsValid &&
         DestinationToIsValid &&
-        TripTimeIsValid &&
+        TripStartTimeIsValid &&
+        TripEndTimeIsValid &&
+        DistanceIsValid &&
+        TripCategoryIsValid &&
+        TripTypeIsValid &&
         DateIsValid;
 
     return allFieldsAreValid;

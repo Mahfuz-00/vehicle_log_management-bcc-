@@ -41,6 +41,7 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
   bool _isFetchedFull = false;
   bool _isLoading = false;
   bool _pageLoading = true;
+  bool _buttonpressed = false;
   bool _errorOccurred = false;
   late String userName = '';
   late String organizationName = '';
@@ -166,7 +167,10 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -182,7 +186,10 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type']),
                 ),
               ),
@@ -287,7 +294,10 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -303,7 +313,10 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type']),
                 ),
               ),
@@ -473,22 +486,32 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
                                                 pendingPrev != 'None' &&
                                                 _isLoading)
                                             ? () {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Loading...'),
+                                                  ),
+                                                );
                                                 print('Prev: $pendingPrev');
                                                 setState(() {
+                                                  _buttonpressed = true;
                                                   _isFetchedFull = false;
                                                   fetchConnectionRequestsPagination(
                                                       pendingPrev);
+                                                  _buttonpressed = false;
                                                   pendingPrev = '';
                                                 });
                                               }
                                             : null,
-                                        child: Text('Previous',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'default',
-                                            )),
+                                        child: _buttonpressed
+                                            ? CircularProgressIndicator()
+                                            : Text('Previous',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'default',
+                                                )),
                                       ),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
@@ -517,22 +540,32 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
                                                 pendingNext != 'None' &&
                                                 _isLoading)
                                             ? () {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Loading...'),
+                                                  ),
+                                                );
                                                 print('Next: $pendingNext');
                                                 setState(() {
+                                                  _buttonpressed = true;
                                                   _isFetchedFull = false;
                                                   fetchConnectionRequestsPagination(
                                                       pendingNext);
+                                                  _buttonpressed = false;
                                                   pendingNext = '';
                                                 });
                                               }
                                             : null,
-                                        child: Text('Next',
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'default',
-                                            )),
+                                        child: _buttonpressed
+                                            ? CircularProgressIndicator()
+                                            : Text('Next',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'default',
+                                                )),
                                       ),
                                     ],
                                   ),

@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart';
 
 import '../../Models/tripRequestModel.dart';
 
@@ -31,7 +33,7 @@ class APIServiceTripRequest {
     return token;
   }
 
-  Future<String> postTripRequest(TripRequest request) async {
+  Future<String> postTripRequest(TripRequest request, File? file) async {
     final String token = await authToken; // Wait for the authToken to complete
     try {
       if (token.isEmpty) {
@@ -40,14 +42,29 @@ class APIServiceTripRequest {
         throw Exception('Authentication token is empty.');
       }
 
-      final http.Response response = await http.post(
-        Uri.parse('$URL/vlm/trip/request'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token' // Use token here
-        },
-        body: jsonEncode(request.toJson()),
-      );
+      var uri = Uri.parse('$URL/vlm/trip/request');
+      var requestMultipart = http.MultipartRequest('POST', uri);
+
+      requestMultipart.headers['Authorization'] = 'Bearer $token';
+      requestMultipart.headers['Content-Type'] = 'multipart/form-data';
+
+      // Add text fields
+      request.toJson().forEach((key, value) {
+        requestMultipart.fields[key] = value.toString();
+      });
+
+      if(file != null){
+        print('File Found');
+        requestMultipart.files.add(await http.MultipartFile.fromPath(
+          'attachment_file',
+          file!.path,
+          filename: basename(file.path),
+        ));
+      }
+
+      var streamedResponse = await requestMultipart.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
       print(response.body);
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);

@@ -156,7 +156,7 @@ class _StaffDashboardState extends State<StaffDashboard> {
         print(request['destination_from']);
         print(request['destination_to']);
         print(request['date']);
-        print(request['time']);
+        print(request['start_time']);
         print(request['trip_type']);
         return StaffTile(
           staff: TripRequest(
@@ -168,7 +168,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -184,7 +187,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type']),
                 ),
               ),
@@ -205,7 +211,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -224,7 +233,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
                     destinationFrom: request['destination_from'],
                     destinationTo: request['destination_to'],
                     date: request['date'],
-                    time: request['time'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
                     type: request['trip_type'],
                   ),
                 ),
@@ -246,7 +258,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -262,7 +277,10 @@ class _StaffDashboardState extends State<StaffDashboard> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type'],
                       driver: request['driver'],
                       Car: request['car'],

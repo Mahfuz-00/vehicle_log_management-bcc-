@@ -59,7 +59,7 @@ class StaffTile extends StatelessWidget {
                 ),
                 SizedBox(width: 5,),
                 Text(
-                  'Time : ${staff.time}',
+                  'Time : ${staff.startTime}',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

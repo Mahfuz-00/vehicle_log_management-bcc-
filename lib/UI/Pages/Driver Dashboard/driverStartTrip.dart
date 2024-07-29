@@ -120,7 +120,7 @@ class _DriverStartTripState extends State<DriverStartTrip> {
                                     _buildRow('Department', staff.department),
                                     _buildRow('Trip Type', staff.type),
                                     _buildRowTime('Date', staff.date),
-                                    _buildRow('Time', staff.time),
+                                    _buildRow('Start Time', staff.startTime),
                                     _buildRow('Destination From',
                                         staff.destinationFrom),
                                     _buildRow(

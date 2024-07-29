@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Models/tripRequestModel.dart';
 
-
 class PendingTripStaff extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TripRequest staff;
@@ -47,7 +46,9 @@ class PendingTripStaff extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 40,),
+                SizedBox(
+                  height: 40,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0),
                   child: const Center(
@@ -68,20 +69,26 @@ class PendingTripStaff extends StatelessWidget {
                 _buildRow('Name', staff.name),
                 //Divider(),
                 _buildRow('Designation', staff.designation),
-               // Divider(),
+                // Divider(),
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
-              //  Divider(),
+                //  Divider(),
                 _buildRow('Trip Type', staff.type),
-               // Divider(),
+                // Divider(),
                 _buildRowTime('Date', staff.date),
-               // Divider(),
-                _buildRow('Time', staff.time),
-              //  Divider(),
+                // Divider(),
+                _buildRow('Start Time', staff.startTime),
+                // Divider(),
+                _buildRow('End Time', staff.endTime),
+                // Divider(),
+                _buildRow('Distance', '${staff.distance} KM'),
+                // Divider(),
+                _buildRow('Trip Type', staff.category),
+                // Divider(),
                 _buildRow('Destination From', staff.destinationFrom),
-               // Divider(),
+                // Divider(),
                 _buildRow('Destination To', staff.destinationTo),
-              //  Divider(),
+                //  Divider(),
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(

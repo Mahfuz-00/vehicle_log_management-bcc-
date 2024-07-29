@@ -131,7 +131,10 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -149,7 +152,10 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type'],
                       id: request['trip_id']),
                 ),
@@ -238,7 +244,10 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
               destinationFrom: request['destination_from'],
               destinationTo: request['destination_to'],
               date: request['date'],
-              time: request['time'],
+              startTime: request['start_time'],
+              endTime: request['end_time'],
+              distance: request['approx_distance'],
+              category: request['trip_category'],
               type: request['trip_type']),
           onPressed: () {
             Navigator.push(
@@ -256,7 +265,10 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
                       destinationFrom: request['destination_from'],
                       destinationTo: request['destination_to'],
                       date: request['date'],
-                      time: request['time'],
+                      startTime: request['start_time'],
+                      endTime: request['end_time'],
+                      distance: request['approx_distance'],
+                      category: request['trip_category'],
                       type: request['trip_type'],
                       id: request['trip_id']),
                 ),
@@ -488,6 +500,12 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
                                 ),
                                 onPressed: (acceptedPrev.isNotEmpty && acceptedPrev != 'None' && _isLoading)
                                     ? () {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Loading...'),
+                                    ),
+                                  );
                                   print('Prev: $acceptedPrev');
                                   setState(() {
                                     _isFetchedFull = false;
@@ -518,6 +536,12 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
                                 ),
                                 onPressed: (acceptedNext.isNotEmpty && acceptedNext != 'None' && _isLoading)
                                     ? () {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Loading...'),
+                                    ),
+                                  );
                                   print('Next: $acceptedNext');
                                   setState(() {
                                     _isFetchedFull = false;
