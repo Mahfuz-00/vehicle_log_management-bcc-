@@ -131,6 +131,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           Name: request['name'],
           MobileNo: request['phone'],
           CarName: request['car_name'],
+          CarRegNo: request['car_number'],
+          CarModel: request['car_model'],
         );
       }).toList();
 

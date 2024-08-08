@@ -129,6 +129,8 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
           Name: request['name'],
           MobileNo: request['phone'],
           CarName: request['car_name'],
+          CarRegNo: request['car_number'],
+          CarModel: request['car_model'],
         );
       }).toList();
 
@@ -257,6 +259,8 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
           Name: request['name'],
           MobileNo: request['phone'],
           CarName: request['car_name'],
+          CarRegNo: request['car_number'],
+          CarModel: request['car_model'],
         );
       }).toList();
 
@@ -473,7 +477,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                                                 : Colors.grey, // Disabled color
                                         fixedSize: Size(
                                             MediaQuery.of(context).size.width *
-                                                0.3,
+                                                0.35,
                                             MediaQuery.of(context).size.height *
                                                 0.05),
                                         shape: RoundedRectangleBorder(
@@ -503,7 +507,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                                       child: Text('Previous',
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 20,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                             fontFamily: 'default',
                                           )),
@@ -519,7 +523,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                                                 : Colors.grey, // Disabled color
                                         fixedSize: Size(
                                             MediaQuery.of(context).size.width *
-                                                0.3,
+                                                0.35,
                                             MediaQuery.of(context).size.height *
                                                 0.05),
                                         shape: RoundedRectangleBorder(
@@ -549,7 +553,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                                       child: Text('Next',
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 20,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                             fontFamily: 'default',
                                           )),

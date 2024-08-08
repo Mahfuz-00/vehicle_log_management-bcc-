@@ -631,7 +631,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                             fontFamily: 'default',
                           ),
                           decoration: InputDecoration(
-                            labelText: 'Approximate Distance of the Trip (in KM)',
+                            labelText: 'Approx. Distance of the Trip (in KM)',
                             labelStyle: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -665,7 +665,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                         padding: EdgeInsets.symmetric(
                             horizontal: screenWidth * 0.025),
                         child: RadioListTileGroup(
-                          options: ['Meeting', 'Official'],
+                          options: ['Personal', 'Official'],
                           selectedOption: tripCatagory,
                           onChanged: (String value) {
                             print('Selected option: $value');
@@ -735,7 +735,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                                         SizedBox(
                                           width: 10,
                                         ),
-                                        Text('Pick File Attachment (If Any)',
+                                        Text('Pick Attachment (If Any)',
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 20,

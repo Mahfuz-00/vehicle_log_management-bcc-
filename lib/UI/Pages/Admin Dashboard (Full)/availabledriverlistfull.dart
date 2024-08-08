@@ -20,6 +20,7 @@ import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/OngoingTripDetails.dart';
 import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
+import '../Admin Dashboard/admindashboardUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
@@ -130,6 +131,8 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
           Name: request['name'],
           MobileNo: request['phone'],
           CarName: request['car_name'],
+          CarRegNo: request['car_number'],
+          CarModel: request['car_model'],
         );
       }).toList();
 
@@ -206,6 +209,8 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
           Name: request['name'],
           MobileNo: request['phone'],
           CarName: request['car_name'],
+          CarRegNo: request['car_number'],
+          CarModel: request['car_model'],
         );
       }).toList();
 
@@ -290,7 +295,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
               body: SingleChildScrollView(
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(/*horizontal: 20,*/ vertical: 20),
                     child: Center(
                       child: Column(
                         children: [
@@ -364,7 +369,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                                       ? const Color.fromRGBO(25, 192, 122, 1)
                                       : Colors.grey, // Disabled color
                                   fixedSize: Size(
-                                      MediaQuery.of(context).size.width * 0.3,
+                                      MediaQuery.of(context).size.width * 0.35,
                                       MediaQuery.of(context).size.height * 0.05),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -389,7 +394,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                                 child: Text('Previous',
                                     style: TextStyle(
                                       color: Colors.black,
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'default',
                                     )),
@@ -400,7 +405,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                                       ? const Color.fromRGBO(25, 192, 122, 1)
                                       : Colors.grey, // Disabled color
                                   fixedSize: Size(
-                                      MediaQuery.of(context).size.width * 0.3,
+                                      MediaQuery.of(context).size.width * 0.35,
                                       MediaQuery.of(context).size.height * 0.05),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -425,7 +430,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                                 child: Text('Next',
                                     style: TextStyle(
                                       color: Colors.black,
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'default',
                                     )),
@@ -451,7 +456,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    AdminDashboardDriver(shouldRefresh: true)));
+                                    AdminDashboard(shouldRefresh: true)));
                       },
                       child: Container(
                         width: screenWidth / 3,

@@ -472,7 +472,7 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
                                               MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  0.3,
+                                                  0.35,
                                               MediaQuery.of(context)
                                                       .size
                                                       .height *
@@ -508,7 +508,7 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
                                             : Text('Previous',
                                                 style: TextStyle(
                                                   color: Colors.black,
-                                                  fontSize: 20,
+                                                  fontSize: 18,
                                                   fontWeight: FontWeight.bold,
                                                   fontFamily: 'default',
                                                 )),
@@ -526,7 +526,7 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
                                               MediaQuery.of(context)
                                                       .size
                                                       .width *
-                                                  0.3,
+                                                  0.35,
                                               MediaQuery.of(context)
                                                       .size
                                                       .height *
@@ -562,7 +562,7 @@ class _StaffDashboardPendingState extends State<StaffDashboardPending> {
                                             : Text('Next',
                                                 style: TextStyle(
                                                   color: Colors.black,
-                                                  fontSize: 20,
+                                                  fontSize: 18,
                                                   fontWeight: FontWeight.bold,
                                                   fontFamily: 'default',
                                                 )),

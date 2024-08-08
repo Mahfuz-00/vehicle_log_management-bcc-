@@ -5,12 +5,16 @@ class DriverInfoCard extends StatelessWidget {
   final String Name;
   final String MobileNo;
   final String CarName;
+  final String CarRegNo;
+  final String CarModel;
 
   const DriverInfoCard({
     Key? key,
     required this.Name,
     required this.MobileNo,
     required this.CarName,
+    required this.CarRegNo,
+    required this.CarModel,
   }) : super(key: key);
 
   @override
@@ -18,7 +22,7 @@ class DriverInfoCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth*.05),
+      padding: EdgeInsets.symmetric(horizontal: 20),
       child: Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(10),
@@ -40,19 +44,23 @@ class DriverInfoCard extends StatelessWidget {
                     size: 40,
                     color: Colors.grey, // Icon color
                   ),
-                  SizedBox(width: 15,),
-                  Text(Name,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    height: 1.6,
-                    letterSpacing: 1.3,
-                  ),)
+                  SizedBox(
+                    width: 15,
+                  ),
+                  Text(
+                    '$CarName $CarModel',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      height: 1.6,
+                      letterSpacing: 1.3,
+                    ),
+                  )
                 ],
               ),
               Divider(),
               Container(
-                width: screenWidth*0.9,
+                width: screenWidth * 0.9,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
@@ -62,6 +70,8 @@ class DriverInfoCard extends StatelessWidget {
                       _buildRow('Name', Name),
                       _buildRow('Mobile No', MobileNo),
                       _buildRow('Car', CarName),
+                      _buildRow('Car Model', CarModel),
+                      _buildRow('Car No', CarRegNo),
                     ],
                   ),
                 ),

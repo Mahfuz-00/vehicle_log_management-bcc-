@@ -645,7 +645,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                                         ? const Color.fromRGBO(25, 192, 122, 1)
                                         : Colors.grey, // Disabled color
                                     fixedSize: Size(
-                                        MediaQuery.of(context).size.width * 0.3,
+                                        MediaQuery.of(context).size.width * 0.35,
                                         MediaQuery.of(context).size.height * 0.05),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -670,7 +670,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                                   child: Text('Previous',
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: 20,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         fontFamily: 'default',
                                       )),
@@ -681,7 +681,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                                         ? const Color.fromRGBO(25, 192, 122, 1)
                                         : Colors.grey, // Disabled color
                                     fixedSize: Size(
-                                        MediaQuery.of(context).size.width * 0.3,
+                                        MediaQuery.of(context).size.width * 0.35,
                                         MediaQuery.of(context).size.height * 0.05),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -706,7 +706,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                                   child: Text('Next',
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: 20,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         fontFamily: 'default',
                                       )),
