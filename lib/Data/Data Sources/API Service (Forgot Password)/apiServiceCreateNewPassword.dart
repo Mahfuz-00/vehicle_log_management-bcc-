@@ -31,14 +31,14 @@ class APIServiceCreateNewPassword{
 
 
   Future<String> NewPassword(String email, String password, String confirmPassword) async {
-    if (authToken.isEmpty) {
+    /*if (authToken.isEmpty) {
       print(authToken);
       // Wait for authToken to be initialized
       await _loadAuthToken();
       throw Exception('Authentication token is empty.');
-    }
+    }*/
     print(email);
-    print(authToken);
+   // print(authToken);
     // Define the headers
     final Map<String, String> headers = {
       'Accept': 'application/json',

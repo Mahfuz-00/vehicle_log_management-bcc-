@@ -65,6 +65,8 @@
                <key>NSMicrophoneUsageDescription</key>
                <string>We need access to your microphone for video recording.</string>
                <key>NSAppTransportSecurity</key>
+               <key>NSFileProviderUsageDescription</key>
+               <string>We need access to your files to pick and use them within the app.</string>
                <dict>
                    <key>NSAllowsArbitraryLoads</key>
                    <true/>
