@@ -42,7 +42,7 @@ class OngoingTrip extends StatelessWidget {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -91,7 +91,7 @@ class OngoingTrip extends StatelessWidget {
                 //  Divider(),
                 _buildRow('Driver', staff.driver),
                 _buildRow('Car', staff.Car),
-                _buildRowTime('Start Time', staff.startTrip),
+                _buildRow('Trip Started', staff.startTrip),
                 _buildRow('Destination To', staff.destinationTo),
                 SizedBox(height: 40),
                 Center(

@@ -112,7 +112,8 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
         print(
             'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
-      final List<dynamic> acceptedRequestsData = records['Accepted'] ?? [];
+      final List<dynamic> acceptedRequestsData = records['Ongoing'] ?? [];
+      print('Accepted ${acceptedRequestsData}\n');
       for (var index = 0; index < acceptedRequestsData.length; index++) {
         print(
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
@@ -211,7 +212,8 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                       distance: request['approx_distance'],
                       category: request['trip_category'],
                       type: request['trip_type'],
-                      id: request['trip_id']),
+                      id: request['trip_id'],
+                      startTrip: request['start']),
                 ),
               ),
             );

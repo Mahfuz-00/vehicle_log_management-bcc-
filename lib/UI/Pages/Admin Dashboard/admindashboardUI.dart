@@ -245,7 +245,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       distance: request['approx_distance'],
                       category: request['trip_category'],
                       type: request['trip_type'],
-                      id: request['trip_id']),
+                      id: request['trip_id'],
+                      startTrip: request['start']),
                 ),
               ),
             );

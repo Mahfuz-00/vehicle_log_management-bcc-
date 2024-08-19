@@ -112,7 +112,7 @@ class _DriverStartTripState extends State<DriverStartTrip> {
                               elevation: 5,
                               borderRadius: BorderRadius.circular(10),
                               child: Container(
-                                padding: EdgeInsets.all(10),
+                                padding: EdgeInsets.all(20),
                                 child: Column(
                                   children: [
                                     _buildRow('Name', staff.name),

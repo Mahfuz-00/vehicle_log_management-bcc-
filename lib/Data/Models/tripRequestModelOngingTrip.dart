@@ -17,7 +17,7 @@ class TripRequestOngoing {
   String distance;
   String category;
   String type;
-  DateTime? startTrip;
+  String startTrip;
   //DateTime? stopTrip;
 
   TripRequestOngoing({
@@ -37,7 +37,8 @@ class TripRequestOngoing {
     required this.distance,
     required this.category,
     required this.type,
-    this.startTrip,
+    required this.startTrip,
+    //this.startTrip,
    // this.stopTrip,
   });
 
@@ -60,7 +61,8 @@ class TripRequestOngoing {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
-      startTrip: json['start_trip'] != null ? DateTime.parse(json['start_trip']) : null,
+      startTrip: json['start_trip'],
+      //startTrip: json['start_trip'] != null ? DateTime.parse(json['start_trip']) : null,
      // stopTrip: json['stop_trip'] != null ? DateTime.parse(json['stop_trip']) : null,
     );
   }
@@ -84,9 +86,10 @@ class TripRequestOngoing {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
-    if (this.startTrip != null) {
+    data['start_trip'] = this.startTrip;
+    /*if (this.startTrip != null) {
       data['start_trip'] = this.startTrip!.toIso8601String();
-    }
+    }*/
    /* if (this.stopTrip != null) {
       data['stop_trip'] = this.stopTrip!.toIso8601String();
     }*/
