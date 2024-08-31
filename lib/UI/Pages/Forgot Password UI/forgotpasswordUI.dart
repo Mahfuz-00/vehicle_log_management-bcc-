@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:footer/footer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Forgot Password)/apiServiceForgotPassword.dart';
+import '../../Bloc/email_cubit.dart';
 import '../Login UI/loginUI.dart';
 import 'otpverficationUI.dart';
 
+// StatefulWidget to manage the state of the Forgot Password screen
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({Key? key}) : super(key: key);
 
@@ -15,42 +17,52 @@ class ForgotPassword extends StatefulWidget {
 
 class _ForgotPasswordState extends State<ForgotPassword> {
   late TextEditingController _emailController = TextEditingController();
-
-  bool _isLoading = false;
+  bool _isloading = false;
 
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
+    _emailController = TextEditingController(); // Initialize email controller
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _emailController
+        .dispose(); // Dispose of email controller to free up resources
     super.dispose();
   }
 
+  // Method to send OTP for password reset
   Future<void> _sendCode(String email) async {
+    setState(() {
+      _isloading = true;
+    });
     final apiService = await APIServiceForgotPassword.create();
-/*    apiService.sendForgotPasswordOTP(email);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => OPTVerfication()),
-    );*/
     apiService.sendForgotPasswordOTP(email).then((response) {
       if (response == 'Forget password otp send successfully') {
+        // Navigate to OTP verification screen if OTP is sent successfully
+        setState(() {
+          _isloading = false;
+        });
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => OPTVerfication()),
         );
       } else if (response == 'validation error') {
+        setState(() {
+          _isloading = false;
+        });
+        // Show snackbar if there is a validation error
         const snackBar = SnackBar(
           content: Text('Invalid Email'),
         );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }).catchError((error) {
-      // Handle registration error
+      setState(() {
+        _isloading = false;
+      });
+      // Handle any errors that occur during the API call
       print(error);
       const snackBar = SnackBar(
         content: Text('Invalid Email'),
@@ -88,9 +100,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       ),
                       child: IconButton(
                         onPressed: () {
-                          // Handle back button press here
                           Navigator.pop(
-                              context); // This will pop the current route off the navigator stack
+                              context); // Navigate back to the previous screen
                         },
                         icon: Icon(Icons.arrow_back_ios),
                         iconSize: 30,
@@ -139,7 +150,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             ),
                             const SizedBox(height: 50),
                             Container(
-                              width: screenWidth*0.9,
+                              width: screenWidth * 0.9,
                               height: 70,
                               child: TextFormField(
                                 controller: _emailController,
@@ -168,18 +179,20 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               onPressed: () async {
                                 String email = _emailController.text;
                                 _sendCode(email);
-                                final prefs = await SharedPreferences.getInstance();
-                                await prefs.setString('email', email);
+                                final emailCubit = context.read<EmailCubit>();
+                                emailCubit.saveEmail(email);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    Color.fromRGBO(25, 192, 122, 1),
+                                Color.fromRGBO(25, 192, 122, 1),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                fixedSize: Size(screenWidth*0.9, 70),
+                                fixedSize: Size(screenWidth * 0.9, 70),
                               ),
-                              child: const Text(
+                              child: _isloading
+                                  ? CircularProgressIndicator() // Show circular progress indicator when button is clicked
+                                  : const Text(
                                 'Send Code',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -217,6 +230,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             ),
                             InkWell(
                               onTap: () {
+                                // Navigate to login screen
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
