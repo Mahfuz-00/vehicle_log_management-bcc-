@@ -1,9 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:vehicle_log_management/UI/Widgets/templateerrorcontainer.dart';
-
 import '../../Data/Models/paginationModel.dart';
 
-
+/// [RequestsWidget] is a StatelessWidget that displays a list of requests with various loading states.
+///
+/// This widget handles different scenarios: loading, error, and displaying a list of requests. It takes in parameters
+/// that dictate its behavior and appearance. The widget can display a loading indicator, an error message, or a list of
+/// request widgets with an optional "See All" button for pagination.
+///
+/// Parameters:
+/// - [loading]: A boolean indicating if the widget is currently loading data.
+/// - [fetch]: A boolean indicating if data fetching has been initiated.
+/// - [errorText]: A string containing an error message to be displayed when an error occurs.
+/// - [listWidget]: A list of widgets representing individual requests.
+/// - [fetchData]: A future that fetches the request data.
+/// - [numberOfWidgets]: An integer that limits the number of widgets displayed.
+/// - [showSeeAllButton]: A boolean indicating whether the "See All" button should be shown.
+/// - [seeAllButtonText]: A string containing the text for the "See All" button.
+/// - [nextView]: An optional widget to navigate to when the "See All" button is pressed.
+/// - [pagination]: A boolean indicating if pagination is enabled.
+///
+/// Actions:
+/// - The widget builds the UI using the [build] method, which constructs a FutureBuilder to handle loading,
+///   error, and data display states.
+/// - When loading, a circular progress indicator is displayed.
+/// - If there is an error, a method [buildNoRequestsWidget] is called to display the error message.
+/// - If the data is successfully fetched, the widget displays a list of requests up to the specified limit
+///   [numberOfWidgets].
+/// - If the list is empty, the same method for displaying no requests is called.
+/// - The [buildSeeAllButton] method constructs a button to navigate to the next view if pagination is enabled.
 class RequestsWidget extends StatelessWidget {
   final bool loading;
   final bool fetch;
@@ -39,10 +64,9 @@ class RequestsWidget extends StatelessWidget {
         future: loading ? null : fetchData,
         builder: (context, snapshot) {
           if (!fetch) {
-            // Return a loading indicator while waiting for data
             return Container(
-              height: 200, // Adjust height as needed
-              width: screenWidth, // Adjust width as needed
+              height: 200,
+              width: screenWidth,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
@@ -56,10 +80,8 @@ class RequestsWidget extends StatelessWidget {
             return buildNoRequestsWidget(screenWidth, 'Error: $errorText');
           } else if (fetch) {
             if (listWidget.isEmpty) {
-              // Handle the case when there are no pending connection requests
               return buildNoRequestsWidget(screenWidth, errorText);
             } else if (listWidget.isNotEmpty) {
-              // If data is loaded successfully, display the ListView
               return Container(
                 child: Column(
                   children: [
@@ -68,7 +90,6 @@ class RequestsWidget extends StatelessWidget {
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: listWidget.length > numberOfWidgets ? numberOfWidgets : listWidget.length,
                       itemBuilder: (context, index) {
-                        // Display each connection request using the listWidget
                         return listWidget[index];
                       },
                       separatorBuilder: (context, index) => const SizedBox(height: 10),
@@ -81,7 +102,7 @@ class RequestsWidget extends StatelessWidget {
               );
             }
           }
-          return SizedBox(); // Return a default widget if none of the conditions above are met
+          return SizedBox();
         },
       ),
     );

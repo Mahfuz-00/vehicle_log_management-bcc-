@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
-
 import '../Pages/Login UI/loginUI.dart';
 
-
+/// [_showLogoutDialog] displays a confirmation dialog when the user attempts to log out.
+///
+/// This function takes [BuildContext] as a parameter, which is required for displaying the dialog.
+/// The dialog includes a title, a content message, and two action buttons: Cancel and Logout.
+///
+/// When the Cancel button is pressed, the dialog is closed. When the Logout button is pressed,
+/// the user is navigated to the [Login] page, replacing the current page in the navigation stack.
+///
+/// [context] is the BuildContext that provides the location of this widget in the widget tree.
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,

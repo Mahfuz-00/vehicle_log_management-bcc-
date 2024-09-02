@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Models/tripRequestModelApprovedStaff.dart';
 
+/// A widget that displays the details of an approved trip for staff.
+///
+/// This widget takes a [TripRequestApprovedStaff] object as input and
+/// presents various details related to the trip, such as the staff's
+/// name, designation, department, mobile number, trip type, date,
+/// start time, end time, distance, trip mode, destination details,
+/// driver information, and car details. It also includes a back button
+/// to return to the previous screen.
+///
+/// Actions:
+/// - Navigate back to the previous screen when the back button is pressed.
 class ApprovedTripStaff extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TripRequestApprovedStaff staff;
@@ -65,32 +75,20 @@ class ApprovedTripStaff extends StatelessWidget {
                 Divider(),
                 SizedBox(height: 20),
                 _buildRow('Name', staff.name),
-                //Divider(),
                 _buildRow('Designation', staff.designation),
-                // Divider(),
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
-                //  Divider(),
                 _buildRow('Trip Type', staff.type),
-                // Divider(),
                 _buildRowTime('Date', staff.date),
-                // Divider(),
                 _buildRow('Start Time', staff.startTime),
-                // Divider(),
                 _buildRow('End Time', staff.endTime),
-                // Divider(),
                 _buildRow('Distance', '${staff.distance} KM'),
-                // Divider(),
                 _buildRow('Trip Type', staff.category),
-                // Divider(),
                 _buildRow('Trip Mode', staff.type),
-                //  Divider(),
                 _buildRow('Destination From', staff.destinationFrom),
-                // Divider(),
                 _buildRow('Destination To', staff.destinationTo),
                 _buildRow('Driver', staff.driver),
                 _buildRow('Car', staff.Car),
-                //  Divider(),
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(
@@ -125,17 +123,13 @@ class ApprovedTripStaff extends StatelessWidget {
   Widget _buildRowTime(String label, String value) {
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
 
-    // Parse the date and time string
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-
-    // Format the date and time
     String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
     DateTime date = DateTime.parse(value);
     DateFormat dateFormat = DateFormat.yMMMMd('en_US');
     DateFormat timeFormat = DateFormat.jm();
     String formattedDate = dateFormat.format(date);
     String formattedTime = timeFormat.format(date);
-    //String formattedDateTime = '$formattedDate, $formattedTime';
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

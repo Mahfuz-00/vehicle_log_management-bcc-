@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Data Sources/API Service (Fetch Drivers)/apiServiceFetchDrivers.dart';
 import '../../Data/Data Sources/Api Service (Assign Driver)/apiServiceAssignDriver.dart';
 import '../../Data/Models/tripRequestModelSROfficer.dart';
 import '../Pages/Admin Dashboard/admindashboardUI.dart';
-import 'AvailableDriverDetails.dart';
 import 'dropdownmodel.dart';
 
+/// [PendingTripAdmin] is a [StatefulWidget] that manages the UI and functionality
+/// for viewing and assigning drivers to pending trips for an admin.
+///
+/// The class handles fetching available drivers, displaying trip details,
+/// and assigning a driver to the selected trip. It also manages the loading states
+/// and error handling for the data fetching process.
+///
+/// Variables:
+/// - [shouldRefresh]: A [bool] that indicates whether the page should refresh upon loading.
+/// - [staff]: An instance of [TripRequestSROfficer] representing the staff associated with the trip.
+/// - [_scaffoldKey]: A [GlobalKey] used to manage the [ScaffoldState].
+/// - [drivers]: A [List] of [String] that stores the names of available drivers.
+/// - [_isFetched]: A [bool] indicating if the driver data has been fetched.
+/// - [_isLoading]: A [bool] indicating if data is currently being fetched.
+/// - [_pageLoading]: A [bool] indicating if the page is still loading.
+/// - [_errorOccurred]: A [bool] indicating if an error occurred while fetching data.
+/// - [carID]: An [int] representing the ID of the selected car.
 class PendingTripAdmin extends StatefulWidget {
   final bool shouldRefresh;
   final TripRequestSROfficer staff;
@@ -40,10 +55,8 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
     try {
       final apiService = await FetchDriverAPIService.create();
 
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData = await apiService.fetchDrivers();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print('No data available or error occurred while fetching dashboard data');
         return;
       }
@@ -65,29 +78,21 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
       print('Error fetching driver data: $e');
       _isFetched = false;
       _isLoading = false;
-      // Handle error as needed
     }
   }
-
-
-
 
   @override
   void initState() {
     super.initState();
     staff = widget.staff;
     print('initState called');
+    if (!_isFetched) {
+      fetchConnectionRequests();
+    }
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
-        if (!_isFetched) {
-          fetchConnectionRequests();
-          //_isFetched = true; // Set _isFetched to true after the first call
-        }
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -105,7 +110,6 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
         ? Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              // Show circular loading indicator while waiting
               child: CircularProgressIndicator(),
             ),
           )
@@ -162,25 +166,15 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
                       Divider(),
                       SizedBox(height: 10),
                       _buildRow('Name', staff.name),
-                      //Divider(),
                       _buildRow('Designation', staff.designation),
-                      // Divider(),
                       _buildRow('Department', staff.department),
-                      //  Divider(),
                       _buildRowTime('Date', staff.date),
-                      // Divider(),
                       _buildRow('Start Time', staff.startTime),
-                      // Divider(),
                       _buildRow('End Time', staff.endTime),
-                      // Divider(),
                       _buildRow('Distance', '${staff.distance} KM'),
-                      // Divider(),
                       _buildRow('Trip Type', staff.category),
-                      // Divider(),
                       _buildRow('Trip Mode', staff.type),
-                      //  Divider(),
                       _buildRow('Destination From', staff.destinationFrom),
-                      // Divider(),
                       _buildRow('Destination To', staff.destinationTo),
                       SizedBox(height: 10),
                       Divider(),
@@ -197,9 +191,8 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
                         children: [
                           DropdownMenuModel(
                             label: 'Driver',
-                            options: drivers, // Assuming drivers is a List<String>
+                            options: drivers,
                             onChanged: (selectedDriver) {
-                              // Implement logic here to handle the selected driver
                               print('Selected driver: $selectedDriver');
                             },
                             onCarIdChanged:(selectedDriver){
@@ -265,7 +258,7 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
     print('Trip Id: ${staff.id}');
     if (staff.id > 0 && driver > 0) {
       final apiService = await AssignCarAPIService.create();
-      bool checker = await apiService.assignCarToTrip(tripId: staff.id, carId: driver); // Invoke assignCarToTrip method on apiService
+      bool checker = await apiService.assignCarToTrip(tripId: staff.id, carId: driver);
       if(checker == true){
         const snackBar = SnackBar(
           content: Text('Car assigned successfully!'),
@@ -286,7 +279,6 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
       print('CarID or Trip ID is missing');
     }
   }
-
 
   Widget _buildRowTime(String label, String? value) {
     if (value == null || value.isEmpty) {
@@ -340,18 +332,14 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
       );
     }
 
-    // Parse the date and time string
-    DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
 
-    // Format the date and time
+    DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
     String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
     DateTime date = DateTime.parse(value);
     DateFormat dateFormat = DateFormat.yMMMMd('en_US');
     DateFormat timeFormat = DateFormat.jm();
     String formattedDate = dateFormat.format(date);
     String formattedTime = timeFormat.format(date);
-    //String formattedDateTime = '$formattedDate, $formattedTime';
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -401,8 +389,6 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
       ],
     );
   }
-
-
 
   Widget _buildRow(String label, String value) {
     return Row(

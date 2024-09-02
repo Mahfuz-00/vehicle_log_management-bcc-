@@ -5,6 +5,15 @@ import '../../Data/Models/profileModelFull.dart';
 
 part 'auth_state.dart';
 
+/// A Cubit class responsible for managing user authentication state.
+///
+/// The `AuthCubit` handles user authentication actions such as login, logout,
+/// and fetching or updating the user profile. It emits different states
+/// based on the user's actions.
+///
+/// ### States:
+/// - [AuthInitial]: The initial state when no user is authenticated.
+/// - [AuthAuthenticated]: The state when a user is authenticated with a valid profile and token.
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 

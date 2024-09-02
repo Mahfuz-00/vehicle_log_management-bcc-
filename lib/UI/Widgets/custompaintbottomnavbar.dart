@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
 
+/// [CustomBottomNavigation] is a custom widget that creates a bottom navigation bar with a notch effect.
+///
+/// This class extends [CustomPaint] and is designed to render a bottom navigation area with customizable properties.
+///
+/// [backgroundColor] is the color of the bottom navigation bar.
+/// [children] is a list of [Widget]s that will be displayed as the navigation items.
+/// [notchRadius] defines the radius of the notch's corners, defaulting to 20.0.
+/// [notchHeight] sets the height of the notch, defaulting to 50.0.
+///
+/// The constructor initializes the [CustomBottomNavigation] with the provided parameters and sets the painter
+/// to an instance of [_CustomBottomNavigationPainter], which handles the drawing of the navigation bar.
 class CustomBottomNavigation extends CustomPaint {
   final Color backgroundColor;
   final List<Widget> children;
@@ -9,8 +20,8 @@ class CustomBottomNavigation extends CustomPaint {
   CustomBottomNavigation({
     required this.backgroundColor,
     required this.children,
-    this.notchRadius = 20.0, // Adjust notch radius as needed
-    this.notchHeight = 50.0, // Adjust notch height as needed
+    this.notchRadius = 20.0,
+    this.notchHeight = 50.0,
   }) : super(
     painter: _CustomBottomNavigationPainter(backgroundColor, children, notchRadius, notchHeight),
   );
@@ -28,15 +39,13 @@ class _CustomBottomNavigationPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = backgroundColor;
 
-    // Draw the background rectangle
     final offset = Offset.zero;
-    final size = Size(100.0, 50.0); // Adjust width and height as needed
-    final left = offset.dx; // Extract x-coordinate from Offset
-    final top = offset.dy; // Extract y-coordinate from Offset
+    final size = Size(100.0, 50.0);
+    final left = offset.dx;
+    final top = offset.dy;
     final rect = Rect.fromLTWH(left, top, size.width, size.height);
     canvas.drawRect(rect, paint);
 
-    // Create and draw the notch path
     final notchPath = Path();
     notchPath.moveTo(0.0, size.height);
     notchPath.lineTo(0.0, notchHeight);
@@ -46,8 +55,6 @@ class _CustomBottomNavigationPainter extends CustomPainter {
     notchPath.lineTo(size.width, size.height);
     notchPath.close();
     canvas.drawPath(notchPath, paint);
-
-    // Layout and paint child widgets here (optional)
   }
 
   @override
@@ -58,12 +65,12 @@ class _CustomBottomNavigationPainter extends CustomPainter {
     return Stack(
       children: [
         CustomPaint(
-          size: Size(double.infinity, kBottomNavigationBarHeight), // Use the full width and a fixed height
+          size: Size(double.infinity, kBottomNavigationBarHeight),
           painter: _CustomBottomNavigationPainter(backgroundColor, children, notchRadius, notchHeight),
         ),
-        Material( // Add a Material widget for ink splash
-          type: MaterialType.transparency, // Make it transparent
-          child: SafeArea( // Use SafeArea to respect the 'notch'
+        Material(
+          type: MaterialType.transparency,
+          child: SafeArea(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: children,

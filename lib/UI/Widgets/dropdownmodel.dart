@@ -1,5 +1,20 @@
 import 'package:flutter/material.dart';
 
+/// [DropdownMenuModel] is a stateful widget that represents a customizable dropdown menu.
+///
+/// This widget allows users to select an option from a dropdown list, with an option to handle
+/// the selection and return the associated car ID. It can display a label for the dropdown and
+/// trigger callback functions when the selected option or car ID changes.
+///
+/// [label] is the text displayed above the dropdown to indicate the selection purpose.
+/// [options] is a list of strings representing the options available in the dropdown.
+/// [selectedOption] is an optional parameter representing the currently selected option.
+/// [onChanged] is a callback function that is triggered when the selected option changes.
+/// [onCarIdChanged] is a callback function that is triggered when the car ID associated with
+/// the selected option changes.
+///
+/// The constructor requires [label] and [options] to be passed as arguments, while other parameters
+/// are optional.
 class DropdownMenuModel extends StatefulWidget {
   final String label;
   final List<String> options;
@@ -57,15 +72,15 @@ class _DropdownMenuModelState extends State<DropdownMenuModel> {
       child: Container(
         alignment: Alignment.center,
         child: DropdownButton<String>(
-          underline: Container(), // Remove underline
-          isExpanded: true, // Expand dropdown to full width
+          underline: Container(),
+          isExpanded: true,
           hint: Text(widget.label,
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 16,
               fontFamily: 'default',
-            ),), // Use label as hint text
+            ),),
           value: _selectedOption,
           onChanged: (newValue) {
             setState(() {

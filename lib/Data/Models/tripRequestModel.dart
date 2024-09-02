@@ -1,7 +1,30 @@
 import 'dart:convert';
 
+/// Represents a trip request with various details.
+///
+/// This class holds all the necessary information related to a trip request.
+///
+/// **Variables:**
+/// - [name]: A String representing the name of the person making the request.
+/// - [designation]: A String representing the designation of the requester.
+/// - [department]: A String indicating the department of the requester.
+/// - [purpose]: A String describing the purpose of the trip.
+/// - [phone]: A String for the contact phone number of the requester.
+/// - [destinationFrom]: A String representing the starting point of the trip.
+/// - [destinationTo]: A String representing the destination of the trip.
+/// - [date]: A String indicating the date of the trip.
+/// - [startTime]: A String representing the starting time of the trip.
+/// - [endTime]: A String representing the ending time of the trip.
+/// - [distance]: A String indicating the approximate distance of the trip.
+/// - [category]: A String categorizing the trip.
+/// - [type]: A String specifying the type of the trip.
+///
+/// **Actions:**
+/// - [fromJson]: A factory constructor that creates a TripRequest instance from a JSON map.
+/// - [toJson]: A method that converts the TripRequest instance to a JSON map.
+/// - [fromJsonList]: A static method that converts a list of JSON maps to a list of TripRequest instances.
+/// - [toJsonList]: A static method that converts a list of TripRequest instances to a list of JSON maps.
 class TripRequest {
-  //String? driverWithCarId;
   String name;
   String designation;
   String department;
@@ -15,11 +38,8 @@ class TripRequest {
   String distance;
   String category;
   String type;
-  //DateTime? startTrip;
-  //DateTime? stopTrip;
 
   TripRequest({
-    //this.driverWithCarId,
     required this.name,
     required this.designation,
     required this.department,
@@ -33,14 +53,10 @@ class TripRequest {
     required this.distance,
     required this.category,
     required this.type,
-   // this.startTrip,
-   // this.stopTrip,
   });
 
-  // Method to convert JSON to Trip object
   factory TripRequest.fromJson(Map<String, dynamic> json) {
     return TripRequest(
-     // driverWithCarId: json['driver_with_car_id'],
       name: json['name'],
       designation: json['designation'],
       department: json['department'],
@@ -54,15 +70,11 @@ class TripRequest {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
-     // startTrip: json['start_trip'] != null ? DateTime.parse(json['start_trip']) : null,
-     // stopTrip: json['stop_trip'] != null ? DateTime.parse(json['stop_trip']) : null,
     );
   }
 
-  // Method to convert Trip object to JSON
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-  //  data['driver_with_car_id'] = this.driverWithCarId;
     data['name'] = this.name;
     data['designation'] = this.designation;
     data['department'] = this.department;
@@ -76,21 +88,13 @@ class TripRequest {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
-   /* if (this.startTrip != null) {
-      data['start_trip'] = this.startTrip!.toIso8601String();
-    }
-    if (this.stopTrip != null) {
-      data['stop_trip'] = this.stopTrip!.toIso8601String();
-    }*/
     return data;
   }
 
-  // Method to convert a list of JSON objects to a list of Trip objects
   static List<TripRequest> fromJsonList(List<dynamic> jsonList) {
     return jsonList.map((json) => TripRequest.fromJson(json)).toList();
   }
 
-  // Method to convert a list of Trip objects to a list of JSON objects
   static List<Map<String, dynamic>> toJsonList(List<TripRequest> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }

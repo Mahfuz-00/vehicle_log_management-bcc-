@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Models/tripRequestModel.dart';
 
+/// The [PendingTripStaff] class is a stateless widget that displays
+/// details of a pending trip request for staff members. It includes
+/// information such as [staff.name], [staff.designation], [staff.department],
+/// [staff.phone], [staff.type], [staff.date], [staff.startTime],
+/// [staff.endTime], [staff.distance], [staff.category],
+/// [staff.destinationFrom], and [staff.destinationTo].
+///
+/// This widget also checks for internet connectivity using the
+/// [InternetChecker] widget. The user can navigate back to the
+/// previous screen using the back button in the app bar. The trip
+/// details are presented in a user-friendly format, with
+/// appropriately formatted dates and times. An ElevatedButton
+/// allows the user to go back to the previous screen.
 class PendingTripStaff extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TripRequest staff;
@@ -67,28 +79,17 @@ class PendingTripStaff extends StatelessWidget {
                 Divider(),
                 SizedBox(height: 20),
                 _buildRow('Name', staff.name),
-                //Divider(),
                 _buildRow('Designation', staff.designation),
-                // Divider(),
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
-                //  Divider(),
                 _buildRow('Trip Type', staff.type),
-                // Divider(),
                 _buildRowTime('Date', staff.date),
-                // Divider(),
                 _buildRow('Start Time', staff.startTime),
-                // Divider(),
                 _buildRow('End Time', staff.endTime),
-                // Divider(),
                 _buildRow('Distance', '${staff.distance} KM'),
-                // Divider(),
                 _buildRow('Trip Type', staff.category),
-                // Divider(),
                 _buildRow('Destination From', staff.destinationFrom),
-                // Divider(),
                 _buildRow('Destination To', staff.destinationTo),
-                //  Divider(),
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(
@@ -123,17 +124,13 @@ class PendingTripStaff extends StatelessWidget {
   Widget _buildRowTime(String label, String value) {
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
 
-    // Parse the date and time string
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-
-    // Format the date and time
     String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
     DateTime date = DateTime.parse(value);
     DateFormat dateFormat = DateFormat.yMMMMd('en_US');
     DateFormat timeFormat = DateFormat.jm();
     String formattedDate = dateFormat.format(date);
     String formattedTime = timeFormat.format(date);
-    //String formattedDateTime = '$formattedDate, $formattedTime';
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

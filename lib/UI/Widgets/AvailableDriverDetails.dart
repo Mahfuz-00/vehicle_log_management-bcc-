@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
+/// [DriverInfoCard] is a stateless widget that displays detailed information about a driver and their vehicle.
+/// This widget is designed to be used within a broader UI context where information cards are presented.
+///
+/// The card includes:
+/// - The [Name] of the driver.
+/// - The [MobileNo] of the driver.
+/// - The [CarName], [CarModel], and [CarRegNo] of the vehicle.
+///
+/// The layout of the card features an icon representing a vehicle, followed by text displaying the car's name and model.
+/// Below that, a series of key-value pairs are shown in rows, where each key (e.g., "Name", "Mobile No") is followed by its corresponding value.
+///
+/// The card is styled with padding, rounded corners, and a slight elevation to create a visually appealing material design.
+///
+/// The constructor requires all fields to be passed in, ensuring that the card always has complete information to display.
 class DriverInfoCard extends StatelessWidget {
   final String Name;
   final String MobileNo;
@@ -42,7 +55,7 @@ class DriverInfoCard extends StatelessWidget {
                   Icon(
                     Icons.drive_eta_outlined,
                     size: 40,
-                    color: Colors.grey, // Icon color
+                    color: Colors.grey,
                   ),
                   SizedBox(
                     width: 15,
@@ -140,111 +153,5 @@ Widget _buildRow(String label, String value) {
         ),
       ],
     ),
-  );
-}
-
-Widget _buildRowApplicationID(String label, int value) {
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Expanded(
-        child: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: label,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  height: 1.6,
-                  letterSpacing: 1.3,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'default',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Text(
-          ":",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      Expanded(
-        child: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: value.toString(),
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  height: 1.6,
-                  letterSpacing: 1.3,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'default',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-Widget _buildRowTime(String label, String value) {
-  //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
-
-  // Option 2: Using separate methods for date and time
-  DateTime date = DateTime.parse(value);
-  DateFormat dateFormat = DateFormat.yMMMMd('en_US');
-  DateFormat timeFormat = DateFormat.jm();
-  String formattedDate = dateFormat.format(date);
-  String formattedTime = timeFormat.format(date);
-  String formattedDateTime = '$formattedDate, $formattedTime';
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Expanded(
-        child: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: label,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  height: 1.6,
-                  letterSpacing: 1.3,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'default',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      Expanded(
-        child: Text(
-          formattedDateTime, // Format date as DD/MM/YYYY
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-            height: 1.6,
-            letterSpacing: 1.3,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'default',
-          ),
-        ),
-      ),
-    ],
   );
 }

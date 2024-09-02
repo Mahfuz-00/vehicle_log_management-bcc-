@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// [DropdownFormField] is a stateful widget that represents a customizable dropdown form field.
+///
+/// This widget allows users to select an option from a dropdown menu. It includes validation
+/// to ensure a selection is made and provides a hint text for guidance.
+///
+/// [hintText] is the placeholder text displayed in the dropdown when no option is selected.
+/// [dropdownItems] is a list of [DropdownMenuItem<String>] representing the items available for selection.
+///
+/// The constructor requires [hintText] and [dropdownItems] to be passed as arguments.
 class DropdownFormField extends StatefulWidget {
   late final String hintText;
   late final List<DropdownMenuItem<String>> dropdownItems;
@@ -70,7 +79,7 @@ class _DropdownFormFieldState extends State<DropdownFormField> {
                     ),
                   );
                 }).toList(),
-                ),// Use provided dropdown items
+                ),
             ],
           ),
         ),

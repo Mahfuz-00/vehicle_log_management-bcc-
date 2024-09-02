@@ -1,5 +1,22 @@
 import 'package:flutter/material.dart';
 
+/// [RadioListTileGroup] is a StatefulWidget that provides a group of radio list tiles for user selection.
+///
+/// It allows users to select one option from a provided list of options. The selected option can be managed
+/// through the widget's state and can also notify external listeners via a callback function.
+///
+/// Parameters:
+/// - [options]: A required list of [String] options displayed as radio tiles.
+/// - [selectedOption]: An optional initial value of type [String] for the selected option.
+/// - [onChanged]: An optional callback function that takes a [String] parameter to handle selection changes.
+///
+/// Internal State:
+/// - [_selectedOption]: A local variable that stores the currently selected option. It is initialized to
+///   [widget.selectedOption] if provided; otherwise, it defaults to the first option in [widget.options].
+///
+/// Actions:
+/// - The radio tile's [onChanged] callback updates [_selectedOption] when a new option is selected,
+///   and invokes the [widget.onChanged] function if it is not null.
 class RadioListTileGroup extends StatefulWidget {
   final List<String> options;
   final String? selectedOption;

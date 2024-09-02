@@ -1,5 +1,27 @@
 import 'dart:convert';
 
+/// Represents an ongoing trip request.
+///
+/// This class contains detailed information about a trip that is currently in progress.
+///
+/// **Variables:**
+/// - [driver]: A String representing the name of the driver.
+/// - [Car]: A String representing the name of the car assigned to the trip.
+/// - [id]: An integer representing the unique identifier for the trip.
+/// - [name]: A String representing the name of the staff member requesting the trip.
+/// - [designation]: A String representing the designation of the staff member.
+/// - [department]: A String representing the department of the staff member.
+/// - [purpose]: A String representing the purpose of the trip.
+/// - [phone]: A String representing the contact phone number of the staff member.
+/// - [destinationFrom]: A String representing the starting location of the trip.
+/// - [destinationTo]: A String representing the destination of the trip.
+/// - [date]: A String representing the date of the trip.
+/// - [startTime]: A String representing the scheduled start time of the trip.
+/// - [endTime]: A String representing the scheduled end time of the trip.
+/// - [distance]: A String representing the approximate distance of the trip.
+/// - [category]: A String representing the category of the trip.
+/// - [type]: A String representing the type of the trip.
+/// - [startTrip]: A String representing the actual start time of the trip.
 class TripRequestOngoing {
   String driver;
   String Car;
@@ -18,7 +40,6 @@ class TripRequestOngoing {
   String category;
   String type;
   String startTrip;
-  //DateTime? stopTrip;
 
   TripRequestOngoing({
     required this.driver,
@@ -38,11 +59,8 @@ class TripRequestOngoing {
     required this.category,
     required this.type,
     required this.startTrip,
-    //this.startTrip,
-   // this.stopTrip,
   });
 
-  // Method to convert JSON to Trip object
   factory TripRequestOngoing.fromJson(Map<String, dynamic> json) {
     return TripRequestOngoing(
       driver: json['driver'],
@@ -62,12 +80,9 @@ class TripRequestOngoing {
       category: json['trip_category'],
       type: json['type'],
       startTrip: json['start_trip'],
-      //startTrip: json['start_trip'] != null ? DateTime.parse(json['start_trip']) : null,
-     // stopTrip: json['stop_trip'] != null ? DateTime.parse(json['stop_trip']) : null,
     );
   }
 
-  // Method to convert Trip object to JSON
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['driver'] = this.driver;
@@ -87,21 +102,13 @@ class TripRequestOngoing {
     data['trip_category'] = this.category;
     data['type'] = this.type;
     data['start_trip'] = this.startTrip;
-    /*if (this.startTrip != null) {
-      data['start_trip'] = this.startTrip!.toIso8601String();
-    }*/
-   /* if (this.stopTrip != null) {
-      data['stop_trip'] = this.stopTrip!.toIso8601String();
-    }*/
     return data;
   }
 
-  // Method to convert a list of JSON objects to a list of Trip objects
   static List<TripRequestOngoing> fromJsonList(List<dynamic> jsonList) {
     return jsonList.map((json) => TripRequestOngoing.fromJson(json)).toList();
   }
 
-  // Method to convert a list of Trip objects to a list of JSON objects
   static List<Map<String, dynamic>> toJsonList(List<TripRequestOngoing> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }

@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Data Sources/API Service (Auth SR Officer)/apiServiceSROfficerAuth.dart';
 import '../../Data/Models/tripRequestModelSROfficer.dart';
 import '../Pages/Senior Officer Dashboard/srofficerdashboardUI.dart';
 
-
+/// A [StatelessWidget] that displays the details of a pending trip for the Senior Officer.
+///
+/// This widget shows various details related to a trip, including:
+/// - The name of the staff member requesting the trip
+/// - Designation and department of the staff
+/// - Contact information and trip specifics
+///
+/// The widget allows the Senior Officer to either accept or decline the trip request.
+/// When an action is taken, a notification is displayed, and the user is redirected
+/// back to the Senior Officer Dashboard.
+///
+/// [staff]: The [TripRequestSROfficer] instance containing details of the trip request.
+/// [action]: A string that determines whether the action taken is 'accepted' or 'rejected'.
+///
+/// The widget uses an [InternetChecker] to verify internet connectivity before displaying the trip details.
 class PendingTripSROfficer extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TripRequestSROfficer staff;
@@ -70,30 +83,18 @@ class PendingTripSROfficer extends StatelessWidget {
                 Divider(),
                 SizedBox(height: 20),
                 _buildRow('Name', staff.name),
-                //Divider(),
                 _buildRow('Designation', staff.designation),
-                // Divider(),
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
-                //  Divider(),
                 _buildRow('Trip Type', staff.type),
-                // Divider(),
                 _buildRowTime('Date', staff.date),
-                // Divider(),
                 _buildRow('Start Time', staff.startTime),
-                // Divider(),
                 _buildRow('End Time', staff.endTime),
-                // Divider(),
                 _buildRow('Distance', '${staff.distance} KM'),
-                // Divider(),
                 _buildRow('Trip Type', staff.category),
-                // Divider(),
                 _buildRow('Trip Mode', staff.type),
-                //  Divider(),
                 _buildRow('Destination From', staff.destinationFrom),
-                // Divider(),
                 _buildRow('Destination To', staff.destinationTo),
-                //  Divider(),
                 SizedBox(height: 40),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -183,17 +184,13 @@ class PendingTripSROfficer extends StatelessWidget {
   Widget _buildRowTime(String label, String value) {
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
 
-    // Parse the date and time string
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-
-    // Format the date and time
     String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
     DateTime date = DateTime.parse(value);
     DateFormat dateFormat = DateFormat.yMMMMd('en_US');
     DateFormat timeFormat = DateFormat.jm();
     String formattedDate = dateFormat.format(date);
     String formattedTime = timeFormat.format(date);
-    //String formattedDateTime = '$formattedDate, $formattedTime';
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -301,10 +298,8 @@ class PendingTripSROfficer extends StatelessWidget {
     );
   }
 
-  // Function to handle accept or reject action
   Future<void> handleAcceptOrReject(String Action) async {
     final apiService = await TripAcceptRejectAPIService.create();
-
     print(Action);
     print(staff.id);
     if (action.isNotEmpty && staff.id > 0) {
@@ -313,5 +308,4 @@ class PendingTripSROfficer extends StatelessWidget {
       print('Action or Trip ID is missing');
     }
   }
-
 }

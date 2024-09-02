@@ -1,7 +1,25 @@
 import 'dart:convert';
 
+/// Represents a trip request for an SR Officer.
+///
+/// This class contains detailed information about a trip requested by an SR Officer.
+///
+/// **Variables:**
+/// - [id]: An integer representing the unique identifier for the trip.
+/// - [name]: A String representing the name of the SR Officer requesting the trip.
+/// - [designation]: A String representing the designation of the SR Officer.
+/// - [department]: A String representing the department of the SR Officer.
+/// - [purpose]: A String representing the purpose of the trip.
+/// - [phone]: A String representing the contact phone number of the SR Officer.
+/// - [destinationFrom]: A String representing the starting location of the trip.
+/// - [destinationTo]: A String representing the destination of the trip.
+/// - [date]: A String representing the date of the trip.
+/// - [startTime]: A String representing the scheduled start time of the trip.
+/// - [endTime]: A String representing the scheduled end time of the trip.
+/// - [distance]: A String representing the approximate distance of the trip.
+/// - [category]: A String representing the category of the trip.
+/// - [type]: A String representing the type of the trip.
 class TripRequestSROfficer {
-  //String? driverWithCarId;
   int id;
   String name;
   String designation;
@@ -16,11 +34,8 @@ class TripRequestSROfficer {
   String distance;
   String category;
   String type;
-  //DateTime? startTrip;
-  //DateTime? stopTrip;
 
   TripRequestSROfficer({
-    //this.driverWithCarId,
     required this.id,
     required this.name,
     required this.designation,
@@ -35,14 +50,10 @@ class TripRequestSROfficer {
     required this.distance,
     required this.category,
     required this.type,
-   // this.startTrip,
-   // this.stopTrip,
   });
 
-  // Method to convert JSON to Trip object
   factory TripRequestSROfficer.fromJson(Map<String, dynamic> json) {
     return TripRequestSROfficer(
-     // driverWithCarId: json['driver_with_car_id'],
       id: json['trip_id'],
       name: json['name'],
       designation: json['designation'],
@@ -57,15 +68,11 @@ class TripRequestSROfficer {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
-     // startTrip: json['start_trip'] != null ? DateTime.parse(json['start_trip']) : null,
-     // stopTrip: json['stop_trip'] != null ? DateTime.parse(json['stop_trip']) : null,
     );
   }
 
-  // Method to convert Trip object to JSON
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-  //  data['driver_with_car_id'] = this.driverWithCarId;
     data['id'] = this.id;
     data['name'] = this.name;
     data['designation'] = this.designation;
@@ -80,21 +87,13 @@ class TripRequestSROfficer {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
-   /* if (this.startTrip != null) {
-      data['start_trip'] = this.startTrip!.toIso8601String();
-    }
-    if (this.stopTrip != null) {
-      data['stop_trip'] = this.stopTrip!.toIso8601String();
-    }*/
     return data;
   }
 
-  // Method to convert a list of JSON objects to a list of Trip objects
   static List<TripRequestSROfficer> fromJsonList(List<dynamic> jsonList) {
     return jsonList.map((json) => TripRequestSROfficer.fromJson(json)).toList();
   }
 
-  // Method to convert a list of Trip objects to a list of JSON objects
   static List<Map<String, dynamic>> toJsonList(List<TripRequestSROfficer> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }

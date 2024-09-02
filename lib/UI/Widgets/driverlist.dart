@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
 
+/// [DriverInfo] is a stateless widget that displays information about a driver.
+///
+/// This widget presents the driver's name, mobile number, and car name in a structured format.
+///
+/// [driverName] is the name of the driver.
+/// [driverMobileNumber] is the mobile number of the driver.
+/// [carName] is the name of the car associated with the driver.
+///
+/// The constructor requires [driverName], [driverMobileNumber], and [carName] to be passed as arguments.
+/// A key can be provided, which will be forwarded to the superclass.
 class DriverInfo extends StatelessWidget {
   final String driverName;
   final String driverMobileNumber;

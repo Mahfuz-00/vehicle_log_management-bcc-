@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Models/tripRequestModelOngingTrip.dart';
 
+/// [OngoingTrip] is a StatelessWidget that displays the details of an ongoing trip.
+///
+/// It takes a [TripRequestOngoing] object as a parameter, which contains information about the trip.
+///
+/// This widget builds a user interface that includes:
+/// - A [Scaffold] with an [AppBar] that has a back button and a title.
+/// - A [SingleChildScrollView] that allows for scrolling if the content exceeds the screen height.
+/// - A column of trip details displayed using [_buildRow] method to format each piece of information.
+///
+/// The [staff] variable is used to access the trip details, which are displayed in a structured format.
+///
+/// The layout adapts to the screen size using [MediaQuery] to ensure proper spacing and sizing of elements.
+///
+/// Actions:
+/// - The back button navigates to the previous screen when pressed.
+/// - The back button at the bottom allows the user to return to the previous screen as well.
+///
+/// Variables:
+/// - [_scaffoldKey]: A GlobalKey for the Scaffold widget to manage the widget tree state.
+/// - [staff]: An instance of [TripRequestOngoing] that contains details about the ongoing trip.
 class OngoingTrip extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TripRequestOngoing staff;
@@ -65,30 +83,18 @@ class OngoingTrip extends StatelessWidget {
                 Divider(),
                 SizedBox(height: 20),
                 _buildRow('Name', staff.name),
-                //Divider(),
                 _buildRow('Designation', staff.designation),
-                // Divider(),
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
-                //  Divider(),
                 _buildRow('Trip Type', staff.type),
-                // Divider(),
                 _buildRow('Date', staff.date),
-                // Divider(),
                 _buildRow('Start Time', staff.startTime),
-                // Divider(),
                 _buildRow('End Time', staff.endTime),
-                // Divider(),
                 _buildRow('Distance', '${staff.distance} KM'),
-                // Divider(),
                 _buildRow('Trip Type', staff.category),
-                // Divider(),
                 _buildRow('Trip Mode', staff.type),
-                //  Divider(),
                 _buildRow('Destination From', staff.destinationFrom),
-                // Divider(),
                 _buildRow('Destination To', staff.destinationTo),
-                //  Divider(),
                 _buildRow('Driver', staff.driver),
                 _buildRow('Car', staff.Car),
                 _buildRow('Trip Started', staff.startTrip),
@@ -180,126 +186,4 @@ class OngoingTrip extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildRowString(String label, String? value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: label,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    height: 1.6,
-                    letterSpacing: 1.3,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'default',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            ":",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: value,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    height: 1.6,
-                    letterSpacing: 1.3,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'default',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRowTime(String label, DateTime? value) {
-    //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
-
-/*    // Parse the date and time string
-    DateTime dateTime = DateFormat('dd-MM-yyyy, hh:mm a').parse(value);
-
-    // Format the date and time
-    String formattedDateTime = DateFormat('dd-MM-yyyy, hh:mm a').format(dateTime);
-   // DateTime date = DateTime.parse(value);
-    DateFormat dateFormat = DateFormat.yMMMMd('en_US');
-    DateFormat timeFormat = DateFormat.jm();
-    String formattedDate = dateFormat.format(date);
-    String formattedTime = timeFormat.format(date);*/
-    //String formattedDateTime = '$formattedDate, $formattedTime';
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: label,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    height: 1.6,
-                    letterSpacing: 1.3,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'default',
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            ":",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value.toString(), // Format date as DD/MM/YYYY
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              height: 1.6,
-              letterSpacing: 1.3,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'default',
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
 }

@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../Data/Models/tripRequestModel.dart';
 
+/// The [StaffTile] class is a stateless widget that represents a
+/// tile displaying information about a staff member's trip request.
+/// It shows the [staff.name], formatted [staff.date], and
+/// [staff.startTime]. The tile is designed with a visually appealing
+/// background color and includes a forward arrow icon for navigation.
+///
+/// The widget takes two parameters:
+/// - [staff]: a [TripRequest] object that contains the details
+///   of the trip request.
+/// - [onPressed]: a callback function that is executed when the
+///   tile is tapped, allowing the parent widget to define the
+///   action to be taken on tap.
 class StaffTile extends StatelessWidget {
   final TripRequest staff;
   final VoidCallback onPressed;
@@ -17,10 +28,8 @@ class StaffTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Assuming staff.date is a string in 'yyyy-MM-dd' format
     DateTime parsedDate = DateTime.parse(staff.date);
     String formattedDate = dateFormat.format(parsedDate);
-
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Column(

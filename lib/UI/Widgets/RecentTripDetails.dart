@@ -1,23 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Models/tripRequestModelRecent.dart';
 
+/// [RecentTripDetails] is a StatelessWidget that displays detailed information about a recent trip.
+///
+/// It receives a [TripRecent] object as a parameter, which contains all the relevant details about the trip.
+/// The widget includes an app bar for navigation, displays various trip details, and provides a back button
+/// for returning to the previous screen.
+///
+/// Parameters:
+/// - [staff]: A required [TripRecent] object containing the trip details.
+///
+/// Actions:
+/// - The widget builds the UI by utilizing the [build] method, which constructs a scrollable layout with
+///   information displayed in rows.
+/// - The [convertDuration] method is used to convert the trip duration from minutes to a formatted string
+///   displaying hours and minutes.
+/// - The [onPressed] action for the back button navigates the user back to the previous screen when tapped.
+///
+/// Private Methods:
+/// - [_buildRow]: A helper method that creates a row displaying a label and a corresponding value.
+/// - [_buildRowTime]: A helper method that formats and displays a date and time label along with the formatted date.
 class RecentTripDetails extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TripRecent staff;
 
   RecentTripDetails({Key? key, required this.staff}) : super(key: key);
 
-// Function to convert duration in minutes to hours and minutes string
   String convertDuration(int duration) {
-    int hours = duration ~/ 60; // Get the integer part of hours
-    int minutes = duration % 60; // Get the remaining minutes
+    int hours = duration ~/ 60;
+    int minutes = duration % 60;
 
-    // Use a conditional expression to set the result
     String result = hours > 0 ? "${hours} hr ${minutes} min" : "${minutes} min";
-
     return result;
   }
 
@@ -76,33 +91,21 @@ class RecentTripDetails extends StatelessWidget {
                 Divider(),
                 SizedBox(height: 20),
                 _buildRow('Name', staff.name),
-                //Divider(),
                 _buildRow('Designation', staff.designation),
-                // Divider(),
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
-                //  Divider(),
                 _buildRow('Trip Type', staff.type),
-                // Divider(),
                 _buildRowTime('Date', staff.date),
-                // Divider(),
                 _buildRow('Start Time', staff.startTime),
-                // Divider(),
                 _buildRow('End Time', staff.endTime),
-                // Divider(),
                 _buildRow('Distance', '${staff.distance} KM'),
-                // Divider(),
                 _buildRow('Trip Type', staff.category),
-                // Divider(),
                 _buildRow('Trip Mode', staff.type),
-                //  Divider(),
                 _buildRow('Destination From', staff.destinationFrom),
-                // Divider(),
                 _buildRow('Destination To', staff.destinationTo),
                 _buildRow('Driver', staff.driver),
                 _buildRow('Car', staff.Car),
                 _buildRow('Duration', convertDuration(staff.Duration)),
-                //  Divider(),
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(
@@ -137,17 +140,13 @@ class RecentTripDetails extends StatelessWidget {
   Widget _buildRowTime(String label, String value) {
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
 
-    // Parse the date and time string
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-
-    // Format the date and time
     String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
     DateTime date = DateTime.parse(value);
     DateFormat dateFormat = DateFormat.yMMMMd('en_US');
     DateFormat timeFormat = DateFormat.jm();
     String formattedDate = dateFormat.format(date);
     String formattedTime = timeFormat.format(date);
-    //String formattedDateTime = '$formattedDate, $formattedTime';
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
