@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/// Creates a widget that displays a message indicating there are no requests.
+///
+/// This function takes the following parameters:
+/// - [screenWidth]: The width of the screen, used to set the width of the widget.
+/// - [message]: The message to display in the widget, typically indicating that there are no requests.
 Widget buildNoRequestsWidget(double screenWidth, String message) {
   return Material(
     elevation: 5,

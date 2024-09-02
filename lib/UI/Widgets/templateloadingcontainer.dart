@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+/// Creates a widget that displays a message indicating there are no requests,
+/// using a Material widget for a more prominent alert-like appearance.
+///
+/// This function takes the following parameters:
+/// - [screenWidth]: The width of the screen, used to set the width of the widget.
+/// - [message]: The message to display in the widget, typically indicating that there are no requests.
 class LoadingContainer extends StatelessWidget {
   final double screenWidth;
 
