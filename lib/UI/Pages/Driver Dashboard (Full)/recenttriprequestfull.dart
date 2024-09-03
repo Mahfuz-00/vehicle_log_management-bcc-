@@ -23,17 +23,17 @@ import '../Driver Dashboard/driverStopTrip.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-class DriverDashboardRecent extends StatefulWidget {
+class DriverDashboardRecentTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const DriverDashboardRecent({Key? key, this.shouldRefresh = false})
+  const DriverDashboardRecentTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<DriverDashboardRecent> createState() => _DriverDashboardRecentState();
+  State<DriverDashboardRecentTripsUI> createState() => _DriverDashboardRecentTripsUIState();
 }
 
-class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
+class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -152,7 +152,7 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
               context,
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
-                  staff: TripRecent(
+                  staff: RecentTrip(
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -192,7 +192,7 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -264,7 +264,7 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
               context,
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
-                  staff: TripRecent(
+                  staff: RecentTrip(
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -352,7 +352,7 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final userProfile = state.userProfile;
-          return InternetChecker(
+          return InternetConnectionChecker(
             child: Scaffold(
               extendBody: true,
               key: _scaffoldKey,
@@ -528,7 +528,7 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
                             SizedBox(height: screenHeight * 0.01),
                             Divider(),
                             SizedBox(height: screenHeight * 0.01),
-                            RequestsWidgetShowAll(
+                            AllRequestsWidget(
                               loading: _isLoading,
                               fetch: _isFetched,
                               errorText: 'You haven\'t finished any trip yet.',
@@ -716,7 +716,7 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => DriverDashboardRecent(
+                                  builder: (context) => DriverDashboardRecentTripsUI(
                                     shouldRefresh: true,
                                   )));
                         },
@@ -755,7 +755,7 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Profile(
+                                  builder: (context) => ProfileUI(
                                     shouldRefresh: true,
                                   )));
                         },
@@ -988,7 +988,7 @@ class _DriverDashboardRecentState extends State<DriverDashboardRecent> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

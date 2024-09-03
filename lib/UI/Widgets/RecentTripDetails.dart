@@ -5,12 +5,12 @@ import '../../Data/Models/tripRequestModelRecent.dart';
 
 /// [RecentTripDetails] is a StatelessWidget that displays detailed information about a recent trip.
 ///
-/// It receives a [TripRecent] object as a parameter, which contains all the relevant details about the trip.
+/// It receives a [RecentTrip] object as a parameter, which contains all the relevant details about the trip.
 /// The widget includes an app bar for navigation, displays various trip details, and provides a back button
 /// for returning to the previous screen.
 ///
 /// Parameters:
-/// - [staff]: A required [TripRecent] object containing the trip details.
+/// - [staff]: A required [RecentTrip] object containing the trip details.
 ///
 /// Actions:
 /// - The widget builds the UI by utilizing the [build] method, which constructs a scrollable layout with
@@ -24,7 +24,7 @@ import '../../Data/Models/tripRequestModelRecent.dart';
 /// - [_buildRowTime]: A helper method that formats and displays a date and time label along with the formatted date.
 class RecentTripDetails extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final TripRecent staff;
+  final RecentTrip staff;
 
   RecentTripDetails({Key? key, required this.staff}) : super(key: key);
 
@@ -41,7 +41,7 @@ class RecentTripDetails extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return InternetChecker(
+    return InternetConnectionChecker(
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(

@@ -2,29 +2,36 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../Models/imageUpdateModel.dart';
 
-
-
-class APIProfilePictureUpdate {
+/// A service class for updating the user's profile picture via an API request.
+///
+/// This class provides methods to handle the uploading of a profile picture using a [File] object and an [authToken]
+/// for authorization. It communicates with the backend to update the user's profile picture.
+///
+/// **Variables:**
+/// - [URL]: The API endpoint for updating the profile picture.
+/// - [authToken]: The authentication token used for authorizing the API request.
+///
+/// **Actions:**
+/// - [create]: A factory method that initializes the [ProfilePictureUpdateAPIService] class and loads the [authToken].
+/// - [_loadAuthToken]: Loads the [authToken] from shared preferences.
+/// - [updateProfilePicture]: Sends a POST request to the API with the selected image file. It constructs a multipart
+///   request containing the image file, and if the request is successful, it returns a [ProfilePictureUpdateResponse].
+///   If the request fails, it throws an exception and prints relevant error messages.
+class ProfilePictureUpdateAPIService {
   static const String URL =
       'https://bcc.touchandsolve.com/api/user/profile/photo/update';
   late final String authToken;
 
-  APIProfilePictureUpdate._();
+  ProfilePictureUpdateAPIService._();
 
-  static Future<APIProfilePictureUpdate> create() async {
-    var apiService = APIProfilePictureUpdate._();
+  static Future<ProfilePictureUpdateAPIService> create() async {
+    var apiService = ProfilePictureUpdateAPIService._();
     await apiService._loadAuthToken();
     print('triggered API');
     return apiService;
   }
-
-/*  APIServiceUpdateUser() {
-    authToken = _loadAuthToken(); // Assigning the future here
-    print('triggered');
-  }*/
 
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -37,7 +44,6 @@ class APIProfilePictureUpdate {
     final String token = await authToken;
     try {
       if (token.isEmpty) {
-        // Wait for authToken to be initialized
         await _loadAuthToken();
         throw Exception('Authentication token is empty.');
       }
@@ -51,7 +57,6 @@ class APIProfilePictureUpdate {
           filename: image.path.split('/').last);
       print(multipartFile);
       request.files.add(multipartFile);
-      //request.files.add(await http.MultipartFile.fromPath('photo', image.path));
 
       var response = await request.send();
 

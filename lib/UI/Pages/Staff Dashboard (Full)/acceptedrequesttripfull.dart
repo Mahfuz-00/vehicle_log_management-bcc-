@@ -23,17 +23,17 @@ import '../Profile UI/profileUI.dart';
 import '../Trip Request Form(Staff)/triprequestformUI.dart';
 
 
-class StaffDashboardAccepted extends StatefulWidget {
+class StaffDashboardAcceptedTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const StaffDashboardAccepted({Key? key, this.shouldRefresh = false})
+  const StaffDashboardAcceptedTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<StaffDashboardAccepted> createState() => _StaffDashboardAcceptedState();
+  State<StaffDashboardAcceptedTripsUI> createState() => _StaffDashboardAcceptedTripsUIState();
 }
 
-class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
+class _StaffDashboardAcceptedTripsUIState extends State<StaffDashboardAcceptedTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -141,8 +141,8 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ApprovedTripStaff(
-                  staff: TripRequestApprovedStaff(
+                builder: (context) => ApprovedStaffTrip(
+                  staff: ApprovedStaffTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     id: request['trip_id'],
@@ -182,7 +182,7 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -253,8 +253,8 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ApprovedTripStaff(
-                  staff: TripRequestApprovedStaff(
+                builder: (context) => ApprovedStaffTrip(
+                  staff: ApprovedStaffTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     id: request['trip_id'],
@@ -339,7 +339,7 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final userProfile = state.userProfile;
-          return InternetChecker(
+          return InternetConnectionChecker(
             child: Scaffold(
               key: _scaffoldKey,
               appBar: AppBar(
@@ -399,7 +399,7 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
                                 )),
                             SizedBox(height: screenHeight * 0.01),
                             Divider(),
-                            RequestsWidgetShowAll(
+                            AllRequestsWidget(
                               loading: _isLoading,
                               fetch: _isFetched,
                               errorText: 'No trip request reviewed yet.',
@@ -502,7 +502,7 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => StaffDashboardAccepted(
+                                builder: (context) => StaffDashboardAcceptedTripsUI(
                                   shouldRefresh: true,
                                 )));
                       },
@@ -540,7 +540,7 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                const TripRequestForm()));
+                                const TripRequestFormUI()));
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Container(
@@ -583,7 +583,7 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Profile(shouldRefresh:  true,)));
+                                builder: (context) => const ProfileUI(shouldRefresh:  true,)));
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -778,7 +778,7 @@ class _StaffDashboardAcceptedState extends State<StaffDashboardAccepted> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

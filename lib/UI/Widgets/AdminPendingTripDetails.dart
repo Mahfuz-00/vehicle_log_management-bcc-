@@ -7,7 +7,7 @@ import '../../Data/Models/tripRequestModelSROfficer.dart';
 import '../Pages/Admin Dashboard/admindashboardUI.dart';
 import 'dropdownmodel.dart';
 
-/// [PendingTripAdmin] is a [StatefulWidget] that manages the UI and functionality
+/// [AdminPendingTrip] is a [StatefulWidget] that manages the UI and functionality
 /// for viewing and assigning drivers to pending trips for an admin.
 ///
 /// The class handles fetching available drivers, displaying trip details,
@@ -16,7 +16,7 @@ import 'dropdownmodel.dart';
 ///
 /// Variables:
 /// - [shouldRefresh]: A [bool] that indicates whether the page should refresh upon loading.
-/// - [staff]: An instance of [TripRequestSROfficer] representing the staff associated with the trip.
+/// - [staff]: An instance of [SROfficerTripRequest] representing the staff associated with the trip.
 /// - [_scaffoldKey]: A [GlobalKey] used to manage the [ScaffoldState].
 /// - [drivers]: A [List] of [String] that stores the names of available drivers.
 /// - [_isFetched]: A [bool] indicating if the driver data has been fetched.
@@ -24,21 +24,21 @@ import 'dropdownmodel.dart';
 /// - [_pageLoading]: A [bool] indicating if the page is still loading.
 /// - [_errorOccurred]: A [bool] indicating if an error occurred while fetching data.
 /// - [carID]: An [int] representing the ID of the selected car.
-class PendingTripAdmin extends StatefulWidget {
+class AdminPendingTrip extends StatefulWidget {
   final bool shouldRefresh;
-  final TripRequestSROfficer staff;
+  final SROfficerTripRequest staff;
 
-  PendingTripAdmin({Key? key, this.shouldRefresh = false, required this.staff})
+  AdminPendingTrip({Key? key, this.shouldRefresh = false, required this.staff})
       : super(key: key);
 
   @override
-  State<PendingTripAdmin> createState() => _PendingTripAdminState();
+  State<AdminPendingTrip> createState() => _AdminPendingTripState();
 }
 
-class _PendingTripAdminState extends State<PendingTripAdmin> {
+class _AdminPendingTripState extends State<AdminPendingTrip> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late TripRequestSROfficer staff;
+  late SROfficerTripRequest staff;
 
   List<String> drivers = [];
   bool _isFetched = false;
@@ -113,7 +113,7 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
               child: CircularProgressIndicator(),
             ),
           )
-        : InternetChecker(
+        : InternetConnectionChecker(
             child: Scaffold(
               key: _scaffoldKey,
               appBar: AppBar(
@@ -266,7 +266,7 @@ class _PendingTripAdminState extends State<PendingTripAdmin> {
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AdminDashboard(shouldRefresh: true)),
+          MaterialPageRoute(builder: (context) => AdminDashboardUI(shouldRefresh: true)),
         );
       }
       else if(checker == false){

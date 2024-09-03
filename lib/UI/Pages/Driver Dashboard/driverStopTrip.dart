@@ -13,21 +13,21 @@ import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import 'driverdashboardUI.dart';
 
-class DriverStopTrip extends StatefulWidget {
+class DriverStopTripUI extends StatefulWidget {
   final bool shouldRefresh;
-  final TripRequestApprovedStaff staff;
+  final ApprovedStaffTripRequest staff;
 
-  const DriverStopTrip(
+  const DriverStopTripUI(
       {Key? key, this.shouldRefresh = false, required this.staff})
       : super(key: key);
 
   @override
-  State<DriverStopTrip> createState() => _DriverStartTripState();
+  State<DriverStopTripUI> createState() => _DriverStartTripState();
 }
 
-class _DriverStartTripState extends State<DriverStopTrip> {
+class _DriverStartTripState extends State<DriverStopTripUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late TripRequestApprovedStaff staff;
+  late ApprovedStaffTripRequest staff;
   bool _isFetched = false;
   bool _isLoading = false;
   bool _pageLoading = true;
@@ -128,7 +128,7 @@ class _DriverStartTripState extends State<DriverStopTrip> {
         child: CircularProgressIndicator(),
       ),
     )
-        : InternetChecker(
+        : InternetConnectionChecker(
       child: PopScope(
         canPop: false,
         child: Scaffold(
@@ -308,7 +308,7 @@ class _DriverStartTripState extends State<DriverStopTrip> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DriverDashboard(shouldRefresh: true,)));
+                              builder: (context) => DriverDashboardUI(shouldRefresh: true,)));
                     },
                     child: Container(
                       width: screenWidth / 3,
@@ -382,7 +382,7 @@ class _DriverStartTripState extends State<DriverStopTrip> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const Profile(shouldRefresh: true,)));
+                              builder: (context) => const ProfileUI(shouldRefresh: true,)));
                     },
                     behavior: HitTestBehavior.translucent,
                     child: Container(
@@ -439,7 +439,7 @@ class _DriverStartTripState extends State<DriverStopTrip> {
         _clearStartTimeAndDuration();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DriverDashboard(shouldRefresh: true,)),
+          MaterialPageRoute(builder: (context) => DriverDashboardUI(shouldRefresh: true,)),
         );
       }
       else if(checker == false){

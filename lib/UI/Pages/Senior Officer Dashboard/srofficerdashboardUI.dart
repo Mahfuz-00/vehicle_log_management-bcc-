@@ -20,17 +20,17 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-class SROfficerDashboard extends StatefulWidget {
+class SROfficerDashboardUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const SROfficerDashboard({Key? key, this.shouldRefresh = false})
+  const SROfficerDashboardUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<SROfficerDashboard> createState() => _SROfficerDashboardState();
+  State<SROfficerDashboardUI> createState() => _SROfficerDashboardUIState();
 }
 
-class _SROfficerDashboardState extends State<SROfficerDashboard> {
+class _SROfficerDashboardUIState extends State<SROfficerDashboardUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -151,8 +151,8 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripSROfficer(
-                  staff: TripRequestSROfficer(
+                builder: (context) => SROfficerPendingTrip(
+                  staff: SROfficerTripRequest(
                       id: request['trip_id'],
                       name: request['name'],
                       designation: request['designation'],
@@ -196,7 +196,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
               context,
               MaterialPageRoute(
                 builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
+                  staff: OngoingTripRequest(
                       driver: request['driver'],
                       Car: request['car'],
                       name: request['name'],
@@ -283,7 +283,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
             builder: (context, state) {
               if (state is AuthAuthenticated) {
                 final userProfile = state.userProfile;
-                return InternetChecker(
+                return InternetConnectionChecker(
                   child: PopScope(
                     canPop: false,
                     child: Scaffold(
@@ -382,7 +382,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                     numberOfWidgets: 5,
                                     showSeeAllButton: canFetchMorePending,
                                     seeAllButtonText: 'See All New Trips',
-                                    nextView: SROfficerDashboardNewTrip(
+                                    nextView: SROfficerDashboardNewTripsUI(
                                       shouldRefresh: true,
                                     ),
                                     pagination: canFetchMorePending,
@@ -477,7 +477,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                     numberOfWidgets: 5,
                                     showSeeAllButton: canFetchMoreAccepted,
                                     seeAllButtonText: 'See All Ongoing Trips',
-                                    nextView: SROfficerDashboardOngoing(
+                                    nextView: SROfficerDashboardOngoingTripsUI(
                                       shouldRefresh: true,
                                     ),
                                     pagination: canFetchMoreAccepted,
@@ -573,7 +573,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            SROfficerDashboard()));
+                                            SROfficerDashboardUI()));
                               },
                               child: Container(
                                 width: screenWidth / 3,
@@ -608,7 +608,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const Profile(
+                                        builder: (context) => const ProfileUI(
                                               shouldRefresh: true,
                                             )));
                               },
@@ -846,7 +846,7 @@ class _SROfficerDashboardState extends State<SROfficerDashboard> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

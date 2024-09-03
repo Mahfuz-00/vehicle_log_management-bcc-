@@ -24,17 +24,17 @@ import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
 
-class AdminDashboardPending extends StatefulWidget {
+class AdminDashboardPendingTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const AdminDashboardPending({Key? key, this.shouldRefresh = false})
+  const AdminDashboardPendingTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<AdminDashboardPending> createState() => _AdminDashboardPendingState();
+  State<AdminDashboardPendingTripsUI> createState() => _AdminDashboardPendingTripsUIState();
 }
 
-class _AdminDashboardPendingState extends State<AdminDashboardPending> {
+class _AdminDashboardPendingTripsUIState extends State<AdminDashboardPendingTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -175,9 +175,9 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripAdmin(
+                builder: (context) => AdminPendingTrip(
                   shouldRefresh: true,
-                  staff: TripRequestSROfficer(
+                  staff: SROfficerTripRequest(
                       id: request['trip_id'],
                       name: request['name'],
                       designation: request['designation'],
@@ -216,7 +216,7 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -319,9 +319,9 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripAdmin(
+                builder: (context) => AdminPendingTrip(
                   shouldRefresh: true,
-                  staff: TripRequestSROfficer(
+                  staff: SROfficerTripRequest(
                       id: request['trip_id'],
                       name: request['name'],
                       designation: request['designation'],
@@ -405,7 +405,7 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final userProfile = state.userProfile;
-          return InternetChecker(
+          return InternetConnectionChecker(
             child: Scaffold(
               key: _scaffoldKey,
               appBar: AppBar(
@@ -450,7 +450,7 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
                                 fontFamily: 'default',
                               )),
                           SizedBox(height: screenHeight * 0.01),
-                          RequestsWidgetShowAll(
+                          AllRequestsWidget(
                             loading: _isLoading,
                             fetch: _isFetched,
                             errorText: 'There aren\'t any trip request yet.',
@@ -594,7 +594,7 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    AdminDashboardPending(shouldRefresh: true)));
+                                    AdminDashboardPendingTripsUI(shouldRefresh: true)));
                       },
                       child: Container(
                         width: screenWidth / 3,
@@ -629,7 +629,7 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Profile(
+                                builder: (context) => const ProfileUI(
                                   shouldRefresh: true,
                                 )));
                       },
@@ -866,7 +866,7 @@ class _AdminDashboardPendingState extends State<AdminDashboardPending> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

@@ -2,23 +2,33 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class APIServicePasswordUpdate {
+/// A service class for updating the user's profile picture via an API request.
+///
+/// This class provides methods to handle the uploading of a profile picture using a [File] object and an [authToken]
+/// for authorization. It communicates with the backend to update the user's profile picture.
+///
+/// **Variables:**
+/// - [URL]: The API endpoint for updating the profile picture.
+/// - [authToken]: The authentication token used for authorizing the API request.
+///
+/// **Actions:**
+/// - [create]: A factory method that initializes the [APIProfilePictureUpdate] class and loads the [authToken].
+/// - [_loadAuthToken]: Loads the [authToken] from shared preferences.
+/// - [updateProfilePicture]: Sends a POST request to the API with the selected image file. It constructs a multipart
+///   request containing the image file, and if the request is successful, it returns a [ProfilePictureUpdateResponse].
+///   If the request fails, it throws an exception and prints relevant error messages.
+class PasswordUpdateAPIService {
   String baseURL = 'https://bcc.touchandsolve.com/api';
   late final String authToken;
 
-  APIServicePasswordUpdate._();
+  PasswordUpdateAPIService._();
 
-  static Future<APIServicePasswordUpdate> create() async {
-    var apiService = APIServicePasswordUpdate._();
+  static Future<PasswordUpdateAPIService> create() async {
+    var apiService = PasswordUpdateAPIService._();
     await apiService._loadAuthToken();
     print('triggered API');
     return apiService;
   }
-
-/*  APIServiceUpdateUser() {
-    authToken = _loadAuthToken(); // Assigning the future here
-    print('triggered');
-  }*/
 
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,7 +46,6 @@ class APIServicePasswordUpdate {
     print('Authen:: $authToken');
     try {
       if (token.isEmpty) {
-        // Wait for authToken to be initialized
         await _loadAuthToken();
         throw Exception('Authentication token is empty.');
       }
@@ -54,7 +63,6 @@ class APIServicePasswordUpdate {
       print('Request Body: $requestBody'); 
       print('Auth: $authToken');
 
-
       final response = await http.post(
         Uri.parse('$baseURL/update/password'),
         headers: {
@@ -66,7 +74,6 @@ class APIServicePasswordUpdate {
 
       if (response.statusCode == 200) {
         print('password');
-        // Request successful, parse response data if needed
         final responseData = jsonDecode(response.body);
         print(response.body);
         final responseMessage = responseData['message'];

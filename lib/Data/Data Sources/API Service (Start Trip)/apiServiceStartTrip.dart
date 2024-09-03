@@ -2,6 +2,24 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A service class for starting a trip via an API.
+///
+/// This class is responsible for sending a request to start a trip by
+/// using a specific trip ID.
+///
+/// **Actions:**
+/// - [create]: Initializes the API service and loads the authentication token.
+/// - [TripStarted]: Sends a request to the API to start a trip using the
+///   provided trip ID. It returns a boolean indicating the success or failure
+///   of the operation.
+///
+/// **Variables:**
+/// - [_baseUrl]: The base URL for the API endpoints.
+/// - [authToken]: The authentication token required for API requests.
+/// - [url]: The full URL for the trip start request, constructed using the
+///   base URL and the trip ID.
+/// - [requestBody]: The body of the request containing the trip ID.
+/// - [response]: The response received from the API after sending the request.
 class StartTripAPIService {
   static const String _baseUrl = 'https://bcc.touchandsolve.com/api';
   late final String authToken;
@@ -14,11 +32,6 @@ class StartTripAPIService {
     print('triggered API');
     return apiService;
   }
-
-/* StartTripAPIService() {
-    _loadAuthToken();
-    print('triggered');
-  }*/
 
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -41,18 +54,14 @@ class StartTripAPIService {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
-        // Add any required headers here
       },
-      //body: jsonEncode(requestBody),
     );
 
     if (response.statusCode == 200) {
       print(response.body);
-      // Request successful
       print('Trip Started successfully');
       return true;
     } else {
-      // Request failed
       print('Failed to Start Trip. Status code: ${response.statusCode}');
       return false;
     }

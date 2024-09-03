@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
-import '../../Data/Data Sources/API Service (Auth SR Officer)/apiServiceSROfficerAuth.dart';
+import '../../Data/Data Sources/API Service (Accept or Decline Trip)/apiServiceAcceptorDeclineTrip.dart';
 import '../../Data/Models/tripRequestModelSROfficer.dart';
 import '../Pages/Senior Officer Dashboard/srofficerdashboardUI.dart';
 
@@ -16,15 +16,15 @@ import '../Pages/Senior Officer Dashboard/srofficerdashboardUI.dart';
 /// When an action is taken, a notification is displayed, and the user is redirected
 /// back to the Senior Officer Dashboard.
 ///
-/// [staff]: The [TripRequestSROfficer] instance containing details of the trip request.
+/// [staff]: The [SROfficerTripRequest] instance containing details of the trip request.
 /// [action]: A string that determines whether the action taken is 'accepted' or 'rejected'.
 ///
-/// The widget uses an [InternetChecker] to verify internet connectivity before displaying the trip details.
-class PendingTripSROfficer extends StatelessWidget {
+/// The widget uses an [InternetConnectionChecker] to verify internet connectivity before displaying the trip details.
+class SROfficerPendingTrip extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final TripRequestSROfficer staff;
+  final SROfficerTripRequest staff;
 
-  PendingTripSROfficer({Key? key, required this.staff}) : super(key: key);
+  SROfficerPendingTrip({Key? key, required this.staff}) : super(key: key);
 
   late String action;
 
@@ -33,7 +33,7 @@ class PendingTripSROfficer extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return InternetChecker(
+    return InternetConnectionChecker(
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
@@ -118,7 +118,7 @@ class PendingTripSROfficer extends StatelessWidget {
                         Future.delayed(Duration(seconds: 2), () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => SROfficerDashboard(shouldRefresh: true)),
+                            MaterialPageRoute(builder: (context) => SROfficerDashboardUI(shouldRefresh: true)),
                           );
                           const snackBar = SnackBar(
                             content: Text('Request Accepted!'),
@@ -155,7 +155,7 @@ class PendingTripSROfficer extends StatelessWidget {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) =>
-                                SROfficerDashboard(shouldRefresh: true)),
+                                SROfficerDashboardUI(shouldRefresh: true)),
                           );
                           const snackBar = SnackBar(
                             content: Text('Request Declined!'),

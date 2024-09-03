@@ -10,14 +10,14 @@ import '../../../Data/Models/tripRequestModel.dart';
 import '../../Widgets/radiooption.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
 
-class TripRequestForm extends StatefulWidget {
-  const TripRequestForm({super.key});
+class TripRequestFormUI extends StatefulWidget {
+  const TripRequestFormUI({super.key});
 
   @override
-  State<TripRequestForm> createState() => _TripRequestFormState();
+  State<TripRequestFormUI> createState() => _TripRequestFormUIState();
 }
 
-class _TripRequestFormState extends State<TripRequestForm> {
+class _TripRequestFormUIState extends State<TripRequestFormUI> {
   late TextEditingController _StartTimecontroller = TextEditingController();
   late TextEditingController _EndTimecontroller = TextEditingController();
   late TextEditingController _Datecontroller = TextEditingController();
@@ -71,7 +71,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return InternetChecker(
+    return InternetConnectionChecker(
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
@@ -82,7 +82,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => StaffDashboard(
+                        builder: (context) => StaffDashboardUI(
                               shouldRefresh: true,
                             )));
               },
@@ -854,7 +854,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
 
       // Perform any additional actions before sending the request
       // Send the connection request using API service
-      APIServiceTripRequest().postTripRequest(_tripRequest, _file).then((response) {
+      TripRequestAPIService().postTripRequest(_tripRequest, _file).then((response) {
         // Handle successful request
         print('Trip request sent successfully!!');
         print(response);
@@ -862,7 +862,7 @@ class _TripRequestFormState extends State<TripRequestForm> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => StaffDashboard(
+                builder: (context) => StaffDashboardUI(
                       shouldRefresh: true,
                     )),
           );

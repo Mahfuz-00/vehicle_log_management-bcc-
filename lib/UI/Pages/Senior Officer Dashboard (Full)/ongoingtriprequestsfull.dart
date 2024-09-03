@@ -20,18 +20,18 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-class SROfficerDashboardOngoing extends StatefulWidget {
+class SROfficerDashboardOngoingTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const SROfficerDashboardOngoing({Key? key, this.shouldRefresh = false})
+  const SROfficerDashboardOngoingTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<SROfficerDashboardOngoing> createState() =>
-      _SROfficerDashboardOngoingState();
+  State<SROfficerDashboardOngoingTripsUI> createState() =>
+      _SROfficerDashboardOngoingTripsUIState();
 }
 
-class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
+class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOngoingTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -138,7 +138,7 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
               context,
               MaterialPageRoute(
                 builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
+                  staff: OngoingTripRequest(
                       driver: request['driver'],
                       Car: request['car'],
                       name: request['name'],
@@ -178,7 +178,7 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -250,7 +250,7 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
               context,
               MaterialPageRoute(
                 builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
+                  staff: OngoingTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     name: request['name'],
@@ -335,7 +335,7 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
             builder: (context, state) {
               if (state is AuthAuthenticated) {
                 final userProfile = state.userProfile;
-                return InternetChecker(
+                return InternetConnectionChecker(
                   child: Scaffold(
                     key: _scaffoldKey,
                     appBar: AppBar(
@@ -474,7 +474,7 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
                                     )),
                                 SizedBox(height: screenHeight * 0.01),
                                 Divider(),
-                                RequestsWidgetShowAll(
+                                AllRequestsWidget(
                                   loading: _isLoading,
                                   fetch: _isFetched,
                                   errorText: 'No trip request reviewed yet.',
@@ -670,7 +670,7 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          SROfficerDashboardOngoing()));
+                                          SROfficerDashboardOngoingTripsUI()));
                             },
                             child: Container(
                               width: screenWidth / 3,
@@ -705,7 +705,7 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const Profile(
+                                      builder: (context) => const ProfileUI(
                                             shouldRefresh: true,
                                           )));
                             },
@@ -942,7 +942,7 @@ class _SROfficerDashboardOngoingState extends State<SROfficerDashboardOngoing> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

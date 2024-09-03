@@ -7,14 +7,14 @@ import '../../Widgets/dropdownfield.dart';
 import '../../Widgets/radiooptionSignUp.dart';
 import '../Login UI/loginUI.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class SignupUI extends StatefulWidget {
+  const SignupUI({super.key});
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<SignupUI> createState() => _SignupUIState();
 }
 
-class _SignupState extends State<Signup> {
+class _SignupUIState extends State<SignupUI> {
   bool _isObscuredPassword = true;
   bool _isObscuredConfirmPassword = true;
   late RegisterRequestmodel _registerRequest;
@@ -414,7 +414,7 @@ class _SignupState extends State<Signup> {
                             InkWell(
                               onTap: () {
                                 Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => Login()));
+                                    MaterialPageRoute(builder: (context) => LoginUI()));
                               },
                               child: const Text(
                                 'Login now',

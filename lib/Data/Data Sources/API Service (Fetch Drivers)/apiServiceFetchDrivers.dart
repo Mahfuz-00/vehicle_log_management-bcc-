@@ -2,6 +2,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A service class for fetching available drivers from an API.
+///
+/// This class manages the authentication token and handles requests to
+/// retrieve available driver data.
+///
+/// **Variables:**
+/// - [baseUrl]: The base URL for the API endpoint.
+/// - [authToken]: The authentication token used for API requests.
+///
+/// **Actions:**
+/// - [create]: Creates an instance of [FetchDriverAPIService] and loads
+///   the authentication token from shared preferences.
+/// - [_loadAuthToken]: Loads the authentication token from shared preferences.
+/// - [fetchDrivers]: Sends a GET request to the API endpoint to fetch
+///   available drivers and returns the response data as a [Map].
 class FetchDriverAPIService{
   final String baseUrl = 'https://bcc.touchandsolve.com/api';
   late final String authToken;
@@ -14,11 +29,6 @@ class FetchDriverAPIService{
     print('triggered API');
     return apiService;
   }
-
-/*  FetchDriverAPIService() {
-    _loadAuthToken();
-    print('triggered');
-  }*/
 
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();

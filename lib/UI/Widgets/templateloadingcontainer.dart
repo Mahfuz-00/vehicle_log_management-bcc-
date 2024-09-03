@@ -17,8 +17,8 @@ class LoadingContainer extends StatelessWidget {
       elevation: 5,
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        height: 200, // Adjust height as needed
-        width: screenWidth, // Adjust width as needed
+        height: 200,
+        width: screenWidth,
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,

@@ -3,25 +3,45 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart';
-
 import '../../Models/tripRequestModel.dart';
 
-
-class APIServiceTripRequest {
+/// A service class for handling trip requests via an API.
+///
+/// This class manages the process of sending trip requests, including
+/// optional file attachments, to the API endpoint.
+///
+/// **Actions:**
+/// - [create]: Initializes the API service and loads the authentication token.
+/// - [_loadAuthToken]: Loads the authentication token from shared preferences.
+/// - [postTripRequest]: Sends a trip request to the API, optionally attaching
+///   a file. Returns a message indicating the success or failure of the request.
+///
+/// **Variables:**
+/// - [URL]: The base URL for the API endpoints.
+/// - [authToken]: A future that resolves to the authentication token required
+///   for API requests.
+/// - [uri]: The complete URI for the trip request endpoint.
+/// - [requestMultipart]: The multipart request object used to send the trip
+///   request and any file attachments.
+/// - [token]: The authentication token retrieved for the current session.
+/// - [response]: The response received from the API after sending the request.
+/// - [jsonResponse]: The JSON-decoded response body when the trip request
+///   is successful.
+class TripRequestAPIService {
   final String URL = 'https://bcc.touchandsolve.com/api';
   late final Future<String> authToken;
 
-  APIServiceTripRequest._();
+  TripRequestAPIService._();
 
-  static Future<APIServiceTripRequest> create() async {
-    var apiService = APIServiceTripRequest._();
+  static Future<TripRequestAPIService> create() async {
+    var apiService = TripRequestAPIService._();
     await apiService._loadAuthToken();
     print('triggered API');
     return apiService;
   }
 
-  APIServiceTripRequest() {
-    authToken = _loadAuthToken(); // Assigning the future here
+  TripRequestAPIService() {
+    authToken = _loadAuthToken();
     print('triggered');
   }
 
@@ -34,10 +54,9 @@ class APIServiceTripRequest {
   }
 
   Future<String> postTripRequest(TripRequest request, File? file) async {
-    final String token = await authToken; // Wait for the authToken to complete
+    final String token = await authToken;
     try {
       if (token.isEmpty) {
-        // Wait for authToken to be initialized
         await _loadAuthToken();
         throw Exception('Authentication token is empty.');
       }
@@ -48,7 +67,6 @@ class APIServiceTripRequest {
       requestMultipart.headers['Authorization'] = 'Bearer $token';
       requestMultipart.headers['Content-Type'] = 'multipart/form-data';
 
-      // Add text fields
       request.toJson().forEach((key, value) {
         requestMultipart.fields[key] = value.toString();
       });

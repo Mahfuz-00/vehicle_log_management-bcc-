@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Models/tripRequestModel.dart';
 
-/// The [PendingTripStaff] class is a stateless widget that displays
+/// The [PendingStaffTrip] class is a stateless widget that displays
 /// details of a pending trip request for staff members. It includes
 /// information such as [staff.name], [staff.designation], [staff.department],
 /// [staff.phone], [staff.type], [staff.date], [staff.startTime],
@@ -11,23 +11,23 @@ import '../../Data/Models/tripRequestModel.dart';
 /// [staff.destinationFrom], and [staff.destinationTo].
 ///
 /// This widget also checks for internet connectivity using the
-/// [InternetChecker] widget. The user can navigate back to the
+/// [InternetConnectionChecker] widget. The user can navigate back to the
 /// previous screen using the back button in the app bar. The trip
 /// details are presented in a user-friendly format, with
 /// appropriately formatted dates and times. An ElevatedButton
 /// allows the user to go back to the previous screen.
-class PendingTripStaff extends StatelessWidget {
+class PendingStaffTrip extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TripRequest staff;
 
-  PendingTripStaff({Key? key, required this.staff}) : super(key: key);
+  PendingStaffTrip({Key? key, required this.staff}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return InternetChecker(
+    return InternetConnectionChecker(
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(

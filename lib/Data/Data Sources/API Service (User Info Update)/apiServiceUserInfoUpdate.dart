@@ -1,30 +1,34 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
-
 import 'package:http/http.dart' as http;
-
 import '../../Models/userInfoUpdateModel.dart';
 
-class APIServiceUpdateUser {
+/// A service class for updating user profile information via an API request.
+///
+/// This class handles the process of sending updated user information to the backend, such as the user's name, phone,
+/// and userId, along with the [authToken] for authorization.
+///
+/// **Variables:**
+/// - [authToken]: The authentication token used to authorize the API request.
+/// - [URL]: The API endpoint for updating the user profile.
+///
+/// **Actions:**
+/// - [create]: A factory method that initializes the [UpdateUserAPIService] class and loads the [authToken].
+/// - [_loadAuthToken]: Loads the [authToken] from shared preferences.
+/// - [updateUserProfile]: Sends a POST request to the API with updated user data ([userId], [name], [phone]).
+class UpdateUserAPIService {
   late final String authToken;
   String URL = "https://bcc.touchandsolve.com/api/user/profile/update";
 
-  APIServiceUpdateUser._();
+  UpdateUserAPIService._();
 
-  static Future<APIServiceUpdateUser> create() async {
-    var apiService = APIServiceUpdateUser._();
+  static Future<UpdateUserAPIService> create() async {
+    var apiService = UpdateUserAPIService._();
     await apiService._loadAuthToken();
     print('triggered API');
     return apiService;
   }
-
-/*  APIServiceUpdateUser() {
-    authToken = _loadAuthToken(); // Assigning the future here
-    print('triggered');
-  }*/
 
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -33,21 +37,18 @@ class APIServiceUpdateUser {
     print(prefs.getString('token'));
   }
 
-  Future<String> updateUserProfile(UserProfileUpdate userData) async {
+  Future<String> updateUserProfile(UserProfileUpdateModel userData) async {
     final String token = await authToken;
     try {
       if (token.isEmpty) {
-        // Wait for authToken to be initialized
         await _loadAuthToken();
         throw Exception('Authentication token is empty.');
       }
 
-      // Create a POST request
       var response = await http.post(
         Uri.parse(URL),
         headers: <String, String>{
-          //'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token' // Use token here
+          'Authorization': 'Bearer $token'
         },
         body: {
           'userId': userData.userId,
@@ -56,14 +57,11 @@ class APIServiceUpdateUser {
         },
       );
 
-      // Check the status code of the response
       if (response.statusCode == 200) {
-        // Successful profile update
         var jsonResponse = jsonDecode(response.body);
         print('User profile updated successfully!');
         return jsonResponse['message'];
       } else {
-        // Handle profile update failure
         print('Failed to update user profile: ${response.body}');
         return 'Failed to update user profile. Please try again.';
       }
@@ -71,8 +69,7 @@ class APIServiceUpdateUser {
       var response = await http.post(
         Uri.parse(URL),
         headers: <String, String>{
-          //'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token' // Use token here
+          'Authorization': 'Bearer $token'
         },
         body: {
           'userId': userData.userId,
@@ -81,7 +78,6 @@ class APIServiceUpdateUser {
         },
       );
       print(response.body);
-      // Handle any exceptions
       print('Error occurred while updating user profile: $e');
       return 'Failed to update user profile. Please try again.';
     }

@@ -23,17 +23,17 @@ import '../Profile UI/profileUI.dart';
 import 'driverStartTrip.dart';
 import 'driverStopTrip.dart';
 
-class DriverDashboard extends StatefulWidget {
+class DriverDashboardUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const DriverDashboard({Key? key, this.shouldRefresh = false})
+  const DriverDashboardUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<DriverDashboard> createState() => _DriverDashboardState();
+  State<DriverDashboardUI> createState() => _DriverDashboardUIState();
 }
 
-class _DriverDashboardState extends State<DriverDashboard> {
+class _DriverDashboardUIState extends State<DriverDashboardUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -165,8 +165,8 @@ class _DriverDashboardState extends State<DriverDashboard> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DriverStartTrip(
-                  staff: TripRequestApprovedStaff(
+                builder: (context) => DriverStartTripUI(
+                  staff: ApprovedStaffTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     id: request['trip_id'],
@@ -212,8 +212,8 @@ class _DriverDashboardState extends State<DriverDashboard> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => DriverStopTrip(
-                  staff: TripRequestApprovedStaff(
+                builder: (context) => DriverStopTripUI(
+                  staff: ApprovedStaffTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     id: request['trip_id'],
@@ -234,8 +234,8 @@ class _DriverDashboardState extends State<DriverDashboard> {
                 ),
               ),
             );
-            DriverStopTrip(
-              staff: TripRequestApprovedStaff(
+            DriverStopTripUI(
+              staff: ApprovedStaffTripRequest(
                   driver: request['driver'],
                   Car: request['car'],
                   name: request['name'],
@@ -279,7 +279,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
               context,
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
-                  staff: TripRecent(
+                  staff: RecentTrip(
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -372,7 +372,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
             builder: (context, state) {
               if (state is AuthAuthenticated) {
                 final userProfile = state.userProfile;
-                return InternetChecker(
+                return InternetConnectionChecker(
                   child: PopScope(
                     canPop: false,
                     child: Scaffold(
@@ -478,7 +478,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                         showSeeAllButton:
                                             canFetchMorePending,
                                         seeAllButtonText: 'See All New Trips',
-                                        nextView: DriverDashboardPending(
+                                        nextView: DriverDashboardPendingTripsUI(
                                           shouldRefresh: true,
                                         ),
                                         pagination: canFetchMorePending,
@@ -608,7 +608,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                       numberOfWidgets: 5,
                                       showSeeAllButton: canFetchMoreRecent,
                                       seeAllButtonText: 'See All Recent Trips',
-                                      nextView: DriverDashboardRecent(
+                                      nextView: DriverDashboardRecentTripsUI(
                                         shouldRefresh: true,
                                       ),
                                       pagination: canFetchMoreRecent,
@@ -717,7 +717,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => DriverDashboard(
+                                          builder: (context) => DriverDashboardUI(
                                                 shouldRefresh: true,
                                               )));
                                 },
@@ -757,7 +757,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => Profile(
+                                          builder: (context) => ProfileUI(
                                                 shouldRefresh: true,
                                               )));
                                 },
@@ -992,7 +992,7 @@ class _DriverDashboardState extends State<DriverDashboard> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

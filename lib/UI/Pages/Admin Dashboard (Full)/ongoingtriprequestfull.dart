@@ -24,17 +24,17 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-class AdminDashboardOngoing extends StatefulWidget {
+class AdminDashboardOngoingTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const AdminDashboardOngoing({Key? key, this.shouldRefresh = false})
+  const AdminDashboardOngoingTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<AdminDashboardOngoing> createState() => _AdminDashboardOngoingState();
+  State<AdminDashboardOngoingTripsUI> createState() => _AdminDashboardOngoingTripsUIState();
 }
 
-class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
+class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -163,7 +163,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
               context,
               MaterialPageRoute(
                 builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
+                  staff: OngoingTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     name: request['name'],
@@ -205,7 +205,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -296,7 +296,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
               context,
               MaterialPageRoute(
                 builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
+                  staff: OngoingTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     name: request['name'],
@@ -382,7 +382,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
             builder: (context, state) {
               if (state is AuthAuthenticated) {
                 final userProfile = state.userProfile;
-                return InternetChecker(
+                return InternetConnectionChecker(
                   child: Scaffold(
                     key: _scaffoldKey,
                     appBar: AppBar(
@@ -444,7 +444,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                                       fontFamily: 'default',
                                     )),
                                 SizedBox(height: screenHeight * 0.01),
-                                RequestsWidgetShowAll(
+                                AllRequestsWidget(
                                   loading: _isLoading,
                                   fetch: _isFetched,
                                   errorText: 'No trip onging.',
@@ -592,7 +592,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          AdminDashboardOngoing(
+                                          AdminDashboardOngoingTripsUI(
                                               shouldRefresh: true)));
                             },
                             child: Container(
@@ -628,7 +628,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const Profile(
+                                      builder: (context) => const ProfileUI(
                                             shouldRefresh: true,
                                           )));
                             },
@@ -865,7 +865,7 @@ class _AdminDashboardOngoingState extends State<AdminDashboardOngoing> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 /// It allows the user to select one option from a list of options provided as a parameter.
 ///
 /// The widget takes the following parameters:
-/// - [options]: A required list of [String] options that will be displayed as radio tiles.
-/// - [selectedOption]: An optional [String] that specifies the initially selected option.
+/// - [options]: A required list of String options that will be displayed as radio tiles.
+/// - [selectedOption]: An optional String that specifies the initially selected option.
 /// - [onChanged]: An optional callback function that is called when the selected option changes, passing the new value as a parameter.
 ///
 /// The widget maintains its own state for the selected option through the [_selectedOption] variable.

@@ -22,17 +22,17 @@ import '../Profile UI/profileUI.dart';
 
 
 
-class SROfficerDashboardNewTrip extends StatefulWidget {
+class SROfficerDashboardNewTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const SROfficerDashboardNewTrip({Key? key, this.shouldRefresh = false})
+  const SROfficerDashboardNewTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<SROfficerDashboardNewTrip> createState() => _SROfficerDashboardNewTripState();
+  State<SROfficerDashboardNewTripsUI> createState() => _SROfficerDashboardNewTripsUIState();
 }
 
-class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
+class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -165,8 +165,8 @@ class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripSROfficer(
-                  staff: TripRequestSROfficer(
+                builder: (context) => SROfficerPendingTrip(
+                  staff: SROfficerTripRequest(
                       id: request['trip_id'],
                       name: request['name'],
                       designation: request['designation'],
@@ -203,7 +203,7 @@ class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -290,8 +290,8 @@ class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripSROfficer(
-                  staff: TripRequestSROfficer(
+                builder: (context) => SROfficerPendingTrip(
+                  staff: SROfficerTripRequest(
                       id: request['trip_id'],
                       name: request['name'],
                       designation: request['designation'],
@@ -373,7 +373,7 @@ class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final userProfile = state.userProfile;
-          return InternetChecker(
+          return InternetConnectionChecker(
             child: Scaffold(
               key: _scaffoldKey,
               appBar: AppBar(
@@ -420,7 +420,7 @@ class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
                               )),
                           SizedBox(height: screenHeight * 0.01),
                           Divider(),
-                          RequestsWidgetShowAll(
+                          AllRequestsWidget(
                             loading: _isLoading,
                             fetch: _isFetched,
                             errorText: 'No new trip request.',
@@ -686,7 +686,7 @@ class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SROfficerDashboardNewTrip()));
+                                builder: (context) => SROfficerDashboardNewTripsUI()));
                       },
                       child: Container(
                         width: screenWidth / 3,
@@ -721,7 +721,7 @@ class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Profile(shouldRefresh: true,)));
+                                builder: (context) => const ProfileUI(shouldRefresh: true,)));
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Container(
@@ -956,7 +956,7 @@ class _SROfficerDashboardNewTripState extends State<SROfficerDashboardNewTrip> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

@@ -19,7 +19,7 @@ import 'dart:convert';
 /// - [distance]: A String representing the approximate distance of the trip.
 /// - [category]: A String representing the category of the trip.
 /// - [type]: A String representing the type of the trip.
-class TripRequestSROfficer {
+class SROfficerTripRequest {
   int id;
   String name;
   String designation;
@@ -35,7 +35,7 @@ class TripRequestSROfficer {
   String category;
   String type;
 
-  TripRequestSROfficer({
+  SROfficerTripRequest({
     required this.id,
     required this.name,
     required this.designation,
@@ -52,8 +52,8 @@ class TripRequestSROfficer {
     required this.type,
   });
 
-  factory TripRequestSROfficer.fromJson(Map<String, dynamic> json) {
-    return TripRequestSROfficer(
+  factory SROfficerTripRequest.fromJson(Map<String, dynamic> json) {
+    return SROfficerTripRequest(
       id: json['trip_id'],
       name: json['name'],
       designation: json['designation'],
@@ -90,11 +90,11 @@ class TripRequestSROfficer {
     return data;
   }
 
-  static List<TripRequestSROfficer> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => TripRequestSROfficer.fromJson(json)).toList();
+  static List<SROfficerTripRequest> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => SROfficerTripRequest.fromJson(json)).toList();
   }
 
-  static List<Map<String, dynamic>> toJsonList(List<TripRequestSROfficer> trips) {
+  static List<Map<String, dynamic>> toJsonList(List<SROfficerTripRequest> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }
 }

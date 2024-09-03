@@ -23,17 +23,17 @@ import '../Profile UI/profileUI.dart';
 import '../Trip Request Form(Staff)/triprequestformUI.dart';
 
 
-class StaffDashboardRecent extends StatefulWidget {
+class StaffDashboardRecentTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const StaffDashboardRecent({Key? key, this.shouldRefresh = false})
+  const StaffDashboardRecentTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<StaffDashboardRecent> createState() => _StaffDashboardRecentState();
+  State<StaffDashboardRecentTripsUI> createState() => _StaffDashboardRecentTripsUIState();
 }
 
-class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
+class _StaffDashboardRecentTripsUIState extends State<StaffDashboardRecentTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -144,7 +144,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
               context,
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
-                  staff: TripRecent(
+                  staff: RecentTrip(
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -182,7 +182,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -259,7 +259,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripStaff(
+                builder: (context) => PendingStaffTrip(
                   staff: TripRequest(
                       name: request['name'],
                       designation: request['designation'],
@@ -341,7 +341,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final userProfile = state.userProfile;
-          return InternetChecker(
+          return InternetConnectionChecker(
             child: Scaffold(
               key: _scaffoldKey,
               appBar: AppBar(
@@ -520,7 +520,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
                                 )),
                             SizedBox(height: screenHeight * 0.01),
                             Divider(),
-                            RequestsWidgetShowAll(
+                            AllRequestsWidget(
                               loading: _isLoading,
                               fetch: _isFetched,
                               errorText: 'You haven\'t take any trip yet.',
@@ -654,7 +654,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => StaffDashboardRecent(
+                                builder: (context) => StaffDashboardRecentTripsUI(
                                   shouldRefresh: true,
                                 )));
                       },
@@ -692,7 +692,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                const TripRequestForm()));
+                                const TripRequestFormUI()));
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Container(
@@ -735,7 +735,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Profile(shouldRefresh:  true,)));
+                                builder: (context) => const ProfileUI(shouldRefresh:  true,)));
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -930,7 +930,7 @@ class _StaffDashboardRecentState extends State<StaffDashboardRecent> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

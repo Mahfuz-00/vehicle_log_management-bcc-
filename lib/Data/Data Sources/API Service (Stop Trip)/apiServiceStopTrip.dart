@@ -2,6 +2,24 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A service class for stopping a trip via an API.
+///
+/// This class handles the process of sending a request to stop a trip using
+/// a specific trip ID.
+///
+/// **Actions:**
+/// - [create]: Initializes the API service and loads the authentication token.
+/// - [TripStopped]: Sends a request to the API to stop a trip using the
+///   provided trip ID. It returns a boolean indicating whether the operation
+///   was successful.
+///
+/// **Variables:**
+/// - [_baseUrl]: The base URL for the API endpoints.
+/// - [authToken]: The authentication token required for API requests.
+/// - [url]: The full URL for the trip stop request, constructed using the
+///   base URL and the trip ID.
+/// - [requestBody]: The body of the request containing the trip ID.
+/// - [response]: The response received from the API after sending the request.
 class StopTripAPIService {
   static const String _baseUrl = 'https://bcc.touchandsolve.com/api';
   late final String authToken;
@@ -14,11 +32,6 @@ class StopTripAPIService {
     print('triggered API');
     return apiService;
   }
-
-/* StopTripAPIService() {
-    _loadAuthToken();
-    print('triggered');
-  }*/
 
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -41,18 +54,14 @@ class StopTripAPIService {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
-        // Add any required headers here
       },
-      //body: jsonEncode(requestBody),
     );
 
     if (response.statusCode == 200) {
       print(response.body);
-      // Request successful
       print('Trip Stopped successfully');
       return true;
     } else {
-      // Request failed
       print('Failed to Stop Trip. Status code: ${response.statusCode}');
       return false;
     }

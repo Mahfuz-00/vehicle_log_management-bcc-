@@ -2,6 +2,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A service class for assigning a car to a trip via an API.
+///
+/// This class handles the assignment of cars to trips and manages the
+/// authentication token required for API requests.
+///
+/// **Variables:**
+/// - [authToken]: The authentication token used for API requests.
+/// - [_baseUrl]: The base URL for the API endpoint.
+///
+/// **Actions:**
+/// - [create]: Creates an instance of [AssignCarAPIService] and loads the
+///   authentication token from shared preferences.
+/// - [_loadAuthToken]: Loads the authentication token from shared preferences.
+/// - [assignCarToTrip]: Sends a POST request to assign a car to a trip using
+///   the provided [tripId] and [carId].
 class AssignCarAPIService {
   static const String _baseUrl = 'https://bcc.touchandsolve.com/api';
   late final String authToken;
@@ -14,11 +29,6 @@ class AssignCarAPIService {
     print('triggered API');
     return apiService;
   }
-
-/* AssignCarAPIService() {
-    _loadAuthToken();
-    print('triggered');
-  }*/
 
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -43,17 +53,14 @@ class AssignCarAPIService {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
-        // Add any required headers here
       },
       body: jsonEncode(requestBody),
     );
 
     if (response.statusCode == 200) {
-      // Request successful
       print('Car assigned successfully');
       return true;
     } else {
-      // Request failed
       print('Failed to assign car. Status code: ${response.statusCode}');
       return false;
     }

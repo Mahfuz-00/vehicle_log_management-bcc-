@@ -14,16 +14,36 @@ import '../Forgot Password UI/forgotpasswordUI.dart';
 import '../Senior Officer Dashboard/srofficerdashboardUI.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
 
-
-
-class Login extends StatefulWidget {
-  const Login({super.key});
+/// This [LoginUI] class represents the user interface for logging into the application.
+///
+/// Variables:
+/// * [bool _isObscured] - Controls the visibility of the password text field.
+/// * [TextEditingController _passwordController] - Manages the text input for the password.
+/// * [TextEditingController _emailController] - Manages the text input for the email.
+/// * [LoginRequestmodel _loginRequest] - Holds the email and password for the login request.
+/// * [GlobalKey<ScaffoldState> globalKey] - Key for the [Scaffold] widget, used for accessing the scaffold.
+/// * [GlobalKey<FormState> globalfromkey] - Key for the [Form] widget, used for validating the form.
+/// * [String userType] - Stores the type of user after a successful login.
+/// * [bool _isLoading] - Indicates whether a login request is in progress.
+/// * [bool _isButtonClicked] - Tracks if the login button has been clicked to display a loading indicator.
+/// * [AuthCubit authCubit] - Manages the authentication state of the application.
+///
+/// Actions:
+/// * [_getIcon()] - Returns the appropriate icon based on the [_isObscured] value.
+/// * [_checkLoginRequest()] - Verifies the [LoginRequestmodel] to ensure email and password are set.
+/// * [initState()] - Initializes the login request model, controllers, and checks the login request.
+/// * [dispose()] - Disposes of the controllers to free up resources.
+/// * [build()] - Builds the login UI, including form fields for email and password, and a login button.
+/// * [validateAndSave()] - Validates the form, sends the login request, handles the response, and manages the navigation based on the user type.
+/// * [showTopToast()] - Displays a toast message at the top of the screen with the provided [message].
+class LoginUI extends StatefulWidget {
+  const LoginUI({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<LoginUI> createState() => _LoginUIState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginUIState extends State<LoginUI> {
   bool _isObscured = true;
   late TextEditingController _passwordController;
   late TextEditingController _emailController;
@@ -41,8 +61,8 @@ class _LoginState extends State<Login> {
 
   void _checkLoginRequest() {
     if (_loginRequest != null) {
-      _loginRequest.Email; // no error
-      _loginRequest.Password; // no error
+      _loginRequest.Email;
+      _loginRequest.Password;
     }
   }
 
@@ -80,7 +100,6 @@ class _LoginState extends State<Login> {
                 Expanded(
                   child: Center(
                     child: Container(
-                      //alignment: Alignment.center,
                       child: Column(
                         children: [
                           const Text(
@@ -221,7 +240,7 @@ class _LoginState extends State<Login> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => const ForgotPassword()));
+                                            builder: (context) => const ForgotPasswordUI()));
                                   },
                                   child: const Text(
                                     'Forgot Password?',
@@ -243,35 +262,34 @@ class _LoginState extends State<Login> {
                           ElevatedButton(
                               onPressed: () async {
                                 setState(() {
-                                  _isButtonClicked = true; // Button clicked, show circular progress indicator
+                                  _isButtonClicked = true;
                                 });
                                 if (await validateAndSave(
                                     globalfromkey, context)) {
-                                  //print(_loginRequest.toJSON());
                                   print('Checking $userType');
                                   if(userType != null){
                                     if (userType == 'vlm_staff') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => StaffDashboard(shouldRefresh: true)),
+                                        MaterialPageRoute(builder: (context) => StaffDashboardUI(shouldRefresh: true)),
                                       );
                                     }
                                     else if (userType == 'vlm_driver') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => DriverDashboard(shouldRefresh: true)),
+                                        MaterialPageRoute(builder: (context) => DriverDashboardUI(shouldRefresh: true)),
                                       );
                                     }
                                     else if (userType == 'vlm_senior_officer') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => SROfficerDashboard(shouldRefresh: true)),
+                                        MaterialPageRoute(builder: (context) => SROfficerDashboardUI(shouldRefresh: true)),
                                       );
                                     }
                                     else if (userType == 'vlm_admin') {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => AdminDashboard(shouldRefresh: true)),
+                                        MaterialPageRoute(builder: (context) => AdminDashboardUI(shouldRefresh: true)),
                                       );
                                     }
                                     else{
@@ -281,7 +299,7 @@ class _LoginState extends State<Login> {
                                   }
                                 }
                                 setState(() {
-                                  _isButtonClicked = false; // Validation complete, hide circular progress indicator
+                                  _isButtonClicked = false;
                                 });
                               },
                               style: ElevatedButton.styleFrom(
@@ -292,7 +310,7 @@ class _LoginState extends State<Login> {
                                 fixedSize: Size(screenWidth*0.9, 70),
                               ),
                               child: _isButtonClicked
-                                  ? CircularProgressIndicator() // Show circular progress indicator when button is clicked
+                                  ? CircularProgressIndicator()
                                   : const Text('Login',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
@@ -362,7 +380,7 @@ class _LoginState extends State<Login> {
     final form = formKey.currentState;
     if (form != null && form.validate()) {
       form.save();
-      final apiService = APIService();
+      final apiService = LoginAPIService();
       final loginRequestModel = LoginRequestmodel(
         Email: _emailController.text,
         Password: _passwordController.text,
@@ -370,7 +388,6 @@ class _LoginState extends State<Login> {
       try {
         final response = await apiService.login(loginRequestModel);
         if (response != null) {
-          // Handle successful login
           storeTokenLocally(response.token);
           userType = response.userType;
           print('UserType :: $userType');
@@ -381,7 +398,6 @@ class _LoginState extends State<Login> {
           return false;
         }
       } catch (e) {
-        // Handle login error
         String errorMessage = 'Incorrect Email and Password.';
         if (e.toString().contains('Invalid User')) {
           errorMessage = 'Invalid User!, Please enter a valid email address.';
@@ -396,7 +412,6 @@ class _LoginState extends State<Login> {
         return false;
       }
     }
-    // Return false if form validation fails
     return false;
   }
 
@@ -404,7 +419,7 @@ class _LoginState extends State<Login> {
     OverlayState? overlayState = Overlay.of(context);
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10, // 10 is for a little margin from the top
+        top: MediaQuery.of(context).padding.top + 10,
         left: 20,
         right: 20,
         child: Material(
@@ -426,7 +441,6 @@ class _LoginState extends State<Login> {
 
     overlayState?.insert(overlayEntry);
 
-    // Remove the overlay entry after some time (e.g., 3 seconds)
     Future.delayed(Duration(seconds: 3)).then((_) {
       overlayEntry.remove();
     });
@@ -445,9 +459,8 @@ class _LoginState extends State<Login> {
 
   Future<void> _fetchUserProfile(String token) async {
     try {
-      final apiService = await APIProfileService();
+      final apiService = await ProfileAPIService();
 
-      // Check if the widget is still mounted
       if (!mounted) return;
 
       print('Mounted');
@@ -458,35 +471,8 @@ class _LoginState extends State<Login> {
       print('Mounted Again');
 
       authCubit.login(userProfile, token);
-
-      /*
-      final apiService = await APIProfileService();
-      final profile = await apiService.fetchUserProfile(token);
-      final userProfile = UserProfile.fromJson(profile);
-
-      // Save user profile data in SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      try {
-        await prefs.setString('userName', userProfile.name);
-        await prefs.setString('organizationName', userProfile.organization);
-        await prefs.setString('photoUrl', userProfile.photo);
-        await prefs.setString('user', userProfile.user);
-        UserName = prefs.getString('userName');
-        OrganizationName = prefs.getString('organizationName');
-        PhotoURL = prefs.getString('photoUrl');
-        User = prefs.getString('user');
-        print('User Name: $UserName');
-        print('Organization Name: $OrganizationName');
-        print('Photo URL: $PhotoURL');
-        print('User Type: $User');
-        print('User profile saved successfully');
-      } catch (e) {
-        print('Error saving user profile: $e');
-      }*/
-
     } catch (e) {
       print('Error fetching user profile: $e');
-      // Handle error as needed
     }
   }
 }

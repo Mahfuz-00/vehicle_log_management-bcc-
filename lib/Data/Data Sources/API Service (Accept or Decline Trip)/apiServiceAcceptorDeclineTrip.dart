@@ -2,6 +2,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A service class for accepting or rejecting trips via an API.
+///
+/// This class manages the authentication token and handles requests to
+/// accept or reject trips.
+///
+/// **Variables:**
+/// - [authToken]: The authentication token used for API requests.
+/// - [URL]: The base URL for the API endpoint.
+///
+/// **Actions:**
+/// - [create]: Creates an instance of [TripAcceptRejectAPIService] and loads
+///   the authentication token from shared preferences.
+/// - [_loadAuthToken]: Loads the authentication token from shared preferences.
+/// - [acceptOrRejectTrip]: Sends a POST request to accept or reject a trip
+///   using the provided [type] and [tripId].
 class TripAcceptRejectAPIService {
   static const String URL = 'https://bcc.touchandsolve.com/api';
   late final String authToken;
@@ -15,18 +30,12 @@ class TripAcceptRejectAPIService {
     return apiService;
   }
 
-/*  TripAcceptRejectAPIService() {
-    _loadAuthToken();
-    print('triggered');
-  }*/
-
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
     authToken = prefs.getString('token') ?? '';
     print('Load Token');
     print(prefs.getString('token'));
   }
-
 
   Future<void> acceptOrRejectTrip({required String type, required int tripId,}) async {
     final String url = '$URL/vlm/trip/accept/or/reject';
@@ -52,7 +61,6 @@ class TripAcceptRejectAPIService {
 
       if (response.statusCode == 200) {
         print(response.body);
-        // Request successful
         print('Trip accepted/rejected successfully');
         if (type.toLowerCase() == 'accepted') {
           print('Request accepted');
@@ -60,11 +68,9 @@ class TripAcceptRejectAPIService {
           print('Request declined');
         }
       } else {
-        // Request failed
         print('Failed to accept/reject Trip. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      // Error occurred
       print('Error accepting/rejecting Trip: $e');
     }
   }

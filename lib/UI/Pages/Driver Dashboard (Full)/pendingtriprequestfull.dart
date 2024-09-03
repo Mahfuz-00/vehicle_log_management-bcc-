@@ -23,17 +23,17 @@ import '../Driver Dashboard/driverStopTrip.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-class DriverDashboardPending extends StatefulWidget {
+class DriverDashboardPendingTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const DriverDashboardPending({Key? key, this.shouldRefresh = false})
+  const DriverDashboardPendingTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<DriverDashboardPending> createState() => _DriverDashboardPendingState();
+  State<DriverDashboardPendingTripsUI> createState() => _DriverDashboardPendingTripsUIState();
 }
 
-class _DriverDashboardPendingState extends State<DriverDashboardPending> {
+class _DriverDashboardPendingTripsUIState extends State<DriverDashboardPendingTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -140,8 +140,8 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => DriverStopTrip(
-                  staff: TripRequestApprovedStaff(
+                builder: (context) => DriverStopTripUI(
+                  staff: ApprovedStaffTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     id: request['trip_id'],
@@ -162,8 +162,8 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                 ),
               ),
             );
-            DriverStopTrip(
-              staff: TripRequestApprovedStaff(
+            DriverStopTripUI(
+              staff: ApprovedStaffTripRequest(
                   driver: request['driver'],
                   Car: request['car'],
                   name: request['name'],
@@ -200,7 +200,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -270,8 +270,8 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => DriverStopTrip(
-                  staff: TripRequestApprovedStaff(
+                builder: (context) => DriverStopTripUI(
+                  staff: ApprovedStaffTripRequest(
                     driver: request['driver'],
                     Car: request['car'],
                     id: request['trip_id'],
@@ -292,8 +292,8 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                 ),
               ),
             );
-            DriverStopTrip(
-              staff: TripRequestApprovedStaff(
+            DriverStopTripUI(
+              staff: ApprovedStaffTripRequest(
                   driver: request['driver'],
                   Car: request['car'],
                   name: request['name'],
@@ -378,7 +378,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final userProfile = state.userProfile;
-          return InternetChecker(
+          return InternetConnectionChecker(
             child: Scaffold(
               extendBody: true,
               key: _scaffoldKey,
@@ -429,7 +429,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                             Divider(),
                             SizedBox(height: screenHeight * 0.01),
                             if (acceptedRequests.isEmpty) ...[
-                              RequestsWidgetShowAll(
+                              AllRequestsWidget(
                                 loading: _isLoading,
                                 fetch: _isFetched,
                                 errorText: 'No New Trip.',
@@ -742,7 +742,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => DriverDashboardPending(
+                                  builder: (context) => DriverDashboardPendingTripsUI(
                                     shouldRefresh: true,
                                   )));
                         },
@@ -781,7 +781,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Profile(
+                                  builder: (context) => ProfileUI(
                                     shouldRefresh: true,
                                   )));
                         },
@@ -1013,7 +1013,7 @@ class _DriverDashboardPendingState extends State<DriverDashboardPending> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

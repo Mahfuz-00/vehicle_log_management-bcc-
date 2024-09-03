@@ -23,7 +23,7 @@ import 'dart:convert';
 /// - [type]: A String representing the type of the trip.
 /// - [Duration]: An integer representing the duration of the trip in minutes.
 /// - [startTrip]: A DateTime representing the actual start time of the trip, which can be null.
-class TripRecent {
+class RecentTrip {
   String driver;
   String Car;
   int id;
@@ -43,7 +43,7 @@ class TripRecent {
   int Duration;
   DateTime? startTrip;
 
-  TripRecent({
+  RecentTrip({
     required this.driver,
     required this.Car,
     required this.id,
@@ -64,8 +64,8 @@ class TripRecent {
     this.startTrip,
   });
 
-  factory TripRecent.fromJson(Map<String, dynamic> json) {
-    return TripRecent(
+  factory RecentTrip.fromJson(Map<String, dynamic> json) {
+    return RecentTrip(
       driver: json['driver'],
       Car: json['car'],
       id: json['trip_id'],
@@ -108,11 +108,11 @@ class TripRecent {
     return data;
   }
 
-  static List<TripRecent> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => TripRecent.fromJson(json)).toList();
+  static List<RecentTrip> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => RecentTrip.fromJson(json)).toList();
   }
 
-  static List<Map<String, dynamic>> toJsonList(List<TripRecent> trips) {
+  static List<Map<String, dynamic>> toJsonList(List<RecentTrip> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }
 }

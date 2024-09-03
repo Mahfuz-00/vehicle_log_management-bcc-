@@ -22,7 +22,7 @@ import 'dart:convert';
 /// - [category]: A String representing the category of the trip.
 /// - [type]: A String representing the type of the trip.
 /// - [startTrip]: A String representing the actual start time of the trip.
-class TripRequestOngoing {
+class OngoingTripRequest {
   String driver;
   String Car;
   int id;
@@ -41,7 +41,7 @@ class TripRequestOngoing {
   String type;
   String startTrip;
 
-  TripRequestOngoing({
+  OngoingTripRequest({
     required this.driver,
     required this.Car,
     required this.id,
@@ -61,8 +61,8 @@ class TripRequestOngoing {
     required this.startTrip,
   });
 
-  factory TripRequestOngoing.fromJson(Map<String, dynamic> json) {
-    return TripRequestOngoing(
+  factory OngoingTripRequest.fromJson(Map<String, dynamic> json) {
+    return OngoingTripRequest(
       driver: json['driver'],
       Car: json['car'],
       id: json['trip_id'],
@@ -105,11 +105,11 @@ class TripRequestOngoing {
     return data;
   }
 
-  static List<TripRequestOngoing> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => TripRequestOngoing.fromJson(json)).toList();
+  static List<OngoingTripRequest> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => OngoingTripRequest.fromJson(json)).toList();
   }
 
-  static List<Map<String, dynamic>> toJsonList(List<TripRequestOngoing> trips) {
+  static List<Map<String, dynamic>> toJsonList(List<OngoingTripRequest> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }
 }

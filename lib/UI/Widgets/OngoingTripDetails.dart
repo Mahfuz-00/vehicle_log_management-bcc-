@@ -4,7 +4,7 @@ import '../../Data/Models/tripRequestModelOngingTrip.dart';
 
 /// [OngoingTrip] is a StatelessWidget that displays the details of an ongoing trip.
 ///
-/// It takes a [TripRequestOngoing] object as a parameter, which contains information about the trip.
+/// It takes a [OngoingTripRequest] object as a parameter, which contains information about the trip.
 ///
 /// This widget builds a user interface that includes:
 /// - A [Scaffold] with an [AppBar] that has a back button and a title.
@@ -21,10 +21,10 @@ import '../../Data/Models/tripRequestModelOngingTrip.dart';
 ///
 /// Variables:
 /// - [_scaffoldKey]: A GlobalKey for the Scaffold widget to manage the widget tree state.
-/// - [staff]: An instance of [TripRequestOngoing] that contains details about the ongoing trip.
+/// - [staff]: An instance of [OngoingTripRequest] that contains details about the ongoing trip.
 class OngoingTrip extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final TripRequestOngoing staff;
+  final OngoingTripRequest staff;
 
   OngoingTrip({Key? key, required this.staff}) : super(key: key);
 
@@ -33,7 +33,7 @@ class OngoingTrip extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return InternetChecker(
+    return InternetConnectionChecker(
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(

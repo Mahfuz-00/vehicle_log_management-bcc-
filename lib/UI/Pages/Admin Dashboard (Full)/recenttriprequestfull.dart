@@ -23,17 +23,17 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-class AdminDashboardRecent extends StatefulWidget {
+class AdminDashboardRecentTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const AdminDashboardRecent({Key? key, this.shouldRefresh = false})
+  const AdminDashboardRecentTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<AdminDashboardRecent> createState() => _AdminDashboardRecentState();
+  State<AdminDashboardRecentTripsUI> createState() => _AdminDashboardRecentTripsUIState();
 }
 
-class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
+class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -160,7 +160,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
               context,
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
-                  staff: TripRecent(
+                  staff: RecentTrip(
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -201,7 +201,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -290,7 +290,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
               context,
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
-                  staff: TripRecent(
+                  staff: RecentTrip(
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -375,7 +375,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
             builder: (context, state) {
               if (state is AuthAuthenticated) {
                 final userProfile = state.userProfile;
-                return InternetChecker(
+                return InternetConnectionChecker(
                   child: Scaffold(
                     key: _scaffoldKey,
                     appBar: AppBar(
@@ -455,7 +455,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                                     )),
                                 SizedBox(height: screenHeight * 0.01),
                                 Divider(),
-                                RequestsWidgetShowAll(
+                                AllRequestsWidget(
                                   loading: _isLoading,
                                   fetch: _isFetched,
                                   errorText: 'No Recent Trip.',
@@ -579,7 +579,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          AdminDashboardRecent(
+                                          AdminDashboardRecentTripsUI(
                                               shouldRefresh: true)));
                             },
                             child: Container(
@@ -615,7 +615,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const Profile(
+                                      builder: (context) => const ProfileUI(
                                             shouldRefresh: true,
                                           )));
                             },
@@ -852,7 +852,7 @@ class _AdminDashboardRecentState extends State<AdminDashboardRecent> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

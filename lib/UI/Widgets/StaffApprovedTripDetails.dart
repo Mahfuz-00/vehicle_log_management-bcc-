@@ -5,7 +5,7 @@ import '../../Data/Models/tripRequestModelApprovedStaff.dart';
 
 /// A widget that displays the details of an approved trip for staff.
 ///
-/// This widget takes a [TripRequestApprovedStaff] object as input and
+/// This widget takes a [ApprovedStaffTripRequest] object as input and
 /// presents various details related to the trip, such as the staff's
 /// name, designation, department, mobile number, trip type, date,
 /// start time, end time, distance, trip mode, destination details,
@@ -14,18 +14,18 @@ import '../../Data/Models/tripRequestModelApprovedStaff.dart';
 ///
 /// Actions:
 /// - Navigate back to the previous screen when the back button is pressed.
-class ApprovedTripStaff extends StatelessWidget {
+class ApprovedStaffTrip extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final TripRequestApprovedStaff staff;
+  final ApprovedStaffTripRequest staff;
 
-  ApprovedTripStaff({Key? key, required this.staff}) : super(key: key);
+  ApprovedStaffTrip({Key? key, required this.staff}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return InternetChecker(
+    return InternetConnectionChecker(
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(

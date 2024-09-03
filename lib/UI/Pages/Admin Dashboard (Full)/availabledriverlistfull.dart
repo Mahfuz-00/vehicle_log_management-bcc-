@@ -25,17 +25,17 @@ import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
 
-class AdminDashboardDriver extends StatefulWidget {
+class AdminDashboardAvailableDriverUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const AdminDashboardDriver({Key? key, this.shouldRefresh = false})
+  const AdminDashboardAvailableDriverUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<AdminDashboardDriver> createState() => _AdminDashboardDriverState();
+  State<AdminDashboardAvailableDriverUI> createState() => _AdminDashboardAvailableDriverUIState();
 }
 
-class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
+class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailableDriverUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -151,7 +151,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
   Future<void> fetchConnectionRequestsPagination(String url) async {
     if (_isFetchedFull) return;
     try {
-      final apiService = await DashboardAPIServiceFull.create();
+      final apiService = await DashboardFullAPIService.create();
 
       // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
@@ -274,7 +274,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
       builder: (context, state) {
         if (state is AuthAuthenticated) {
           final userProfile = state.userProfile;
-          return InternetChecker(
+          return InternetConnectionChecker(
             child: Scaffold(
               key: _scaffoldKey,
               appBar: AppBar(
@@ -353,7 +353,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                               )),
                           SizedBox(height: screenHeight * 0.01),
                           Divider(),
-                          RequestsWidgetShowAll(
+                          AllRequestsWidget(
                             loading: _isLoading,
                             fetch: _isFetched,
                             errorText: 'No driver Available.',
@@ -456,7 +456,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    AdminDashboard(shouldRefresh: true)));
+                                    AdminDashboardUI(shouldRefresh: true)));
                       },
                       child: Container(
                         width: screenWidth / 3,
@@ -491,7 +491,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Profile(
+                                builder: (context) => const ProfileUI(
                                   shouldRefresh: true,
                                 )));
                       },
@@ -728,7 +728,7 @@ class _AdminDashboardDriverState extends State<AdminDashboardDriver> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

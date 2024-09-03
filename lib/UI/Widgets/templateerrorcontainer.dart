@@ -10,8 +10,8 @@ Widget buildNoRequestsWidget(double screenWidth, String message) {
     elevation: 5,
     borderRadius: BorderRadius.circular(10),
     child: Container(
-      height: 200, // Adjust height as needed
-      width: screenWidth*0.9, // Adjust width as needed
+      height: 200,
+      width: screenWidth*0.9,
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,

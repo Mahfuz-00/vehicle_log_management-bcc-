@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'templateerrorcontainer.dart';
 
-/// [RequestsWidgetShowAll] is a StatelessWidget that displays a list of requests with loading and error handling.
+/// [AllRequestsWidget] is a StatelessWidget that displays a list of requests with loading and error handling.
 ///
 /// This widget handles loading states and displays a list of request widgets. It is specifically designed
 /// to show all available requests based on the provided list. The widget manages different scenarios like
@@ -22,7 +22,7 @@ import 'templateerrorcontainer.dart';
 /// - When fetching is complete and data is available, it checks if the [listWidget] is empty and displays a
 ///   message accordingly or shows the list of requests.
 /// - The widget uses a [ListView.separated] to display the list of requests with a fixed height and padding.
-class RequestsWidgetShowAll extends StatelessWidget {
+class AllRequestsWidget extends StatelessWidget {
   final bool loading;
   final bool fetch;
   final String errorText;
@@ -30,7 +30,7 @@ class RequestsWidgetShowAll extends StatelessWidget {
   final List<Widget> listWidget;
 
 
-  const RequestsWidgetShowAll({
+  const AllRequestsWidget({
     Key? key,
     required this.loading,
     required this.fetch,

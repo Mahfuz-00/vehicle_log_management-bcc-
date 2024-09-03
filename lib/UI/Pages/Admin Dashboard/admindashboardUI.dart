@@ -24,17 +24,17 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-class AdminDashboard extends StatefulWidget {
+class AdminDashboardUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const AdminDashboard({Key? key, this.shouldRefresh = false})
+  const AdminDashboardUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  State<AdminDashboardUI> createState() => _AdminDashboardUIState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
+class _AdminDashboardUIState extends State<AdminDashboardUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -183,9 +183,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PendingTripAdmin(
+                builder: (context) => AdminPendingTrip(
                   shouldRefresh: true,
-                  staff: TripRequestSROfficer(
+                  staff: SROfficerTripRequest(
                       id: request['trip_id'],
                       name: request['name'],
                       designation: request['designation'],
@@ -229,7 +229,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               context,
               MaterialPageRoute(
                 builder: (context) => OngoingTrip(
-                  staff: TripRequestOngoing(
+                  staff: OngoingTripRequest(
                       driver: request['driver'],
                       Car: request['car'],
                       name: request['name'],
@@ -275,7 +275,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               context,
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
-                  staff: TripRecent(
+                  staff: RecentTrip(
                       name: request['name'],
                       designation: request['designation'],
                       department: request['department'],
@@ -365,7 +365,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             builder: (context, state) {
               if (state is AuthAuthenticated) {
                 final userProfile = state.userProfile;
-                return InternetChecker(
+                return InternetConnectionChecker(
                   child: PopScope(
                     canPop: false,
                     child: Scaffold(
@@ -463,7 +463,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     numberOfWidgets: 3,
                                     showSeeAllButton: canFetchMoreDrivers,
                                     seeAllButtonText: 'See All Drivers',
-                                    nextView: AdminDashboardDriver(
+                                    nextView: AdminDashboardAvailableDriverUI(
                                       shouldRefresh: true,
                                     ),
                                     pagination: canFetchMoreDrivers,
@@ -488,7 +488,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     showSeeAllButton: (shouldShowSeeAllButton(
                                         pendingRequests)),
                                     seeAllButtonText: 'See All New Trips',
-                                    nextView: AdminDashboardPending(
+                                    nextView: AdminDashboardPendingTripsUI(
                                       shouldRefresh: true,
                                     ),
                                     pagination: canFetchMorePending,
@@ -512,7 +512,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     showSeeAllButton: (shouldShowSeeAllButton(
                                         acceptedRequests)),
                                     seeAllButtonText: 'See All Ongoing Trips',
-                                    nextView: AdminDashboardOngoing(
+                                    nextView: AdminDashboardOngoingTripsUI(
                                       shouldRefresh: true,
                                     ),
                                     pagination: canFetchMoreAccepted,
@@ -558,7 +558,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => AdminDashboard(
+                                        builder: (context) => AdminDashboardUI(
                                             shouldRefresh: true)));
                               },
                               child: Container(
@@ -594,7 +594,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const Profile(
+                                        builder: (context) => const ProfileUI(
                                               shouldRefresh: true,
                                             )));
                               },
@@ -832,7 +832,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  Login())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

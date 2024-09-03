@@ -2,6 +2,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A service class that handles marking notifications as read by making an API request.
+///
+/// This class provides methods to mark a notification as read using the stored authentication token.
+/// The token is used to authorize the API request.
+///
+/// **Variables:**
+/// - [URL]: The base URL of the API endpoint.
+/// - [authToken]: The authentication token used for authorization in the API request.
+///
+/// **Actions:**
+/// - [create]: A factory method that initializes the [NotificationReadApiService] and loads the [authToken].
+/// - [_loadAuthToken]: A private method to load the [authToken] from [SharedPreferences].
+/// - [readNotification]: Sends a GET request to the API to mark a notification as read.
+///   If the request is successful, it returns `true`. If not, it returns `false`. Handles exceptions
+///   by catching errors during the request.
 class NotificationReadApiService {
   static const String URL = 'https://bcc.touchandsolve.com/api';
   late final String authToken;
@@ -15,26 +30,18 @@ class NotificationReadApiService {
     return apiService;
   }
 
-/*  NotificationReadApiService() {
-    authToken = _loadAuthToken(); // Assigning the future here
-    print('triggered');
-  }*/
-
   Future<void> _loadAuthToken() async {
     final prefs = await SharedPreferences.getInstance();
     authToken = prefs.getString('token') ?? '';
     print('Load Token');
     print(authToken);
-    //return token;
   }
-
 
   Future<bool> readNotification() async {
     print(authToken);
     try {
       if (authToken.isEmpty) {
         print(authToken);
-        // Wait for authToken to be initialized
         await _loadAuthToken();
         throw Exception('Authentication token is empty.');
       }
@@ -48,13 +55,11 @@ class NotificationReadApiService {
       );
 
       if (response.statusCode == 200) {
-        // Request was successful, handle response accordingly
         print(response.body);
         print('Notification Read!!');
         return true;
       } else {
         print(response.body);
-        // Request failed, handle error accordingly
         print('Failed to read Notification: ${response.statusCode}');
         return false;
       }
@@ -67,7 +72,6 @@ class NotificationReadApiService {
         },
       );
       print(response.body);
-      // Exception occurred, handle error accordingly
       print('Exception While Reading Notification: $e');
       return false;
     }

@@ -7,7 +7,7 @@ import '../Pages/Login UI/loginUI.dart';
 /// The dialog includes a title, a content message, and two action buttons: Cancel and Logout.
 ///
 /// When the Cancel button is pressed, the dialog is closed. When the Logout button is pressed,
-/// the user is navigated to the [Login] page, replacing the current page in the navigation stack.
+/// the user is navigated to the [LoginUI] page, replacing the current page in the navigation stack.
 ///
 /// [context] is the BuildContext that provides the location of this widget in the widget tree.
   void _showLogoutDialog(BuildContext context) {
@@ -56,7 +56,7 @@ import '../Pages/Login UI/loginUI.dart';
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Login()));
+                            builder: (context) => const LoginUI()));
                   },
                   child: Text('Logout',
                     style: TextStyle(

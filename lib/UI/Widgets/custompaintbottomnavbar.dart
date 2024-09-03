@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// [CustomBottomNavigation] is a custom widget that creates a bottom navigation bar with a notch effect.
+/// [CustomBottomNavBar] is a custom widget that creates a bottom navigation bar with a notch effect.
 ///
 /// This class extends [CustomPaint] and is designed to render a bottom navigation area with customizable properties.
 ///
@@ -9,15 +9,15 @@ import 'package:flutter/material.dart';
 /// [notchRadius] defines the radius of the notch's corners, defaulting to 20.0.
 /// [notchHeight] sets the height of the notch, defaulting to 50.0.
 ///
-/// The constructor initializes the [CustomBottomNavigation] with the provided parameters and sets the painter
+/// The constructor initializes the [CustomBottomNavBar] with the provided parameters and sets the painter
 /// to an instance of [_CustomBottomNavigationPainter], which handles the drawing of the navigation bar.
-class CustomBottomNavigation extends CustomPaint {
+class CustomBottomNavBar extends CustomPaint {
   final Color backgroundColor;
   final List<Widget> children;
   final double notchRadius;
   final double notchHeight;
 
-  CustomBottomNavigation({
+  CustomBottomNavBar({
     required this.backgroundColor,
     required this.children,
     this.notchRadius = 20.0,
