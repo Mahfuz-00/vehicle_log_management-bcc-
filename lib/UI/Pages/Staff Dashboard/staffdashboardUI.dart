@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vehicle_log_management/UI/Pages/Staff%20Dashboard%20(Full)/acceptedrequesttripfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Staff%20Dashboard%20(Full)/pendingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Staff%20Dashboard%20(Full)/recenttriprequestfull.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
@@ -23,6 +22,39 @@ import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import '../Trip Request Form(Staff)/triprequestformUI.dart';
 
+/// [StaffDashboardUI] is a widget that displays the dashboard for staff users, showing
+/// their pending, accepted, and recent trip requests. It handles user profile loading,
+/// fetches connection requests from an API, and maintains the state of the dashboard.
+///
+/// Variables:
+/// - [shouldRefresh]: a boolean indicating whether to refresh the dashboard upon loading.
+///
+/// Actions:
+/// - [loadUserProfile]: loads user profile information from SharedPreferences.
+/// - [fetchConnectionRequests]: fetches trip requests and updates the UI accordingly.
+///
+/// State Variables:
+/// - [_scaffoldKey]: a GlobalKey for managing the Scaffold state.
+/// - [pendingRequests]: a list of widgets displaying pending trip requests.
+/// - [acceptedRequests]: a list of widgets displaying accepted trip requests.
+/// - [recentRequests]: a list of widgets displaying recent trip requests.
+/// - [_isFetched]: a boolean indicating if data has been fetched.
+/// - [_isLoading]: a boolean indicating if the dashboard is currently loading data.
+/// - [_pageLoading]: a boolean indicating if the page is loading.
+/// - [_errorOccurred]: a boolean indicating if an error has occurred while fetching data.
+/// - [userName]: a string holding the user's name.
+/// - [organizationName]: a string holding the user's organization name.
+/// - [photoUrl]: a string holding the URL of the user's photo.
+/// - [notifications]: a list of strings holding notifications.
+/// - [pendingPagination]: an instance of Pagination for pending requests.
+/// - [acceptedPagination]: an instance of Pagination for accepted requests.
+/// - [recentPagination]: an instance of Pagination for recent requests.
+/// - [pendingurl]: a string holding the URL for fetching more pending requests.
+/// - [acceptedurl]: a string holding the URL for fetching more accepted requests.
+/// - [recenturl]: a string holding the URL for fetching more recent requests.
+/// - [canFetchMorePending]: a boolean indicating if more pending requests can be fetched.
+/// - [canFetchMoreAccepted]: a boolean indicating if more accepted requests can be fetched.
+/// - [canFetchMoreRecent]: a boolean indicating if more recent requests can be fetched.
 class StaffDashboardUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -46,16 +78,12 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
   late String organizationName = '';
   late String photoUrl = '';
   List<String> notifications = [];
-
   late Pagination pendingPagination;
   late Pagination acceptedPagination;
   late Pagination recentPagination;
-
   late String pendingurl = '';
   late String acceptedurl = '';
   late String recenturl = '';
-
-  // Example to check if more data can be fetched
   bool canFetchMorePending = false;
   bool canFetchMoreAccepted = false;
   bool canFetchMoreRecent = false;
@@ -78,12 +106,9 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
     if (_isFetched) return;
     try {
       final apiService = await DashboardAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -93,12 +118,10 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -115,7 +138,6 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
       print('URL :$pendingurl');
       acceptedurl = acceptedPagination.nextPage as String;
       recenturl = recentPagination.nextPage as String;
-
       canFetchMorePending = pendingPagination.canFetchNext;
       print(pendingPagination.canFetchNext);
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
@@ -124,10 +146,8 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
       print(canFetchMoreAccepted);
       print(canFetchMoreRecent);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
@@ -145,7 +165,6 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
         print('Recent Trip at index $index: ${recentTripData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
         print('Pending Trip');
         print(request['name']);
@@ -199,7 +218,6 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
         );
       }).toList();
 
-      // Map accepted requests to widgets
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -246,7 +264,6 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
         );
       }).toList();
 
-      // Map accepted requests to widgets
       final List<Widget> recentWidgets = recentTripData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -302,14 +319,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
-  }
-
-  // Function to check if more than 10 items are available in the list
-  bool shouldShowSeeAllButton(List list) {
-    return list.length > 10;
   }
 
   @override
@@ -318,9 +328,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
     print('initState called');
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
-    // Initialize the pagination with default values
     pendingPagination = Pagination(nextPage: null, previousPage: null);
     acceptedPagination = Pagination(nextPage: null, previousPage: null);
     recentPagination = Pagination(nextPage: null, previousPage: null);
@@ -328,11 +336,8 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
     Future.delayed(Duration(seconds: 2), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -349,7 +354,6 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
         ? Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              // Show circular loading indicator while waiting
               child: CircularProgressIndicator(),
             ),
           )
@@ -475,81 +479,6 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                                       ),
                                       pagination: canFetchMorePending,
                                     ),
-                                    /* Container(
-                                //height: screenHeight*0.25,
-                                child: FutureBuilder<void>(
-                                    future: _isLoading
-                                        ? null
-                                        : fetchConnectionRequests(),
-                                    builder: (context, snapshot) {
-                                      if (!_isFetched) {
-                                        // Return a loading indicator while waiting for data
-                                        return Container(
-                                          height:
-                                              200, // Adjust height as needed
-                                          width:
-                                              screenWidth, // Adjust width as needed
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        // Handle errors
-                                        return buildNoRequestsWidget(
-                                            screenWidth,
-                                            'Error: ${snapshot.error}');
-                                      } else if (_isFetched) {
-                                        if (pendingRequests.isNotEmpty) {
-                                          // If data is loaded successfully, display the ListView
-                                          return Container(
-                                            child: Column(
-                                              children: [
-                                                ListView.separated(
-                                                  shrinkWrap: true,
-                                                  physics:
-                                                      NeverScrollableScrollPhysics(),
-                                                  itemCount: pendingRequests
-                                                              .length >
-                                                          10
-                                                      ? 10
-                                                      : pendingRequests.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    // Display each connection request using ConnectionRequestInfoCard
-                                                    return pendingRequests[
-                                                        index];
-                                                  },
-                                                  separatorBuilder:
-                                                      (context, index) =>
-                                                          const SizedBox(
-                                                              height: 10),
-                                                ),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                */ /*if (shouldShowSeeAllButton(
-                                                    pendingRequests))
-                                                  buildSeeAllButtonRequestList(
-                                                      context)*/ /*
-                                              ],
-                                            ),
-                                          );
-                                        } else if (pendingRequests.isEmpty) {
-                                          // Handle the case when there are no pending connection requests
-                                          return buildNoRequestsWidget(
-                                              screenWidth,
-                                              'You haven\'t created any trip request yet.');
-                                        }
-                                      }
-                                      // Return a default widget if none of the conditions above are met
-                                      return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                    }),
-                              ),*/
                                     Divider(),
                                     SizedBox(height: screenHeight * 0.02),
                                     Text('Approved Trip',
@@ -859,8 +788,6 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
     );
 
     overlay?.insert(overlayEntry);
-
-    // Remove the overlay when tapping outside
     Future.delayed(Duration(seconds: 5), () {
       if (overlayEntry.mounted) {
         overlayEntry.remove();
@@ -902,7 +829,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Cancel',
@@ -919,18 +846,12 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
@@ -938,7 +859,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                                  LoginUI()));
                     }
                   },
                   child: Text(

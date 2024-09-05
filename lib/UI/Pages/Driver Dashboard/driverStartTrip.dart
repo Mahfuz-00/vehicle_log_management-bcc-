@@ -1,16 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Start Trip)/apiServiceStartTrip.dart';
 import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../Widgets/customclipperbottomnavbar.dart';
 import '../../Widgets/customnotchpainter.dart';
-import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import 'driverStopTrip.dart';
 import 'driverdashboardUI.dart';
 
+/// The [DriverStartTripUI] class is a StatefulWidget that represents the
+/// user interface for drivers to start a trip. It takes in a
+/// [shouldRefresh] boolean to determine if the page should refresh and
+/// an [ApprovedStaffTripRequest] object [staff] that contains the trip
+/// details.
+///
+/// Key variables:
+/// - [scaffoldKey]: A GlobalKey for the Scaffold to manage its state.
+/// - [staff]: Holds the trip details passed from the parent widget.
+/// - [_isFetched]: Indicates whether the trip data has been fetched.
+/// - [_isLoading]: Indicates if the loading state is active.
+/// - [_pageLoading]: Controls the loading state of the page.
+/// - [_errorOccurred]: Indicates if an error has occurred during the
+///   fetching process.
+///
+/// Key actions:
+/// - [StartTrip]: Starts the trip by calling the API and navigating
+///   to the [DriverStopTripUI] on success.
+/// - [showTopToast]: Displays a temporary toast message at the top of
+///   the screen.
+/// - [_buildRowTime]: Builds a row to display time in a formatted
+///   manner.
 class DriverStartTripUI extends StatefulWidget {
   final bool shouldRefresh;
   final ApprovedStaffTripRequest staff;
@@ -38,11 +58,8 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
     print('initState called');
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh) {
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -58,7 +75,6 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
         ? Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              // Show circular loading indicator while waiting
               child: CircularProgressIndicator(),
             ),
           )
@@ -295,7 +311,6 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
                           painter: NotchPainter(),
                           child: Container(
                             decoration: BoxDecoration(
-                              //color: const Color.fromRGBO(25, 192, 122, 1),
                               border: Border(
                                 left: BorderSide(
                                   color: Colors.black,
@@ -377,13 +392,12 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
           );
   }
 
-
   Future<void> StartTrip() async {
     showTopToast(context, 'Processing...');
     print('Trip Id: ${staff.id}');
     if (staff.id > 0) {
       final apiService = await StartTripAPIService.create();
-      bool checker = await apiService.TripStarted(tripId: staff.id,); // Invoke assignCarToTrip method on apiService
+      bool checker = await apiService.TripStarted(tripId: staff.id,);
       if(checker == true){
         showTopToast(context, 'Trip Started successfully!');
         Navigator.pushReplacement(
@@ -403,7 +417,7 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
     OverlayState? overlayState = Overlay.of(context);
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10, // 10 is for a little margin from the top
+        top: MediaQuery.of(context).padding.top + 10,
         left: 20,
         right: 20,
         child: Material(
@@ -424,8 +438,6 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
     );
 
     overlayState?.insert(overlayEntry);
-
-    // Remove the overlay entry after some time (e.g., 3 seconds)
     Future.delayed(Duration(seconds: 3)).then((_) {
       overlayEntry.remove();
     });
@@ -433,18 +445,13 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
 
   Widget _buildRowTime(String label, String value) {
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
-
-    // Parse the date and time string
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-
-    // Format the date and time
     String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
     DateTime date = DateTime.parse(value);
     DateFormat dateFormat = DateFormat.yMMMMd('en_US');
     DateFormat timeFormat = DateFormat.jm();
     String formattedDate = dateFormat.format(date);
     String formattedTime = timeFormat.format(date);
-    //String formattedDateTime = '$formattedDate, $formattedTime';
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

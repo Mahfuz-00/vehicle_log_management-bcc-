@@ -2,24 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboardFull.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelOngingTrip.dart';
-import '../../../Data/Models/tripRequestModelSROfficer.dart';
 import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/OngoingTripDetails.dart';
-import '../../Widgets/SrOfficerPendingTripDetails.dart';
-import '../../Widgets/requestWidget.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
+/// The [SROfficerDashboardOngoingTripsUI] class represents the user interface
+/// for the ongoing trips dashboard for a Senior Officer. It manages the
+/// loading and displaying of ongoing trip requests and user profile details.
+///
+/// **Constructor:**
+/// - [SROfficerDashboardOngoingTripsUI]: Initializes the widget with an optional
+///   parameter [shouldRefresh] to control refresh behavior.
+///
+/// **State Variables:**
+/// - [shouldRefresh]: A boolean indicating whether the dashboard should refresh.
+/// - [_scaffoldKey]: A key for the scaffold to manage the state of the widget.
+/// - [pendingRequests]: A list of widgets representing pending trip requests.
+/// - [acceptedRequests]: A list of widgets representing accepted trip requests.
+/// - [_isFetched]: A boolean indicating whether the data has been fetched.
+/// - [_isFetchedFull]: A boolean indicating whether all data has been fetched.
+/// - [_isLoading]: A boolean indicating whether the data is currently loading.
+/// - [_pageLoading]: A boolean indicating whether the page is currently loading.
+/// - [_errorOccurred]: A boolean indicating whether an error occurred during data fetch.
+/// - [userName]: A string representing the user's name.
+/// - [organizationName]: A string representing the user's organization name.
+/// - [photoUrl]: A string representing the URL to the user's photo.
+/// - [notifications]: A list of strings representing notifications for the user.
+/// - [acceptedPagination]: An instance of [Pagination] containing pagination details.
+/// - [canFetchMoreAccepted]: A boolean indicating whether more accepted requests can be fetched.
+/// - [acceptedNext]: A string representing the URL for the next page of accepted requests.
+/// - [acceptedPrev]: A string representing the URL for the previous page of accepted requests.
+///
+/// **Methods:**
+/// - [loadUserProfile]: Loads the user's profile data from shared preferences.
+/// - [fetchConnectionRequests]: Fetches ongoing trip requests from the dashboard API.
+/// - [fetchConnectionRequestsPagination]: Fetches paginated ongoing trip requests from the dashboard API.
 class SROfficerDashboardOngoingTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -31,7 +57,8 @@ class SROfficerDashboardOngoingTripsUI extends StatefulWidget {
       _SROfficerDashboardOngoingTripsUIState();
 }
 
-class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOngoingTripsUI> {
+class _SROfficerDashboardOngoingTripsUIState
+    extends State<SROfficerDashboardOngoingTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -67,12 +94,9 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
     if (_isFetched) return;
     try {
       final apiService = await DashboardAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -82,12 +106,10 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -106,8 +128,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
       });
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
       print(canFetchMoreAccepted);
-
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
       final List<dynamic> acceptedRequestsData = records['Accepted'] ?? [];
@@ -116,7 +136,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
       }
 
-      // Map accepted requests to widgets
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -170,8 +189,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
@@ -179,12 +196,9 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
     if (_isFetchedFull) return;
     try {
       final apiService = await DashboardFullAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -194,18 +208,15 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-
       acceptedPagination = Pagination.fromJson(pagination['ongoing']);
 
       print(acceptedPagination.nextPage);
@@ -219,7 +230,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
       print(canFetchMoreAccepted);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
       final List<dynamic> acceptedRequestsData = records['Accepted'] ?? [];
@@ -228,7 +238,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
       }
 
-      // Map accepted requests to widgets
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -283,14 +292,7 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetchedFull = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
-  }
-
-  // Function to check if more than 10 items are available in the list
-  bool shouldShowSeeAllButton(List list) {
-    return list.length > 10;
   }
 
   @override
@@ -301,16 +303,12 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
     loadUserProfile();
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -327,7 +325,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
         ? Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              // Show circular loading indicator while waiting
               child: CircularProgressIndicator(),
             ),
           )
@@ -373,98 +370,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
                                 SizedBox(
                                   height: 20,
                                 ),
-                                /*     Text('New Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    Divider(),
-                    RequestsWidget(
-                        loading: _isLoading,
-                        fetch: _isFetched,
-                        errorText: 'No new trip request.',
-                        listWidget: pendingRequests,
-                        fetchData: fetchConnectionRequests(),
-                        numberOfWidgets: 10,
-                        showSeeAllButton: shouldShowSeeAllButton(
-                            pendingRequests),
-                        seeAllButtonText: '',
-                        nextPage: null),*/
-                                /* Container(
-                            //height: screenHeight*0.25,
-                            child: FutureBuilder<void>(
-                                future: _isLoading
-                                    ? null
-                                    : fetchConnectionRequests(),
-                                builder: (context, snapshot) {
-                                  if (!_isFetched) {
-                                    // Return a loading indicator while waiting for data
-                                    return Container(
-                                      height: 200, // Adjust height as needed
-                                      width:
-                                          screenWidth, // Adjust width as needed
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
-                                  } else if (snapshot.hasError) {
-                                    // Handle errors
-                                    return buildNoRequestsWidget(screenWidth,
-                                        'Error: ${snapshot.error}');
-                                  } else if (_isFetched) {
-                                    if (pendingRequests.isNotEmpty) {
-                                      // If data is loaded successfully, display the ListView
-                                      return Container(
-                                        child: Column(
-                                          children: [
-                                            ListView.separated(
-                                              shrinkWrap: true,
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              itemCount:
-                                                  pendingRequests.length > 10
-                                                      ? 10
-                                                      : pendingRequests
-                                                          .length,
-                                              itemBuilder: (context, index) {
-                                                // Display each connection request using ConnectionRequestInfoCard
-                                                return pendingRequests[index];
-                                              },
-                                              separatorBuilder: (context,
-                                                      index) =>
-                                                  const SizedBox(height: 10),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            */ /*if (shouldShowSeeAllButton(
-                                                  pendingRequests))
-                                                buildSeeAllButtonRequestList(
-                                                    context)*/ /*
-                                          ],
-                                        ),
-                                      );
-                                    } else if (pendingRequests.isEmpty) {
-                                      // Handle the case when there are no pending connection requests
-                                      return buildNoRequestsWidget(
-                                          screenWidth,
-                                          'No new trip request.');
-                                    }
-                                  }
-                                  // Return a default widget if none of the conditions above are met
-                                  return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                }),
-                          ),*/
-                                /*   Divider(),
-                    SizedBox(height: screenHeight * 0.02),*/
                                 Text('Ongoing Trip',
                                     style: TextStyle(
                                       color: Colors.black,
@@ -493,7 +398,7 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
                                                     _isLoading)
                                                 ? const Color.fromRGBO(
                                                     25, 192, 122, 1)
-                                                : Colors.grey, // Disabled color
+                                                : Colors.grey,
                                         fixedSize: Size(
                                             MediaQuery.of(context).size.width *
                                                 0.35,
@@ -539,7 +444,7 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
                                                     _isLoading)
                                                 ? const Color.fromRGBO(
                                                     25, 192, 122, 1)
-                                                : Colors.grey, // Disabled color
+                                                : Colors.grey,
                                         fixedSize: Size(
                                             MediaQuery.of(context).size.width *
                                                 0.35,
@@ -579,78 +484,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
                                     ),
                                   ],
                                 ),
-                                /*    Container(
-                            //height: screenHeight*0.25,
-                            child: FutureBuilder<void>(
-                                future: _isLoading
-                                    ? null
-                                    : fetchConnectionRequests(),
-                                builder: (context, snapshot) {
-                                  if (!_isFetched) {
-                                    // Return a loading indicator while waiting for data
-                                    return Container(
-                                      height: 200, // Adjust height as needed
-                                      width:
-                                          screenWidth, // Adjust width as needed
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
-                                  } else if (snapshot.hasError) {
-                                    // Handle errors
-                                    return buildNoRequestsWidget(screenWidth,
-                                        'Error: ${snapshot.error}');
-                                  } else if (_isFetched) {
-                                    if (acceptedRequests.isNotEmpty) {
-                                      // If data is loaded successfully, display the ListView
-                                      return Container(
-                                        child: Column(
-                                          children: [
-                                            ListView.separated(
-                                              shrinkWrap: true,
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              itemCount:
-                                                  acceptedRequests.length > 10
-                                                      ? 10
-                                                      : acceptedRequests
-                                                          .length,
-                                              itemBuilder: (context, index) {
-                                                // Display each connection request using ConnectionRequestInfoCard
-                                                return acceptedRequests[
-                                                    index];
-                                              },
-                                              separatorBuilder: (context,
-                                                      index) =>
-                                                  const SizedBox(height: 10),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            */ /*if (shouldShowSeeAllButton(
-                                                  pendingRequests))
-                                                buildSeeAllButtonRequestList(
-                                                    context)*/ /*
-                                          ],
-                                        ),
-                                      );
-                                    } else if (acceptedRequests.isEmpty) {
-                                      // Handle the case when there are no pending connection requests
-                                      return buildNoRequestsWidget(
-                                          screenWidth,
-                                          'No trip request reviewed yet.');
-                                    }
-                                  }
-                                  // Return a default widget if none of the conditions above are met
-                                  return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                }),
-                          ),*/
-                                // Divider()
                               ],
                             ),
                           ),
@@ -797,81 +630,6 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
           );
   }
 
-  void _showNotificationsOverlay(BuildContext context) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry overlayEntry;
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: kToolbarHeight + 10.0,
-        right: 10.0,
-        width: 250,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: notifications.isEmpty
-                ? Container(
-                    height: 50,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.notifications_off),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          'No new notifications',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(8),
-                    shrinkWrap: true,
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.info_outline),
-                            title: Text(notifications[index]),
-                            onTap: () {
-                              // Handle notification tap if necessary
-                              overlayEntry.remove();
-                            },
-                          ),
-                          if (index < notifications.length - 1) Divider()
-                        ],
-                      );
-                    },
-                  ),
-          ),
-        ),
-      ),
-    );
-
-    overlay?.insert(overlayEntry);
-
-    // Remove the overlay when tapping outside
-    Future.delayed(Duration(seconds: 5), () {
-      if (overlayEntry.mounted) {
-        overlayEntry.remove();
-      }
-    });
-  }
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -906,7 +664,7 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Cancel',
@@ -923,26 +681,17 @@ class _SROfficerDashboardOngoingTripsUIState extends State<SROfficerDashboardOng
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

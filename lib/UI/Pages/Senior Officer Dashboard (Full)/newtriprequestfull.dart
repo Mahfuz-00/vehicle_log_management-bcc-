@@ -2,26 +2,55 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboardFull.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
-import '../../../Data/Models/tripRequestModelOngingTrip.dart';
 import '../../../Data/Models/tripRequestModelSROfficer.dart';
 import '../../Bloc/auth_cubit.dart';
-import '../../Widgets/OngoingTripDetails.dart';
 import '../../Widgets/SrOfficerPendingTripDetails.dart';
-import '../../Widgets/requestWidget.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-
-
+/// This class represents the UI for the Senior Officer Dashboard, specifically for new trip requests.
+///
+/// The [SROfficerDashboardNewTripsUI] class handles the display of pending trip requests
+/// and manages the state of data fetching and user profile loading.
+///
+/// Variables:
+/// - [shouldRefresh]: A boolean to determine whether to refresh the user profile.
+/// - [_scaffoldKey]: A GlobalKey for the Scaffold widget.
+/// - [pendingRequests]: A list of widgets displaying pending trip requests.
+/// - [acceptedRequests]: A list of widgets displaying accepted trip requests.
+/// - [_isFetched]: A boolean indicating whether data has been fetched.
+/// - [_isFetchedFull]: A boolean indicating whether all data has been fetched.
+/// - [_isLoading]: A boolean indicating whether data is currently being loaded.
+/// - [_pageLoading]: A boolean indicating whether the page is in a loading state.
+/// - [_errorOccurred]: A boolean indicating whether an error has occurred during data fetching.
+/// - [userName]: A string storing the user's name.
+/// - [organizationName]: A string storing the user's organization name.
+/// - [photoUrl]: A string storing the user's profile photo URL.
+/// - [notifications]: A list of notifications for the user.
+/// - [pendingPagination]: An instance of [Pagination] for managing pending requests pagination.
+/// - [acceptedPagination]: An instance of [Pagination] for managing accepted requests pagination.
+/// - [recentPagination]: An instance of [Pagination] for managing recent requests pagination.
+/// - [canFetchMorePending]: A boolean indicating whether more pending requests can be fetched.
+/// - [canFetchMoreAccepted]: A boolean indicating whether more accepted requests can be fetched.
+/// - [canFetchMoreRecent]: A boolean indicating whether more recent requests can be fetched.
+/// - [pendingNext]: A string storing the next page URL for pending requests.
+/// - [acceptedNext]: A string storing the next page URL for accepted requests.
+/// - [recentNext]: A string storing the next page URL for recent requests.
+/// - [pendingPrev]: A string storing the previous page URL for pending requests.
+/// - [acceptedPrev]: A string storing the previous page URL for accepted requests.
+/// - [recentPrev]: A string storing the previous page URL for recent requests.
+///
+/// Actions:
+/// - [loadUserProfile]: Loads the user profile information from SharedPreferences.
+/// - [fetchConnectionRequests]: Fetches the connection requests data for the dashboard.
+/// - [fetchConnectionRequestsPagination]: Fetches paginated connection requests data.
 class SROfficerDashboardNewTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -48,12 +77,9 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
   late Pagination pendingPagination;
   late Pagination acceptedPagination;
   late Pagination recentPagination;
-
-  // Example to check if more data can be fetched
   bool canFetchMorePending = false;
   bool canFetchMoreAccepted = false;
   bool canFetchMoreRecent = false;
-
   late String pendingNext = '';
   late String acceptedNext = '';
   late String recentNext = '';
@@ -79,12 +105,9 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
     if (_isFetched) return;
     try {
       final apiService = await DashboardAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
       await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -94,18 +117,15 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-
       pendingPagination = Pagination.fromJson(pagination['pending']);
 
       print(pendingPagination.nextPage);
@@ -120,11 +140,8 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
       canFetchMorePending = pendingPagination.canFetchNext;
       print(canFetchMorePending);
 
-
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
@@ -133,7 +150,6 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
             'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
         print('Pending Trip');
         print(request['name']);
@@ -195,8 +211,6 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
@@ -204,12 +218,9 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
     if (_isFetchedFull) return;
     try {
       final apiService = await DashboardFullAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
       await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -219,18 +230,14 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
-
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-
       pendingPagination = Pagination.fromJson(pagination['pending']);
 
       print(pendingPagination.nextPage);
@@ -245,11 +252,8 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
       canFetchMorePending = pendingPagination.canFetchNext;
       print(canFetchMorePending);
 
-
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
@@ -258,7 +262,6 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
             'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
         print('Pending Trip');
         print(request['name']);
@@ -320,35 +323,23 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetchedFull = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
-  }
-
-  // Function to check if more than 10 items are available in the list
-  bool shouldShowSeeAllButton(List list) {
-    return list.length > 10;
   }
 
   @override
   void initState() {
     super.initState();
-    // Initialize the pagination with default values
     pendingPagination = Pagination(nextPage: null, previousPage: null);
     print('initState called');
     loadUserProfile();
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -365,7 +356,6 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
         ? Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        // Show circular loading indicator while waiting
         child: CircularProgressIndicator(),
       ),
     )
@@ -434,7 +424,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: (pendingPrev.isNotEmpty && pendingPrev != 'None' && _isLoading)
                                       ? const Color.fromRGBO(25, 192, 122, 1)
-                                      : Colors.grey, // Disabled color
+                                      : Colors.grey,
                                   fixedSize: Size(
                                       MediaQuery.of(context).size.width * 0.35,
                                       MediaQuery.of(context).size.height * 0.05),
@@ -470,7 +460,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: (pendingNext.isNotEmpty && pendingNext != 'None' && _isLoading)
                                       ? const Color.fromRGBO(25, 192, 122, 1)
-                                      : Colors.grey, // Disabled color
+                                      : Colors.grey,
                                   fixedSize: Size(
                                       MediaQuery.of(context).size.width * 0.35,
                                       MediaQuery.of(context).size.height * 0.05),
@@ -504,170 +494,6 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                               ),
                             ],
                           ),
-                          /* Container(
-                            //height: screenHeight*0.25,
-                            child: FutureBuilder<void>(
-                                future: _isLoading
-                                    ? null
-                                    : fetchConnectionRequests(),
-                                builder: (context, snapshot) {
-                                  if (!_isFetched) {
-                                    // Return a loading indicator while waiting for data
-                                    return Container(
-                                      height: 200, // Adjust height as needed
-                                      width:
-                                          screenWidth, // Adjust width as needed
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
-                                  } else if (snapshot.hasError) {
-                                    // Handle errors
-                                    return buildNoRequestsWidget(screenWidth,
-                                        'Error: ${snapshot.error}');
-                                  } else if (_isFetched) {
-                                    if (pendingRequests.isNotEmpty) {
-                                      // If data is loaded successfully, display the ListView
-                                      return Container(
-                                        child: Column(
-                                          children: [
-                                            ListView.separated(
-                                              shrinkWrap: true,
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              itemCount:
-                                                  pendingRequests.length > 10
-                                                      ? 10
-                                                      : pendingRequests
-                                                          .length,
-                                              itemBuilder: (context, index) {
-                                                // Display each connection request using ConnectionRequestInfoCard
-                                                return pendingRequests[index];
-                                              },
-                                              separatorBuilder: (context,
-                                                      index) =>
-                                                  const SizedBox(height: 10),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            *//*if (shouldShowSeeAllButton(
-                                                  pendingRequests))
-                                                buildSeeAllButtonRequestList(
-                                                    context)*//*
-                                          ],
-                                        ),
-                                      );
-                                    } else if (pendingRequests.isEmpty) {
-                                      // Handle the case when there are no pending connection requests
-                                      return buildNoRequestsWidget(
-                                          screenWidth,
-                                          'No new trip request.');
-                                    }
-                                  }
-                                  // Return a default widget if none of the conditions above are met
-                                  return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                }),
-                          ),*/
-                          /*   Divider(),
-                    SizedBox(height: screenHeight * 0.02),
-                    Text('Ongoing Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    Divider(),
-                    RequestsWidget(
-                        loading: _isLoading,
-                        fetch: _isFetched,
-                        errorText: 'No trip request reviewed yet.',
-                        listWidget: acceptedRequests,
-                        fetchData: fetchConnectionRequests(),
-                        numberOfWidgets: 10,
-                        showSeeAllButton: shouldShowSeeAllButton(
-                            acceptedRequests),
-                        seeAllButtonText: '',
-                        nextPage: null),*/
-                          /*    Container(
-                            //height: screenHeight*0.25,
-                            child: FutureBuilder<void>(
-                                future: _isLoading
-                                    ? null
-                                    : fetchConnectionRequests(),
-                                builder: (context, snapshot) {
-                                  if (!_isFetched) {
-                                    // Return a loading indicator while waiting for data
-                                    return Container(
-                                      height: 200, // Adjust height as needed
-                                      width:
-                                          screenWidth, // Adjust width as needed
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
-                                  } else if (snapshot.hasError) {
-                                    // Handle errors
-                                    return buildNoRequestsWidget(screenWidth,
-                                        'Error: ${snapshot.error}');
-                                  } else if (_isFetched) {
-                                    if (acceptedRequests.isNotEmpty) {
-                                      // If data is loaded successfully, display the ListView
-                                      return Container(
-                                        child: Column(
-                                          children: [
-                                            ListView.separated(
-                                              shrinkWrap: true,
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              itemCount:
-                                                  acceptedRequests.length > 10
-                                                      ? 10
-                                                      : acceptedRequests
-                                                          .length,
-                                              itemBuilder: (context, index) {
-                                                // Display each connection request using ConnectionRequestInfoCard
-                                                return acceptedRequests[
-                                                    index];
-                                              },
-                                              separatorBuilder: (context,
-                                                      index) =>
-                                                  const SizedBox(height: 10),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            *//*if (shouldShowSeeAllButton(
-                                                  pendingRequests))
-                                                buildSeeAllButtonRequestList(
-                                                    context)*//*
-                                          ],
-                                        ),
-                                      );
-                                    } else if (acceptedRequests.isEmpty) {
-                                      // Handle the case when there are no pending connection requests
-                                      return buildNoRequestsWidget(
-                                          screenWidth,
-                                          'No trip request reviewed yet.');
-                                    }
-                                  }
-                                  // Return a default widget if none of the conditions above are met
-                                  return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                }),
-                          ),*/
-                          //Divider()
                         ],
                       ),
                     ),
@@ -809,81 +635,6 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
         }
       },
     );
-
-  }
-
-  void _showNotificationsOverlay(BuildContext context) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry overlayEntry;
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: kToolbarHeight + 10.0,
-        right: 10.0,
-        width: 250,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: notifications.isEmpty
-                ? Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.notifications_off),
-                  SizedBox(width: 10,),
-                  Text(
-                    'No new notifications',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            )
-                : ListView.builder(
-              padding: EdgeInsets.all(8),
-              shrinkWrap: true,
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.info_outline),
-                      title: Text(notifications[index]),
-                      onTap: () {
-                        // Handle notification tap if necessary
-                        overlayEntry.remove();
-                      },
-                    ),
-                    if (index < notifications.length - 1)
-                      Divider()
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay?.insert(overlayEntry);
-
-    // Remove the overlay when tapping outside
-    Future.delayed(Duration(seconds: 5), () {
-      if (overlayEntry.mounted) {
-        overlayEntry.remove();
-      }
-    });
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -920,7 +671,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Cancel',
@@ -937,18 +688,12 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
@@ -956,7 +701,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                                  LoginUI()));
                     }
                   },
                   child: Text(

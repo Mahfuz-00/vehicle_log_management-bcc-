@@ -1,29 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboardFull.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelOngingTrip.dart';
-import '../../../Data/Models/tripRequestModelRecent.dart';
-import '../../../Data/Models/tripRequestModelSROfficer.dart';
 import '../../Bloc/auth_cubit.dart';
-import '../../Widgets/AdminPendingTripDetails.dart';
 import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/OngoingTripDetails.dart';
-import '../../Widgets/RecentTripDetails.dart';
-import '../../Widgets/staffPendingTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
+/// This class [AdminDashboardOngoingTripsUI] manages the UI for displaying ongoing trips in the admin dashboard.
+/// It includes functionalities for fetching user profile details and ongoing trip requests, handling pagination,
+/// and displaying a loading state until the data is fetched.
+///
+/// [shouldRefresh]: A [bool] that indicates whether the dashboard should refresh its content.
+///
+/// State Variables:
+/// - [_scaffoldKey]: A [GlobalKey] for the Scaffold widget to control its state.
+/// - [pendingRequests]: A List<Widget> holding the widgets for pending requests.
+/// - [acceptedRequests]: A List<Widget> containing the widgets for accepted requests.
+/// - [recentRequests]: A List<Widget> for the recent requests.
+/// - [drivers]: A List<Widget> that holds driver-related widgets.
+/// - [_isFetched]: A bool indicating if the data has been fetched.
+/// - [_isFetchedFull]: A bool indicating if all paginated data has been fetched.
+/// - [_isLoading]: A bool representing whether the data is still loading.
+/// - [_pageLoading]: A bool that shows whether the entire page is loading.
+/// - [_errorOccurred]: A bool indicating if an error occurred during data fetching.
+/// - [photoUrl]: A String with the user's profile photo URL.
+/// - [notifications]: A List<String> of notifications fetched from the server.
+/// - [acceptedPagination]: A [Pagination] object managing pagination for accepted requests.
+/// - [canFetchMoreAccepted]: A bool that determines if more accepted requests can be fetched.
+/// - [acceptedNext]: A String storing the next page URL for accepted requests.
+/// - [acceptedPrev]: A String storing the previous page URL for accepted requests.
+///
+/// [loadUserProfile]: An async function to load user profile details from SharedPreferences.
+///
+/// [fetchConnectionRequests]: An async function to fetch ongoing trip requests from the API. It handles
+/// loading states and updates the UI with the fetched data.
+///
+/// [fetchConnectionRequestsPagination]: An async function to handle pagination when fetching ongoing trip requests.
 class AdminDashboardOngoingTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -31,10 +53,12 @@ class AdminDashboardOngoingTripsUI extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<AdminDashboardOngoingTripsUI> createState() => _AdminDashboardOngoingTripsUIState();
+  State<AdminDashboardOngoingTripsUI> createState() =>
+      _AdminDashboardOngoingTripsUIState();
 }
 
-class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTripsUI> {
+class _AdminDashboardOngoingTripsUIState
+    extends State<AdminDashboardOngoingTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -74,11 +98,9 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
     try {
       final apiService = await DashboardAPIService.create();
 
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -88,12 +110,10 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -113,10 +133,8 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
       print(canFetchMoreAccepted);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> driverData = records['Available_Driver'] ?? [];
@@ -124,7 +142,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
         print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> driverWidgets = driverData.map((request) {
         return DriverInfoCard(
           Name: request['name'],
@@ -141,7 +158,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
       }
 
-      // Map accepted requests to widgets
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -197,8 +213,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
@@ -207,11 +221,9 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
     try {
       final apiService = await DashboardFullAPIService.create();
 
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -221,12 +233,10 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -246,10 +256,8 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
       print(canFetchMoreAccepted);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> driverData = records['Available_Driver'] ?? [];
@@ -257,7 +265,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
         print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> driverWidgets = driverData.map((request) {
         return DriverInfoCard(
           Name: request['name'],
@@ -274,7 +281,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
       }
 
-      // Map accepted requests to widgets
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -330,14 +336,7 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetchedFull = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
-  }
-
-  // Function to check if more than 10 items are available in the list
-  bool shouldShowSeeAllButton(List list) {
-    return list.length > 10;
   }
 
   @override
@@ -348,16 +347,12 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
     loadUserProfile();
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -374,7 +369,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
         ? Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              // Show circular loading indicator while waiting
               child: CircularProgressIndicator(),
             ),
           )
@@ -420,22 +414,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
                                 SizedBox(
                                   height: 20,
                                 ),
-                                /*     Text('New Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    RequestsWidgetShowAll(
-                      loading: _isLoading,
-                      fetch: _isFetched,
-                      errorText: 'There aren\'t any trip request yet.',
-                      listWidget: pendingRequests,
-                      fetchData: fetchConnectionRequests(),
-                    ),*/
-                                // SizedBox(height: screenHeight * 0.02),
                                 Text('Ongoing Trip',
                                     style: TextStyle(
                                       color: Colors.black,
@@ -463,7 +441,7 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
                                                     _isLoading)
                                                 ? const Color.fromRGBO(
                                                     25, 192, 122, 1)
-                                                : Colors.grey, // Disabled color
+                                                : Colors.grey,
                                         fixedSize: Size(
                                             MediaQuery.of(context).size.width *
                                                 0.35,
@@ -509,7 +487,7 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
                                                     _isLoading)
                                                 ? const Color.fromRGBO(
                                                     25, 192, 122, 1)
-                                                : Colors.grey, // Disabled color
+                                                : Colors.grey,
                                         fixedSize: Size(
                                             MediaQuery.of(context).size.width *
                                                 0.35,
@@ -549,27 +527,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
                                     ),
                                   ],
                                 ),
-                                //Divider(),
-                                /* SizedBox(height: screenHeight * 0.02),
-                          Text('Recent Trip',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 30,
-                                fontFamily: 'default',
-                              )),
-                          SizedBox(height: screenHeight * 0.01),
-                          Divider(),
-                          RequestsWidget(
-                              loading: _isLoading,
-                              fetch: _isFetched,
-                              errorText: 'No Recent Trip.',
-                              listWidget: recentRequests,
-                              fetchData: fetchConnectionRequests(),
-                              numberOfWidgets: 10,
-                              showSeeAllButton: (shouldShowSeeAllButton(recentRequests)),
-                              seeAllButtonText: '',
-                              nextPage: null),*/
                                 SizedBox(
                                   height: 20,
                                 )
@@ -720,81 +677,6 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
           );
   }
 
-  void _showNotificationsOverlay(BuildContext context) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry overlayEntry;
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: kToolbarHeight + 10.0,
-        right: 10.0,
-        width: 250,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: notifications.isEmpty
-                ? Container(
-                    height: 50,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.notifications_off),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          'No new notifications',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(8),
-                    shrinkWrap: true,
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.info_outline),
-                            title: Text(notifications[index]),
-                            onTap: () {
-                              // Handle notification tap if necessary
-                              overlayEntry.remove();
-                            },
-                          ),
-                          if (index < notifications.length - 1) Divider()
-                        ],
-                      );
-                    },
-                  ),
-          ),
-        ),
-      ),
-    );
-
-    overlay?.insert(overlayEntry);
-
-    // Remove the overlay when tapping outside
-    Future.delayed(Duration(seconds: 5), () {
-      if (overlayEntry.mounted) {
-        overlayEntry.remove();
-      }
-    });
-  }
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -829,7 +711,7 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Cancel',
@@ -846,18 +728,12 @@ class _AdminDashboardOngoingTripsUIState extends State<AdminDashboardOngoingTrip
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();

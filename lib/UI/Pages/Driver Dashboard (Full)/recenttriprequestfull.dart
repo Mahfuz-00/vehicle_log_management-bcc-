@@ -1,28 +1,59 @@
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboardFull.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
-import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../../Data/Models/tripRequestModelRecent.dart';
 import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
-import '../../Widgets/templateerrorcontainer.dart';
-import '../Driver Dashboard/driverStartTrip.dart';
-import '../Driver Dashboard/driverStopTrip.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
+/// [DriverDashboardRecentTripsUI] is a StatefulWidget that represents
+/// the user interface for the driver's dashboard, displaying recent trips.
+///
+/// Variables:
+/// - [shouldRefresh]: A boolean indicating whether the UI should refresh
+///   upon initialization.
+///
+/// State Class Variables:
+/// - [_scaffoldKey]: A GlobalKey for the Scaffold widget.
+/// - [pendingRequests]: A list of widgets representing pending trip requests.
+/// - [acceptedRequests]: A list of widgets representing accepted trip requests.
+/// - [recentRequests]: A list of widgets representing recent trip requests.
+/// - [_isFetched]: A boolean indicating whether the initial data has been fetched.
+/// - [_isFetchedFull]: A boolean indicating whether the full data has been fetched.
+/// - [_isLoading]: A boolean indicating whether data is currently being loaded.
+/// - [_pageLoading]: A boolean indicating whether the page is currently loading.
+/// - [_errorOccurred]: A boolean indicating whether an error has occurred during data fetching.
+/// - [userName]: A string representing the user's name.
+/// - [organizationName]: A string representing the user's organization name.
+/// - [photoUrl]: A string representing the user's profile photo URL.
+/// - [notifications]: A list of notifications received.
+/// - [pendingPagination]: A Pagination object for pending requests.
+/// - [acceptedPagination]: A Pagination object for accepted requests.
+/// - [recentPagination]: A Pagination object for recent requests.
+/// - [canFetchMorePending]: A boolean indicating if more pending requests can be fetched.
+/// - [canFetchMoreAccepted]: A boolean indicating if more accepted requests can be fetched.
+/// - [canFetchMoreRecent]: A boolean indicating if more recent requests can be fetched.
+/// - [pendingNext]: A string for the next page URL for pending requests.
+/// - [acceptedNext]: A string for the next page URL for accepted requests.
+/// - [recentNext]: A string for the next page URL for recent requests.
+/// - [pendingPrev]: A string for the previous page URL for pending requests.
+/// - [acceptedPrev]: A string for the previous page URL for accepted requests.
+/// - [recentPrev]: A string for the previous page URL for recent requests.
+///
+/// Actions:
+/// - [loadUserProfile]: Loads user profile information from SharedPreferences.
+/// - [fetchConnectionRequests]: Fetches the initial connection requests data.
+/// - [fetchConnectionRequestsPagination(url)]: Fetches paginated connection requests data.
+/// - [initState]: Initializes the state of the widget, loading user profile and fetching data.
 class DriverDashboardRecentTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -50,12 +81,9 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
   late Pagination pendingPagination;
   late Pagination acceptedPagination;
   late Pagination recentPagination;
-
-  // Example to check if more data can be fetched
   bool canFetchMorePending = false;
   bool canFetchMoreAccepted = false;
   bool canFetchMoreRecent = false;
-
   late String pendingNext = '';
   late String acceptedNext = '';
   late String recentNext = '';
@@ -81,12 +109,9 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
     if (_isFetched) return;
     try {
       final apiService = await DashboardAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
       await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -96,12 +121,10 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -122,7 +145,6 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
       canFetchMoreRecent = recentPagination.canFetchNext;
       print(canFetchMoreRecent);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
       final List<dynamic> recentTripData = records['Recent'] ?? [];
@@ -130,7 +152,6 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
         print('Recent Trip at index $index: ${recentTripData[index]}\n');
       }
 
-      // Map accepted requests to widgets
       final List<Widget> recentWidgets = recentTripData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -184,8 +205,6 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
@@ -193,12 +212,9 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
     if (_isFetchedFull) return;
     try {
       final apiService = await DashboardFullAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
       await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -208,18 +224,15 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-
       recentPagination = Pagination.fromJson(pagination['recent']);
 
       print(recentPagination.nextPage);
@@ -234,7 +247,6 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
       canFetchMoreRecent = recentPagination.canFetchNext;
       print(canFetchMoreRecent);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
       final List<dynamic> recentTripData = records['Recent'] ?? [];
@@ -242,7 +254,6 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
         print('Recent Trip at index $index: ${recentTripData[index]}\n');
       }
 
-      // Map accepted requests to widgets
       final List<Widget> recentWidgets = recentTripData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -296,14 +307,7 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetchedFull = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
-  }
-
-  // Function to check if more than 10 items are available in the list
-  bool shouldShowSeeAllButton(List list) {
-    return list.length > 10;
   }
 
   @override
@@ -312,18 +316,14 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
     recentPagination = Pagination(nextPage: null, previousPage: null);
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
     print('initState called');
     loadUserProfile();
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -337,14 +337,13 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
     final screenHeight = MediaQuery.of(context).size.height;
 
     double fabHeight =
-    56.0; // Default FAB height is 56, adjust if your FAB size is different
-    double containerHeight = screenHeight * 0.08; // Your container height
+    56.0;
+    double containerHeight = screenHeight * 0.08;
 
     return _pageLoading
         ? Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        // Show circular loading indicator while waiting
         child: CircularProgressIndicator(),
       ),
     )
@@ -392,132 +391,6 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
                             SizedBox(
                               height: 20,
                             ),
-                            /*  Text('New Trip',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                            fontFamily: 'default',
-                          )),
-                      SizedBox(height: screenHeight * 0.01),*/
-                            /*     Divider(),
-                      SizedBox(height: screenHeight * 0.01),
-                      if (acceptedRequests.isEmpty) ...[
-                        RequestsWidget(
-                            loading: _isLoading,
-                            fetch: _isFetched,
-                            errorText: 'No New Trip.',
-                            listWidget: pendingRequests,
-                            fetchData: fetchConnectionRequests(),
-                            numberOfWidgets: 10,
-                            showSeeAllButton: shouldShowSeeAllButton(
-                                pendingRequests),
-                            seeAllButtonText: '',
-                            nextPage: null),
-                      ] else if (acceptedRequests.isNotEmpty) ...[
-                        buildNoRequestsWidget(screenWidth,
-                            'You Currently on a Trip. Please complete that trip to start a new trip.')
-                      ],
-                      Divider(),
-                      SizedBox(height: screenHeight * 0.02),
-                      Text('Ongoing Trip',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                            fontFamily: 'default',
-                          )),
-                      SizedBox(height: screenHeight * 0.01),
-                      Divider(),
-                      SizedBox(height: screenHeight * 0.01),
-                      RequestsWidget(
-                          loading: _isLoading,
-                          fetch: _isFetched,
-                          errorText: 'No trip onging.',
-                          listWidget: acceptedRequests,
-                          fetchData: fetchConnectionRequests(),
-                          numberOfWidgets: 10,
-                          showSeeAllButton: shouldShowSeeAllButton(
-                              acceptedRequests),
-                          seeAllButtonText: '',
-                          nextPage: null),*/
-                            /*Container(
-                              //height: screenHeight*0.25,
-                              child: FutureBuilder<void>(
-                                  future: _isLoading
-                                      ? null
-                                      : fetchConnectionRequests(),
-                                  builder: (context, snapshot) {
-                                    if (!_isFetched) {
-                                      // Return a loading indicator while waiting for data
-                                      return Container(
-                                        height:
-                                            200, // Adjust height as needed
-                                        width:
-                                            screenWidth, // Adjust width as needed
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      );
-                                    } else if (snapshot.hasError) {
-                                      // Handle errors
-                                      return buildNoRequestsWidget(
-                                          screenWidth,
-                                          'Error: ${snapshot.error}');
-                                    } else if (_isFetched) {
-                                      if (acceptedRequests.isNotEmpty) {
-                                        // If data is loaded successfully, display the ListView
-                                        return Container(
-                                          child: Column(
-                                            children: [
-                                              ListView.separated(
-                                                shrinkWrap: true,
-                                                physics:
-                                                    NeverScrollableScrollPhysics(),
-                                                itemCount: acceptedRequests
-                                                            .length >
-                                                        10
-                                                    ? 10
-                                                    : acceptedRequests.length,
-                                                itemBuilder:
-                                                    (context, index) {
-                                                  // Display each connection request using ConnectionRequestInfoCard
-                                                  return acceptedRequests[
-                                                      index];
-                                                },
-                                                separatorBuilder:
-                                                    (context, index) =>
-                                                        const SizedBox(
-                                                            height: 10),
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              *//*if (shouldShowSeeAllButton(
-                                                  pendingRequests))
-                                                buildSeeAllButtonRequestList(
-                                                    context)*//*
-                                            ],
-                                          ),
-                                        );
-                                      } else if (acceptedRequests.isEmpty) {
-                                        // Handle the case when there are no pending connection requests
-                                        return buildNoRequestsWidget(
-                                            screenWidth, 'No trip onging.');
-                                      }
-                                    }
-                                    // Return a default widget if none of the conditions above are met
-                                    return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                  }),
-                            ),*/
-                            /*SizedBox(height: screenHeight * 0.01),
-                      Divider(),
-                      SizedBox(height: screenHeight * 0.02),*/
                             Text('Recent Trip',
                                 style: TextStyle(
                                   color: Colors.black,
@@ -542,7 +415,7 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: (recentPrev.isNotEmpty && recentPrev != 'None' && _isLoading)
                                         ? const Color.fromRGBO(25, 192, 122, 1)
-                                        : Colors.grey, // Disabled color
+                                        : Colors.grey,
                                     fixedSize: Size(
                                         MediaQuery.of(context).size.width * 0.35,
                                         MediaQuery.of(context).size.height * 0.05),
@@ -578,7 +451,7 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: (recentNext.isNotEmpty && recentNext != 'None' && _isLoading)
                                         ? const Color.fromRGBO(25, 192, 122, 1)
-                                        : Colors.grey, // Disabled color
+                                        : Colors.grey,
                                     fixedSize: Size(
                                         MediaQuery.of(context).size.width * 0.35,
                                         MediaQuery.of(context).size.height * 0.05),
@@ -612,81 +485,6 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
                                 ),
                               ],
                             ),
-                            /*Container(
-                              //height: screenHeight*0.25,
-                              child: FutureBuilder<void>(
-                                  future: _isLoading
-                                      ? null
-                                      : fetchConnectionRequests(),
-                                  builder: (context, snapshot) {
-                                    if (!_isFetched) {
-                                      // Return a loading indicator while waiting for data
-                                      return Container(
-                                        height:
-                                            200, // Adjust height as needed
-                                        width:
-                                            screenWidth, // Adjust width as needed
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      );
-                                    } else if (snapshot.hasError) {
-                                      // Handle errors
-                                      return buildNoRequestsWidget(
-                                          screenWidth,
-                                          'Error: ${snapshot.error}');
-                                    } else if (_isFetched) {
-                                      if (recentRequests.isNotEmpty) {
-                                        // If data is loaded successfully, display the ListView
-                                        return Container(
-                                          child: Column(
-                                            children: [
-                                              ListView.separated(
-                                                shrinkWrap: true,
-                                                physics:
-                                                    NeverScrollableScrollPhysics(),
-                                                itemCount:
-                                                    recentRequests.length > 10
-                                                        ? 10
-                                                        : recentRequests
-                                                            .length,
-                                                itemBuilder:
-                                                    (context, index) {
-                                                  // Display each connection request using ConnectionRequestInfoCard
-                                                  return recentRequests[
-                                                      index];
-                                                },
-                                                separatorBuilder:
-                                                    (context, index) =>
-                                                        const SizedBox(
-                                                            height: 10),
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              *//*if (shouldShowSeeAllButton(
-                                                  pendingRequests))
-                                                buildSeeAllButtonRequestList(
-                                                    context)*//*
-                                            ],
-                                          ),
-                                        );
-                                      } else if (recentRequests.isEmpty) {
-                                        // Handle the case when there are no pending connection requests
-                                        return buildNoRequestsWidget(
-                                            screenWidth,
-                                            'You haven\'t finished any trip yet.');
-                                      }
-                                    }
-                                    // Return a default widget if none of the conditions above are met
-                                    return SizedBox(); // You can return an empty SizedBox or any other default widget
-                                  }),
-                            ),*/
                           ],
                         ),
                       ),
@@ -840,82 +638,6 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
         }
       },
     );
-
-  }
-
-  void _showNotificationsOverlay(BuildContext context) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry overlayEntry;
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: kToolbarHeight + 10.0,
-        right: 10.0,
-        width: 250,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: notifications.isEmpty
-                ? Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.notifications_off),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'No new notifications',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            )
-                : ListView.builder(
-              padding: EdgeInsets.all(8),
-              shrinkWrap: true,
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.info_outline),
-                      title: Text(notifications[index]),
-                      onTap: () {
-                        // Handle notification tap if necessary
-                        overlayEntry.remove();
-                      },
-                    ),
-                    if (index < notifications.length - 1) Divider()
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay?.insert(overlayEntry);
-
-    // Remove the overlay when tapping outside
-    Future.delayed(Duration(seconds: 5), () {
-      if (overlayEntry.mounted) {
-        overlayEntry.remove();
-      }
-    });
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -952,7 +674,7 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Cancel',
@@ -969,18 +691,12 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
@@ -988,7 +704,7 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                                  LoginUI()));
                     }
                   },
                   child: Text(

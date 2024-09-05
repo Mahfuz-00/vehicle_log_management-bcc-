@@ -1,12 +1,32 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
-
 import '../../../Data/Models/registermodels.dart';
 import '../../Widgets/dropdownfield.dart';
 import '../../Widgets/radiooptionSignUp.dart';
 import '../Login UI/loginUI.dart';
 
+/// The [SignupUI] class is a StatefulWidget that represents the signup screen
+/// for user registration. It contains various input fields for user details
+/// including name, designation, department, email, mobile number, password,
+/// and profile picture upload option. The UI is built using a combination of
+/// widgets including TextFormField, RadioListTileGroup, and ElevatedButton.
+/// It manages the state of password visibility and form validation.
+///
+/// Variables:
+/// - [_isObscuredPassword]: Indicates if the password field is obscured.
+/// - [_isObscuredConfirmPassword]: Indicates if the confirm password field is obscured.
+/// - [RegisterRequestmodel] [_registerRequest]: Model for the registration request data.
+/// - [_emailController]: Controller for the email input field.
+/// - [_passwordController]: Controller for the password input field.
+/// - [_confirmPasswordController]: Controller for the confirm password input field.
+/// - [globalKey]: Key for managing the scaffold state.
+/// - [globalfromkey]: Key for managing the form state.
+/// - [dropdownItems]: List of dropdown menu items for user departments.
+///
+/// Actions:
+/// - [_getIconPassword]: Returns the appropriate icon for the password visibility toggle.
+/// - [_getIconConfirmPassword]: Returns the appropriate icon for the confirm password visibility toggle.
 class SignupUI extends StatefulWidget {
   const SignupUI({super.key});
 
@@ -24,7 +44,7 @@ class _SignupUIState extends State<SignupUI> {
   var globalKey = GlobalKey<ScaffoldState>();
   GlobalKey<FormState> globalfromkey = GlobalKey<FormState>();
 
-  List<DropdownMenuItem<String>> dropdownItems1 = [
+  List<DropdownMenuItem<String>> dropdownItems = [
     DropdownMenuItem(child: Text("IT"), value: "IT"),
     DropdownMenuItem(child: Text("Management"), value: "Management"),
     DropdownMenuItem(child: Text("Executive"), value: "Executive"),
@@ -41,7 +61,6 @@ class _SignupUIState extends State<SignupUI> {
   @override
   void initState() {
     super.initState();
-    //_registerRequest = RegisterRequestmodel(Email: '', Password: '');
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
@@ -53,13 +72,11 @@ class _SignupUIState extends State<SignupUI> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
         final screenWidth = MediaQuery.of(context).size.width;
         final screenHeight = MediaQuery.of(context).size.height;
      return Scaffold(
-      //resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
@@ -115,7 +132,6 @@ class _SignupUIState extends State<SignupUI> {
                             selectedOption: null,
                             onChanged: (String value) {
                               print('Selected option: $value');
-                              // You can perform any other actions here based on the selected option
                             }
                         ),
                         SizedBox(height: 10,),
@@ -173,14 +189,13 @@ class _SignupUIState extends State<SignupUI> {
                                 ),
                               ),
                               const SizedBox(height: 5),
-                              DropdownFormField(hintText: 'Department', dropdownItems: dropdownItems1,),
+                              DropdownFormField(hintText: 'Department', dropdownItems: dropdownItems,),
                               const SizedBox(height: 20),
                               Container(
                                 width: 350,
                                 height: 70,
                                 child: TextFormField(
                                   keyboardType: TextInputType.emailAddress,
-                                 // onSaved: (input) => _registerRequest.Email= input!,
                                   validator: (input) {
                                     if (input == null || !input.contains('@')) {
                                       return "Please enter a valid email address";
@@ -239,8 +254,7 @@ class _SignupUIState extends State<SignupUI> {
                                 height: 70,
                                 child: TextFormField(
                                   keyboardType: TextInputType.text,
-                                  //onSaved: (input)=> _registerRequest.Password = input!,
-                                  validator: (input) => input!.length < 6 ? "Password should be more than 3 characters": null,
+                                  validator: (input) => input!.length < 8 ? "Password should be more than 7 characters": null,
                                   controller: _passwordController,
                                   obscureText: _isObscuredPassword,
                                   style: const TextStyle(
@@ -280,7 +294,7 @@ class _SignupUIState extends State<SignupUI> {
                                 child: TextFormField(
                                   keyboardType: TextInputType.text,
                                   //onSaved: (input)=> _registerRequest.Password = input!,
-                                  validator: (input) => input!.length < 6 ? "Password should be more than 3 characters": null,
+                                  validator: (input) => input!.length < 8 ? "Password should be more than 7 characters": null,
                                   controller: _confirmPasswordController,
                                   obscureText: _isObscuredConfirmPassword,
                                   style: const TextStyle(
@@ -372,7 +386,7 @@ class _SignupUIState extends State<SignupUI> {
                         ),
                         const SizedBox(height: 50),
                         ElevatedButton(
-                            onPressed: /*_registerUser*/() {},
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color.fromRGBO(25, 192, 122, 1),
                               shape: RoundedRectangleBorder(

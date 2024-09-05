@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
-
 import '../Login UI/loginUI.dart';
-import '../Sign Up UI/signupUI.dart';
 
+/// A [SplashScreenUI] class that provides a splash screen for the Vehicle Log Management App.
+///
+/// The splash screen displays a logo, an app title, and a login button.
+/// It utilizes animations for a smooth transition effect and navigates to the [LoginUI] on button press.
+///
+/// Variables:
+/// - [animationController]: Controls the animation of the splash screen.
+/// - [FadeAnimation]: Manages the fade-in and fade-out animation effect.
+/// - [SlideAnimation]: Manages the slide-in animation effect.
+/// - [animatedpadding]: Manages the padding animation effect during the splash screen transition.
+///
+/// Actions:
+/// - [initState]: Initializes the animations and triggers the forward animation after a delay.
+/// - [dispose]: Disposes of the animation controller to free up resources.
 class SplashScreenUI extends StatefulWidget {
   const SplashScreenUI({super.key});
 
@@ -18,14 +30,11 @@ class _SplashScreenUIState extends State<SplashScreenUI>
   late Animation<Offset> SlideAnimation;
   late Animation<Offset> animatedpadding;
 
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1500));
-
     SlideAnimation = Tween(begin: const Offset(0, 3), end: const Offset(0, 0)).animate(
         CurvedAnimation(parent: animationController, curve: Curves.easeInOutCirc));
     FadeAnimation = Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(parent: animationController, curve: Curves.easeInOut));
@@ -34,7 +43,6 @@ class _SplashScreenUIState extends State<SplashScreenUI>
     Future.delayed(const Duration(seconds: 5), () {
       animationController.forward();
     });
-
   }
 
   @override
@@ -94,7 +102,6 @@ class _SplashScreenUIState extends State<SplashScreenUI>
               height: 50,
             ),
             Stack(
-              //fit: StackFit.expand,
               alignment: Alignment.bottomCenter,
               children: [
                 FadeTransition(
@@ -108,14 +115,6 @@ class _SplashScreenUIState extends State<SplashScreenUI>
                 ),
                 SlideTransition(
                   position: SlideAnimation,
-                  /*CurvedAnimation(
-                    parent: animationController,
-                    curve: Curves.easeInOutCirc, // Adjust values for desired timing
-                  ).drive(Tween<Offset>(
-                    begin: Offset(0, 2), // Start beyond the bottom edge
-                    end: Offset(0, 0),
-                  )),*/
-                  //position: SlideAnimation,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -130,9 +129,7 @@ class _SplashScreenUIState extends State<SplashScreenUI>
                             backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
-                              //side: BorderSide(color: Colors.black, width: 2),
                             ),
-                            //elevation: 3,
                             fixedSize: Size(screenWidth*0.7, 70),
                           ),
                           child: const Text('Login',
@@ -146,30 +143,6 @@ class _SplashScreenUIState extends State<SplashScreenUI>
                       const SizedBox(
                         height: 40,
                       ),
-                      /* ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Signup()));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(color: Colors.black, width: 2),
-                            ),
-                            //elevation: 3,
-                            fixedSize: const Size(350, 70),
-                          ),
-                          child: const Text('Register',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                                fontFamily: 'default',
-                              )))*/
                     ],
                   ),
                 ),

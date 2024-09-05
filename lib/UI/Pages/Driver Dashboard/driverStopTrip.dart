@@ -1,18 +1,43 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Stop Trip)/apiServiceStopTrip.dart';
 import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../Widgets/customclipperbottomnavbar.dart';
 import '../../Widgets/customnotchpainter.dart';
-import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import 'driverdashboardUI.dart';
 
+/// The [DriverStopTripUI] class represents the UI for the driver's trip stop
+/// interface. It allows the driver to view current trip details, elapsed
+/// time, and stop the trip when necessary.
+///
+/// This widget takes the following parameters:
+///
+/// - [shouldRefresh]: A boolean value indicating whether to refresh the page
+///   on initialization (default is false).
+/// - [staff]: An instance of [ApprovedStaffTripRequest] representing the
+///   details of the staff member for the current trip.
+///
+/// The state class [_DriverStartTripState] manages the following variables:
+///
+/// - [_scaffoldKey]: A GlobalKey for the Scaffold widget to manage the
+///   state of the scaffold.
+/// - [staff]: An instance of [ApprovedStaffTripRequest] representing the
+///   details of the staff member for the current trip.
+/// - [_isFetched]: A boolean indicating whether data has been fetched.
+/// - [_isLoading]: A boolean indicating whether the loading indicator is
+///   active.
+/// - [_pageLoading]: A boolean indicating whether the page is currently
+///   loading.
+/// - [_errorOccurred]: A boolean indicating whether an error has occurred.
+/// - [_startTime]: A DateTime object representing the start time of the trip.
+/// - [_stopwatch]: A Stopwatch to track the elapsed time.
+/// - [_timer]: A Timer to update the elapsed time periodically.
+/// - [_elapsed]: A Duration object representing the total elapsed time since
+///   the trip started.
 class DriverStopTripUI extends StatefulWidget {
   final bool shouldRefresh;
   final ApprovedStaffTripRequest staff;
@@ -42,8 +67,6 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
     super.initState();
     staff = widget.staff;
     _loadStartTime();
-/*    _startTime = DateTime.now();
-    _stopwatch.start();*/
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         if (_startTime != null) {
@@ -54,11 +77,8 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
     print('initState called');
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh) {
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -124,7 +144,6 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
         ? Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        // Show circular loading indicator while waiting
         child: CircularProgressIndicator(),
       ),
     )
@@ -345,7 +364,6 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
                       painter: NotchPainter(),
                       child: Container(
                         decoration: BoxDecoration(
-                          //color: const Color.fromRGBO(25, 192, 122, 1),
                           border: Border(
                             left: BorderSide(
                               color: Colors.black,
@@ -433,7 +451,7 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
     print('Trip Id: ${staff.id}');
     if (staff.id > 0) {
       final apiService = await StopTripAPIService.create();
-      bool checker = await apiService.TripStopped(tripId: staff.id,); // Invoke assignCarToTrip method on apiService
+      bool checker = await apiService.TripStopped(tripId: staff.id,);
       if(checker == true){
         showTopToast(context, 'Trip Finished successfully!');
         _clearStartTimeAndDuration();
@@ -454,7 +472,7 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
     OverlayState? overlayState = Overlay.of(context);
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top + 10, // 10 is for a little margin from the top
+        top: MediaQuery.of(context).padding.top + 10,
         left: 20,
         right: 20,
         child: Material(
@@ -475,8 +493,6 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
     );
 
     overlayState?.insert(overlayEntry);
-
-    // Remove the overlay entry after some time (e.g., 3 seconds)
     Future.delayed(Duration(seconds: 3)).then((_) {
       overlayEntry.remove();
     });
@@ -484,18 +500,13 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
 
   Widget _buildRowTime(String label, String value) {
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
-
-    // Parse the date and time string
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-
-    // Format the date and time
     String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
     DateTime date = DateTime.parse(value);
     DateFormat dateFormat = DateFormat.yMMMMd('en_US');
     DateFormat timeFormat = DateFormat.jm();
     String formattedDate = dateFormat.format(date);
     String formattedTime = timeFormat.format(date);
-    //String formattedDateTime = '$formattedDate, $formattedTime';
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

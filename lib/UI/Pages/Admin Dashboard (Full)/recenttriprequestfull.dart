@@ -2,27 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vehicle_log_management/UI/Bloc/auth_cubit.dart';
-import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboardFull.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
-import '../../../Data/Models/tripRequestModelOngingTrip.dart';
 import '../../../Data/Models/tripRequestModelRecent.dart';
-import '../../../Data/Models/tripRequestModelSROfficer.dart';
-import '../../Widgets/AdminPendingTripDetails.dart';
 import '../../Widgets/AvailableDriverDetails.dart';
-import '../../Widgets/OngoingTripDetails.dart';
 import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
+/// The [AdminDashboardRecentTripsUI] widget represents the user interface
+/// for displaying recent trip information on the Admin Dashboard.
+///
+/// [shouldRefresh]: Determines if the UI should refresh the data upon loading.
+///
+/// Variables:
+/// * [_scaffoldKey]: Key for managing the scaffold state.
+/// * [pendingRequests]: Holds the list of widgets representing pending requests.
+/// * [acceptedRequests]: Holds the list of widgets representing accepted requests.
+/// * [recentRequests]: Holds the list of widgets representing recent requests.
+/// * [drivers]: Holds the list of widgets representing driver details.
+/// * [_isFetched]: Tracks whether the data has been fetched to avoid redundant calls.
+/// * [_isFetchedFull]: Tracks whether the full data has been fetched.
+/// * [_isLoading]: Indicates whether data loading is currently in progress.
+/// * [_pageLoading]: Indicates whether the initial page loading is ongoing.
+/// * [_errorOccurred]: Tracks if an error occurred during data fetching.
+/// * [userName]: Stores the name of the user fetched from SharedPreferences.
+/// * [organizationName]: Stores the organization name fetched from SharedPreferences.
+/// * [photoUrl]: Stores the URL of the user's photo fetched from SharedPreferences.
+/// * [notifications]: Holds the list of notifications fetched from the API.
+/// * [recentPagination]: Stores pagination information for recent trips.
+/// * [canFetchMoreRecent]: Indicates if more recent trips can be fetched.
+/// * [recentNext]: Stores the URL for fetching the next page of recent trips.
+/// * [recentPrev]: Stores the URL for fetching the previous page of recent trips.
+///
+/// Actions:
+/// * [loadUserProfile]: Fetches and sets the user's profile information from SharedPreferences.
+/// * [fetchConnectionRequests]: Fetches connection requests and updates the UI accordingly.
+/// * [fetchConnectionRequestsPagination(String url)]: Fetches paginated data for recent trips.
 class AdminDashboardRecentTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -30,10 +52,12 @@ class AdminDashboardRecentTripsUI extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<AdminDashboardRecentTripsUI> createState() => _AdminDashboardRecentTripsUIState();
+  State<AdminDashboardRecentTripsUI> createState() =>
+      _AdminDashboardRecentTripsUIState();
 }
 
-class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsUI> {
+class _AdminDashboardRecentTripsUIState
+    extends State<AdminDashboardRecentTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -73,11 +97,9 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
     try {
       final apiService = await DashboardAPIService.create();
 
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -87,12 +109,10 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -112,10 +132,8 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
       canFetchMoreRecent = recentPagination.canFetchNext;
       print(canFetchMoreRecent);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> driverData = records['Available_Driver'] ?? [];
@@ -123,7 +141,6 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
         print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> driverWidgets = driverData.map((request) {
         return DriverInfoCard(
           Name: request['name'],
@@ -193,8 +210,6 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
@@ -203,11 +218,9 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
     try {
       final apiService = await DashboardFullAPIService.create();
 
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -217,18 +230,15 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-
       recentPagination = Pagination.fromJson(pagination['Recent']);
       print(recentPagination.nextPage);
       setState(() {
@@ -242,10 +252,8 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
       canFetchMoreRecent = recentPagination.canFetchNext;
       print(canFetchMoreRecent);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> driverData = records['Available_Driver'] ?? [];
@@ -253,7 +261,6 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
         print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> driverWidgets = driverData.map((request) {
         return DriverInfoCard(
           Name: request['name'],
@@ -323,14 +330,7 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetchedFull = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
-  }
-
-  // Function to check if more than 10 items are available in the list
-  bool shouldShowSeeAllButton(List list) {
-    return list.length > 10;
   }
 
   @override
@@ -340,17 +340,13 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
     recentPagination = Pagination(nextPage: null, previousPage: null);
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
     loadUserProfile();
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -367,7 +363,6 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
         ? Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              // Show circular loading indicator while waiting
               child: CircularProgressIndicator(),
             ),
           )
@@ -413,39 +408,6 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
                                 SizedBox(
                                   height: 20,
                                 ),
-                                /*           Text('New Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    RequestsWidgetShowAll(
-                      loading: _isLoading,
-                      fetch: _isFetched,
-                      errorText: 'There aren\'t any trip request yet.',
-                      listWidget: pendingRequests,
-                      fetchData: fetchConnectionRequests(),
-                    ),*/
-                                /*   SizedBox(height: screenHeight * 0.02),
-                    Text('Ongoing Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    RequestsWidgetShowAll(
-                        loading: _isLoading,
-                        fetch: _isFetched,
-                        errorText: 'No trip onging.',
-                        listWidget: acceptedRequests,
-                        fetchData: fetchConnectionRequests(),
-                     ),
-                    Divider(),*/
-                                // SizedBox(height: screenHeight * 0.02),
                                 Text('Recent Trip',
                                     style: TextStyle(
                                       color: Colors.black,
@@ -474,7 +436,7 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
                                                     _isLoading)
                                                 ? const Color.fromRGBO(
                                                     25, 192, 122, 1)
-                                                : Colors.grey, // Disabled color
+                                                : Colors.grey,
                                         fixedSize: Size(
                                             MediaQuery.of(context).size.width *
                                                 0.35,
@@ -520,7 +482,7 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
                                                     _isLoading)
                                                 ? const Color.fromRGBO(
                                                     25, 192, 122, 1)
-                                                : Colors.grey, // Disabled color
+                                                : Colors.grey,
                                         fixedSize: Size(
                                             MediaQuery.of(context).size.width *
                                                 0.35,
@@ -707,81 +669,6 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
           );
   }
 
-  void _showNotificationsOverlay(BuildContext context) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry overlayEntry;
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: kToolbarHeight + 10.0,
-        right: 10.0,
-        width: 250,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: notifications.isEmpty
-                ? Container(
-                    height: 50,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.notifications_off),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          'No new notifications',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(8),
-                    shrinkWrap: true,
-                    itemCount: notifications.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(Icons.info_outline),
-                            title: Text(notifications[index]),
-                            onTap: () {
-                              // Handle notification tap if necessary
-                              overlayEntry.remove();
-                            },
-                          ),
-                          if (index < notifications.length - 1) Divider()
-                        ],
-                      );
-                    },
-                  ),
-          ),
-        ),
-      ),
-    );
-
-    overlay?.insert(overlayEntry);
-
-    // Remove the overlay when tapping outside
-    Future.delayed(Duration(seconds: 5), () {
-      if (overlayEntry.mounted) {
-        overlayEntry.remove();
-      }
-    });
-  }
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -816,7 +703,7 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Cancel',
@@ -833,26 +720,17 @@ class _AdminDashboardRecentTripsUIState extends State<AdminDashboardRecentTripsU
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

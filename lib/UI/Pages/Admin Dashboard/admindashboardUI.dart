@@ -5,7 +5,6 @@ import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/avail
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/ongoingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/pendingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
@@ -24,6 +23,44 @@ import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
+/// The [AdminDashboardUI] widget represents the main dashboard screen for administrators.
+/// This screen allows admins to view and manage various requests and drivers, including pending, accepted, and recent requests.
+///
+/// **Variables:**
+/// - [shouldRefresh] (bool): Determines if the dashboard should refresh upon loading.
+///
+/// **StatefulWidget Components:**
+/// - [AdminDashboardUI]: The main widget class for the admin dashboard.
+/// - [_AdminDashboardUIState]: Manages the state and logic for the admin dashboard, including data fetching and user profile loading.
+///
+/// **State Management:**
+/// - [_scaffoldKey] (GlobalKey<ScaffoldState>): Key for managing the scaffold state.
+/// - [pendingRequests] (List<Widget>): List of widgets representing pending requests.
+/// - [acceptedRequests] (List<Widget>): List of widgets representing accepted requests.
+/// - [recentRequests] (List<Widget>): List of widgets representing recent requests.
+/// - [drivers] (List<Widget>): List of widgets representing available drivers.
+/// - [_isFetched] (bool): Flag indicating if the data has been fetched.
+/// - [_isLoading] (bool): Flag indicating if data is currently being loaded.
+/// - [_pageLoading] (bool): Flag indicating if the page is in a loading state.
+/// - [_errorOccurred] (bool): Flag indicating if an error occurred during data fetching.
+///
+/// **User Profile Data:**
+/// - [userName] (String): Stores the user's name.
+/// - [organizationName] (String): Stores the user's organization name.
+/// - [photoUrl] (String): Stores the user's profile photo URL.
+/// - [notifications] (List<String>): Stores a list of user notifications.
+///
+/// **Pagination Data:**
+/// - [pendingPagination] (Pagination): Manages pagination for pending requests.
+/// - [acceptedPagination] (Pagination): Manages pagination for accepted requests.
+/// - [recentPagination] (Pagination): Manages pagination for recent requests.
+/// - [driversPagination] (Pagination): Manages pagination for available drivers.
+///
+/// **Data Fetching Flags:**
+/// - [canFetchMorePending] (bool): Indicates if more pending requests can be fetched.
+/// - [canFetchMoreAccepted] (bool): Indicates if more accepted requests can be fetched.
+/// - [canFetchMoreRecent] (bool): Indicates if more recent requests can be fetched.
+/// - [canFetchMoreDrivers] (bool): Indicates if more drivers can be fetched.
 class AdminDashboardUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -77,11 +114,9 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
     try {
       final apiService = await DashboardAPIService.create();
 
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -91,12 +126,10 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -107,17 +140,13 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
       pendingPagination = Pagination.fromJson(pagination['new_trip']);
       acceptedPagination = Pagination.fromJson(pagination['ongoing']);
       driversPagination = Pagination.fromJson(pagination['driver']);
-      //recentPagination = Pagination.fromJson(pagination['recent']);
 
       canFetchMorePending = pendingPagination.canFetchNext;
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
       canFetchMoreDrivers = driversPagination.canFetchNext;
-      //canFetchMoreRecent = recentPagination.canFetchNext;
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> driverData = records['Available_Driver'] ?? [];
@@ -125,7 +154,6 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
         print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> driverWidgets = driverData.map((request) {
         return DriverInfoCard(
           Name: request['name'],
@@ -151,7 +179,6 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
         print('Pending Request at index $index: ${recentTripData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
         print('Pending Trip');
         print(request['name']);
@@ -207,7 +234,6 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
         );
       }).toList();
 
-      // Map accepted requests to widgets
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
           staff: TripRequest(
@@ -310,12 +336,9 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
-  // Function to check if more than 10 items are available in the list
   bool shouldShowSeeAllButton(List list) {
     return list.length > 10;
   }
@@ -323,24 +346,19 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
   @override
   void initState() {
     super.initState();
-    // Initialize the pagination with default values
     pendingPagination = Pagination(nextPage: null, previousPage: null);
     acceptedPagination = Pagination(nextPage: null, previousPage: null);
     recentPagination = Pagination(nextPage: null, previousPage: null);
     print('initState called');
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
     loadUserProfile();
     Future.delayed(Duration(seconds: 2), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -357,7 +375,6 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
         ? Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              // Show circular loading indicator while waiting
               child: CircularProgressIndicator(),
             ),
           )
@@ -517,26 +534,6 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                     ),
                                     pagination: canFetchMoreAccepted,
                                   ),
-                                  /* SizedBox(height: screenHeight * 0.02),
-                            Text('Recent Trip',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 30,
-                                  fontFamily: 'default',
-                                )),
-                            SizedBox(height: screenHeight * 0.01),
-                            Divider(),
-                            RequestsWidget(
-                                loading: _isLoading,
-                                fetch: _isFetched,
-                                errorText: 'No Recent Trip.',
-                                listWidget: recentRequests,
-                                fetchData: fetchConnectionRequests(),
-                                numberOfWidgets: 10,
-                                showSeeAllButton: (shouldShowSeeAllButton(recentRequests)),
-                                seeAllButtonText: 'Seel all recent trips',
-                                nextPage: AdminDashboardRecent(shouldRefresh: true,)),*/
                                   SizedBox(
                                     height: 20,
                                   )
@@ -753,8 +750,6 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
     );
 
     overlay?.insert(overlayEntry);
-
-    // Remove the overlay when tapping outside
     Future.delayed(Duration(seconds: 5), () {
       if (overlayEntry.mounted) {
         overlayEntry.remove();
@@ -796,7 +791,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Cancel',
@@ -813,18 +808,12 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
@@ -832,7 +821,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                                  LoginUI()));
                     }
                   },
                   child: Text(

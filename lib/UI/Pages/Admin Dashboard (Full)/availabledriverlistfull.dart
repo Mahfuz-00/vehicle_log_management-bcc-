@@ -2,29 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vehicle_log_management/UI/Bloc/auth_cubit.dart';
-import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboardFull.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/paginationModel.dart';
-import '../../../Data/Models/tripRequestModel.dart';
-import '../../../Data/Models/tripRequestModelOngingTrip.dart';
-import '../../../Data/Models/tripRequestModelRecent.dart';
-import '../../../Data/Models/tripRequestModelSROfficer.dart';
-import '../../Widgets/AdminPendingTripDetails.dart';
 import '../../Widgets/AvailableDriverDetails.dart';
-import '../../Widgets/OngoingTripDetails.dart';
-import '../../Widgets/RecentTripDetails.dart';
-import '../../Widgets/staffTripTile.dart';
 import '../Admin Dashboard/admindashboardUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-
+/// The [AdminDashboardAvailableDriverUI] class represents a UI screen within the vehicle log management app, specifically designed for the admin to view and manage available drivers.
+///
+/// [shouldRefresh]: A bool flag that determines whether the screen should refresh its data upon loading.
+///
+/// The main actions in this class include:
+/// - [loadUserProfile]: Fetches and displays the user profile from shared preferences.
+/// - [fetchConnectionRequests]: Retrieves connection requests related to available drivers from the dashboard API.
+/// - [fetchConnectionRequestsPagination]: Fetches paginated connection requests for drivers using the provided URL.
+/// - [shouldShowSeeAllButton]: Determines if the "See All" button should be displayed based on the length of the provided list.
+///
+/// The main [variables] utilized within this class are:
+/// - [_scaffoldKey]: A key for controlling the scaffold of the screen.
+/// - [pendingRequests], [acceptedRequests], [recentRequests], [drivers]: Lists of widgets that display various types of requests and drivers.
+/// - [_isFetched], [_isFetchedFull], [_isLoading], [_pageLoading], [_errorOccurred]: Flags used to manage the loading and error states of the screen.
+/// - [userName], [organizationName], [photoUrl]: Strings that store user information for display.
+/// - [notifications]: A list of notifications fetched from the API.
+/// - [driverPagination]: An instance of [Pagination] used to manage driver pagination details.
+/// - [canFetchMoreDriver]: A flag indicating if more driver data can be fetched.
+/// - [driverNext], [driverPrev]: Strings that hold the next and previous pagination URLs for fetching driver data.
 class AdminDashboardAvailableDriverUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -75,11 +82,9 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
     try {
       final apiService = await DashboardAPIService.create();
 
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
       await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -89,12 +94,10 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -114,10 +117,8 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
       canFetchMoreDriver = driverPagination.canFetchNext;
       print(canFetchMoreDriver);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> driverData = records['Available_Driver'] ?? [];
@@ -125,7 +126,6 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
         print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> driverWidgets = driverData.map((request) {
         return DriverInfoCard(
           Name: request['name'],
@@ -143,8 +143,6 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
@@ -153,11 +151,9 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
     try {
       final apiService = await DashboardFullAPIService.create();
 
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
       await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -167,12 +163,10 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
@@ -192,10 +186,8 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
       canFetchMoreDriver = driverPagination.canFetchNext;
       print(canFetchMoreDriver);
 
-      // Extract notifications
       notifications = List<String>.from(records['notifications'] ?? []);
 
-      // Simulate fetching data for 5 seconds
       await Future.delayed(Duration(seconds: 3));
 
       final List<dynamic> driverData = records['Available_Driver'] ?? [];
@@ -203,7 +195,6 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
         print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> driverWidgets = driverData.map((request) {
         return DriverInfoCard(
           Name: request['name'],
@@ -214,7 +205,6 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
         );
       }).toList();
 
-
       setState(() {
         drivers = driverWidgets;
         _isFetched = true;
@@ -222,12 +212,9 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetchedFull = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
-  // Function to check if more than 10 items are available in the list
   bool shouldShowSeeAllButton(List list) {
     return list.length > 10;
   }
@@ -239,17 +226,13 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
     driverPagination = Pagination(nextPage: null, previousPage: null);
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
     loadUserProfile();
     Future.delayed(Duration(seconds: 5), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -266,7 +249,6 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
         ? Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        // Show circular loading indicator while waiting
         child: CircularProgressIndicator(),
       ),
     )
@@ -295,7 +277,7 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
               body: SingleChildScrollView(
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(/*horizontal: 20,*/ vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Center(
                       child: Column(
                         children: [
@@ -311,39 +293,6 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
                           SizedBox(
                             height: 20,
                           ),
-                          /*           Text('New Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    RequestsWidgetShowAll(
-                      loading: _isLoading,
-                      fetch: _isFetched,
-                      errorText: 'There aren\'t any trip request yet.',
-                      listWidget: pendingRequests,
-                      fetchData: fetchConnectionRequests(),
-                    ),*/
-                          /*   SizedBox(height: screenHeight * 0.02),
-                    Text('Ongoing Trip',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30,
-                          fontFamily: 'default',
-                        )),
-                    SizedBox(height: screenHeight * 0.01),
-                    RequestsWidgetShowAll(
-                        loading: _isLoading,
-                        fetch: _isFetched,
-                        errorText: 'No trip onging.',
-                        listWidget: acceptedRequests,
-                        fetchData: fetchConnectionRequests(),
-                     ),
-                    Divider(),*/
-                          // SizedBox(height: screenHeight * 0.02),
                           Text('Driver List',
                               style: TextStyle(
                                 color: Colors.black,
@@ -367,7 +316,7 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: (driverPrev.isNotEmpty && driverPrev != 'None' && _isLoading)
                                       ? const Color.fromRGBO(25, 192, 122, 1)
-                                      : Colors.grey, // Disabled color
+                                      : Colors.grey,
                                   fixedSize: Size(
                                       MediaQuery.of(context).size.width * 0.35,
                                       MediaQuery.of(context).size.height * 0.05),
@@ -403,7 +352,7 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: (driverNext.isNotEmpty && driverNext != 'None' && _isLoading)
                                       ? const Color.fromRGBO(25, 192, 122, 1)
-                                      : Colors.grey, // Disabled color
+                                      : Colors.grey,
                                   fixedSize: Size(
                                       MediaQuery.of(context).size.width * 0.35,
                                       MediaQuery.of(context).size.height * 0.05),
@@ -583,81 +532,6 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
     );
   }
 
-  void _showNotificationsOverlay(BuildContext context) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry overlayEntry;
-
-    overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: kToolbarHeight + 10.0,
-        right: 10.0,
-        width: 250,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: notifications.isEmpty
-                ? Container(
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.notifications_off),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'No new notifications',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            )
-                : ListView.builder(
-              padding: EdgeInsets.all(8),
-              shrinkWrap: true,
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.info_outline),
-                      title: Text(notifications[index]),
-                      onTap: () {
-                        // Handle notification tap if necessary
-                        overlayEntry.remove();
-                      },
-                    ),
-                    if (index < notifications.length - 1) Divider()
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay?.insert(overlayEntry);
-
-    // Remove the overlay when tapping outside
-    Future.delayed(Duration(seconds: 5), () {
-      if (overlayEntry.mounted) {
-        overlayEntry.remove();
-      }
-    });
-  }
-
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -692,7 +566,7 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: Text(
                     'Cancel',
@@ -709,18 +583,13 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
 
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
@@ -728,7 +597,7 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                                  LoginUI()));
                     }
                   },
                   child: Text(

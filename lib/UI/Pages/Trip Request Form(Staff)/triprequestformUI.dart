@@ -2,14 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Trip Request)/apiServiceTripRequest.dart';
 import '../../../Data/Models/tripRequestModel.dart';
+import '../../Widgets/CustomTextField.dart';
 import '../../Widgets/radiooption.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
 
+/// [TripRequestFormUI] is a StatefulWidget that represents the user interface for submitting a new trip request.
+///
+/// It provides input fields for trip details such as [Full Name], [Designation], [Department],
+/// [Purpose], [Mobile Number], [Destination From], [Destination To], [Start Time],
+/// [End Time], [Trip Date], and [Approx. Distance of the Trip].
+///
+/// This widget also allows users to select the trip type and mode using radio buttons,
+/// and it includes a file picker for official trip requests.
+///
+/// The state of the widget is managed using a private state class [_TripRequestFormUIState].
+///
+/// Variables:
+/// - [_StartTimecontroller]: Controller for the start time input field.
+/// - [_EndTimecontroller]: Controller for the end time input field.
+/// - [_Datecontroller]: Controller for the date input field.
+/// - [_nameController]: Controller for the full name input field.
+/// - [_desinationController]: Controller for the designation input field.
+/// - [_distanceController]: Controller for the distance input field.
+/// - [_departmentController]: Controller for the department input field.
+/// - [_purposeController]: Controller for the purpose input field.
+/// - [_phoneController]: Controller for the mobile number input field.
+/// - [_destinationfromController]: Controller for the starting destination input field.
+/// - [_destinationtoController]: Controller for the destination input field.
+/// - [triptype]: Stores the selected trip mode (e.g., One-Way, Round-Trip).
+/// - [tripCatagory]: Stores the selected trip type (e.g., Personal, Official).
+/// - [_tripRequest]: Instance of [TripRequest] model used to hold trip details.
+/// - [Date]: Stores the selected trip date.
+/// - [_file]: Holds the selected file for official trip requests.
+/// - [_scaffoldKey]: Global key for the scaffold to manage state and display snack bars.
 class TripRequestFormUI extends StatefulWidget {
   const TripRequestFormUI({super.key});
 
@@ -118,495 +147,176 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                             fontFamily: 'default',
                           )),
                       SizedBox(height: 20),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: TextFormField(
-                          controller: _nameController,
-                          validator: (input) {
-                            if (input == null || input.isEmpty) {
-                              return 'Please enter your name';
+                      CustomTextFormField(
+                        controller: _nameController,
+                        labelText: 'Full Name',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _desinationController,
+                        labelText: 'Designation',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter your designation';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _departmentController,
+                        labelText: 'Department',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter the department you are affiliated with';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _purposeController,
+                        labelText: 'Purpose and Trip details',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter the purpose of your trip and trip details';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _phoneController,
+                        labelText: 'Mobile Number',
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(11),
+                        ],
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter your mobile number';
+                          }
+                          if (input.length != 11) {
+                            return 'Mobile number must be 11 digits';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _destinationfromController,
+                        labelText: 'Destination From',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter where the trip will start';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _destinationtoController,
+                        labelText: 'Destination To',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter the destination of the trip';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _StartTimecontroller,
+                        labelText: 'Start Trip Time',
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select the start time';
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          ).then((selectedTime) {
+                            if (selectedTime != null) {
+                              String formattedTime = DateFormat('h:mm a').format(
+                                DateTime(
+                                  2020,
+                                  1,
+                                  1,
+                                  selectedTime.hour,
+                                  selectedTime.minute,
+                                ),
+                              );
+                              _StartTimecontroller.text = formattedTime;
                             }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: Color.fromRGBO(143, 150, 158, 1),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Full Name',
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'default',
-                            ),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                            //floatingLabelBehavior: FloatingLabelBehavior.never,
-                          ),
-                        ),
+                          });
+                        },
                       ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: TextFormField(
-                          controller: _desinationController,
-                          validator: (input) {
-                            if (input == null || input.isEmpty) {
-                              return 'Please enter your designation';
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _EndTimecontroller,
+                        labelText: 'Stop Trip Time',
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select the end time';
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          ).then((selectedTime) {
+                            if (selectedTime != null) {
+                              String formattedTime = DateFormat('h:mm a').format(
+                                DateTime(
+                                  2020,
+                                  1,
+                                  1,
+                                  selectedTime.hour,
+                                  selectedTime.minute,
+                                ),
+                              );
+                              _EndTimecontroller.text = formattedTime;
                             }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: Color.fromRGBO(143, 150, 158, 1),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Designation',
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'default',
-                            ),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                          ),
-                        ),
+                          });
+                        },
                       ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: TextFormField(
-                          controller: _departmentController,
-                          validator: (input) {
-                            if (input == null || input.isEmpty) {
-                              return 'Please enter the department you are affiliated with';
+                      const SizedBox(height: 10),
+                      CustomTextFormField(
+                        controller: _Datecontroller,
+                        labelText: 'Trip Date',
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select a date';
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2101),
+                          ).then((selectedDate) {
+                            if (selectedDate != null) {
+                              String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+                              _Datecontroller.text = formattedDate;
                             }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: Color.fromRGBO(143, 150, 158, 1),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Department',
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'default',
-                            ),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: TextFormField(
-                          controller: _purposeController,
-                          validator: (input) {
-                            if (input == null || input.isEmpty) {
-                              return 'Please enter the purpose of your trip and trip details';
-                            }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: Color.fromRGBO(143, 150, 158, 1),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Purpose and Trip details',
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'default',
-                            ),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: TextFormField(
-                          controller: _phoneController,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            // Only allow digits
-                            LengthLimitingTextInputFormatter(11),
-                          ],
-                          validator: (input) {
-                            if (input == null || input.isEmpty) {
-                              return 'Please enter your mobile number name';
-                            }
-                            if (input.length != 11) {
-                              return 'Mobile number must be 11 digits';
-                            }
-                            return null; // Return null if the input is valid
-                          },
-                          style: const TextStyle(
-                            color: Color.fromRGBO(143, 150, 158, 1),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Mobile Number',
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'default',
-                            ),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: TextFormField(
-                          controller: _destinationfromController,
-                          validator: (input) {
-                            if (input == null || input.isEmpty) {
-                              return 'Please enter where the trip will start';
-                            }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: Color.fromRGBO(143, 150, 158, 1),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Destination From',
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'default',
-                            ),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: TextFormField(
-                          controller: _destinationtoController,
-                          validator: (input) {
-                            if (input == null || input.isEmpty) {
-                              return 'Please enter the destination of the trip';
-                            }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: Color.fromRGBO(143, 150, 158, 1),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Destination To',
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'default',
-                            ),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: Stack(
-                          children: [
-                            TextFormField(
-                              controller: _StartTimecontroller,
-                              validator: (value) {
-                                // Check if the text field is empty or contains a valid time
-                                if (value == null || value.isEmpty) {
-                                  return 'Please select the start time';
-                                }
-                                // You can add more complex validation logic if needed
-                                return null;
-                              },
-                              readOnly: true,
-                              // Make the text field readonly
-                              enableInteractiveSelection: false,
-                              // Disable interactive selection
-                              style: const TextStyle(
-                                color: Color.fromRGBO(143, 150, 158, 1),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'default',
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Start Trip Time',
-                                labelStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  fontFamily: 'default',
-                                ),
-                                border: const OutlineInputBorder(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5))),
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  // Adjust the padding as needed
-                                  child: Icon(
-                                    Icons.schedule_rounded,
-                                    size: 25,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    // Show the time picker dialog
-                                    showTimePicker(
-                                      context: context,
-                                      initialTime: TimeOfDay.now(),
-                                    ).then((selectedTime) {
-                                      // Check if a time is selected
-                                      if (selectedTime != null) {
-                                        // Convert selectedTime to a formatted string
-                                        /*String formattedTime =
-                                            selectedTime.hour.toString().padLeft(2, '0') +
-                                                ':' +
-                                                selectedTime.minute.toString().padLeft(2, '0');*/
-                                        String formattedTime =
-                                            DateFormat('h:mm a').format(
-                                          DateTime(
-                                              2020,
-                                              1,
-                                              1,
-                                              selectedTime.hour,
-                                              selectedTime.minute),
-                                        );
-                                        print(formattedTime);
-                                        // Set the formatted time to the controller
-                                        _StartTimecontroller.text =
-                                            formattedTime;
-                                        print(formattedTime);
-                                      } else {
-                                        print('No time selected');
-                                      }
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: Stack(
-                          children: [
-                            TextFormField(
-                              controller: _EndTimecontroller,
-                              validator: (value) {
-                                // Check if the text field is empty or contains a valid time
-                                if (value == null || value.isEmpty) {
-                                  return 'Please select the end time';
-                                }
-                                // You can add more complex validation logic if needed
-                                return null;
-                              },
-                              readOnly: true,
-                              // Make the text field readonly
-                              enableInteractiveSelection: false,
-                              // Disable interactive selection
-                              style: const TextStyle(
-                                color: Color.fromRGBO(143, 150, 158, 1),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'default',
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Stop Trip Time',
-                                labelStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  fontFamily: 'default',
-                                ),
-                                border: const OutlineInputBorder(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5))),
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  // Adjust the padding as needed
-                                  child: Icon(
-                                    Icons.schedule_rounded,
-                                    size: 25,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    // Show the time picker dialog
-                                    showTimePicker(
-                                      context: context,
-                                      initialTime: TimeOfDay.now(),
-                                    ).then((selectedTime) {
-                                      // Check if a time is selected
-                                      if (selectedTime != null) {
-                                        // Convert selectedTime to a formatted string
-                                        /*String formattedTime =
-                                            selectedTime.hour.toString().padLeft(2, '0') +
-                                                ':' +
-                                                selectedTime.minute.toString().padLeft(2, '0');*/
-                                        String formattedTime =
-                                            DateFormat('h:mm a').format(
-                                          DateTime(
-                                              2020,
-                                              1,
-                                              1,
-                                              selectedTime.hour,
-                                              selectedTime.minute),
-                                        );
-                                        print(formattedTime);
-                                        // Set the formatted time to the controller
-                                        _EndTimecontroller.text = formattedTime;
-                                        print(formattedTime);
-                                      } else {
-                                        print('No time selected');
-                                      }
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: Stack(
-                          children: [
-                            TextFormField(
-                              controller: _Datecontroller,
-                              validator: (value) {
-                                // Check if the text field is empty or contains a valid date
-                                if (value == null || value.isEmpty) {
-                                  return 'Please select a date';
-                                }
-                                // You can add more complex validation logic if needed
-                                return null;
-                              },
-                              readOnly: true,
-                              // Make the text field readonly
-                              enableInteractiveSelection: false,
-                              // Disable interactive selection
-                              style: const TextStyle(
-                                color: Color.fromRGBO(143, 150, 158, 1),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'default',
-                              ),
-                              decoration: InputDecoration(
-                                labelText: 'Trip Date',
-                                labelStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  fontFamily: 'default',
-                                ),
-                                border: const OutlineInputBorder(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5))),
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  // Adjust the padding as needed
-                                  child: Icon(
-                                    Icons.calendar_today_outlined,
-                                    size: 25,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned.fill(
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    // Show the date picker dialog
-                                    showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(2020),
-                                      lastDate: DateTime(2100),
-                                    ).then((selectedDate) {
-                                      // Check if a date is selected
-                                      if (selectedDate != null) {
-                                        // Format the selected date as needed
-                                        final formattedDate =
-                                            DateFormat('yyyy-MM-dd')
-                                                .format(selectedDate);
-                                        // Set the formatted date to the controller
-                                        _Datecontroller.text = formattedDate;
-                                        Date = DateTime.parse(formattedDate);
-                                        print(formattedDate);
-                                      } else {
-                                        print('No date selected');
-                                      }
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          });
+                        },
                       ),
                       SizedBox(height: 10),
                       Container(
@@ -806,7 +516,10 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
           _file = File(result.files.single.path!);
         });
       } else {
-        // User canceled the picker
+        const snackBar = SnackBar(
+          content: Text('File is not available'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     } catch (e) {
       print('Error picking file: $e');
@@ -814,7 +527,6 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
   }
 
   void _tripRequestForm() {
-    // Validate and save form data
     if (_validateAndSave()) {
       const snackBar = SnackBar(
         content: Text('Processing'),
@@ -822,7 +534,6 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       print('triggered Validation');
 
-      // Print each field with its corresponding name
       print('Name: ${_nameController.text}');
       print('Designation: ${_desinationController.text}');
       print('Department: ${_departmentController.text}');
@@ -836,7 +547,6 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
       print('Type: ${triptype}');
       print('Distance: ${_distanceController.text}');
       print('Trip Catagory: ${tripCatagory}');
-      // Initialize connection request model
       _tripRequest = TripRequest(
           name: _nameController.text,
           designation: _desinationController.text,
@@ -852,10 +562,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
           type: triptype,
           category: tripCatagory);
 
-      // Perform any additional actions before sending the request
-      // Send the connection request using API service
       TripRequestAPIService().postTripRequest(_tripRequest, _file).then((response) {
-        // Handle successful request
         print('Trip request sent successfully!!');
         print(response);
         if (response != null && response == "Trip request successfully") {
@@ -876,11 +583,9 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
           content: Text('Error while submitting request'),
         );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        // Handle error
         print('Error sending Trip request: $error');
       });
     } else {
-      // Show error snackbar
       const snackBar = SnackBar(
         content: Text('Please fill all required fields'),
       );
@@ -890,7 +595,6 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
   }
 
   bool _validateAndSave() {
-/*    final requestTypeIsValid = _requestType.isNotEmpty;*/
     final NameIsValid = _nameController.text.isNotEmpty;
     final DesignationIsValid = _desinationController.text.isNotEmpty;
     final DepartmentIsValid = _departmentController.text.isNotEmpty;
@@ -905,9 +609,6 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
     final TripTypeIsValid = triptype.isNotEmpty;
     final DateIsValid = _Datecontroller.text.isNotEmpty;
 
-    // Perform any additional validation logic if needed
-
-    // Check if all fields are valid
     final allFieldsAreValid = NameIsValid &&
         DesignationIsValid &&
         DepartmentIsValid &&
@@ -921,7 +622,6 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
         TripCategoryIsValid &&
         TripTypeIsValid &&
         DateIsValid;
-
     return allFieldsAreValid;
   }
 }

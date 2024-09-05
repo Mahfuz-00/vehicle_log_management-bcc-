@@ -2,26 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidgetShowAll.dart';
-
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboardFull.dart';
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
-import '../../../Data/Data Sources/API Service (Notification)/apiServiceNotificationRead.dart';
 import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
-import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
-import '../../../Data/Models/tripRequestModelRecent.dart';
 import '../../Bloc/auth_cubit.dart';
-import '../../Widgets/RecentTripDetails.dart';
-import '../../Widgets/StaffApprovedTripDetails.dart';
-import '../../Widgets/requestWidget.dart';
 import '../../Widgets/staffPendingTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import '../Trip Request Form(Staff)/triprequestformUI.dart';
 
+/// This class represents the [StaffDashboardPendingTripsUI], which displays
+/// the pending trips for staff members. It fetches user profile information
+/// and connection requests from the API and displays them in a list format.
+///
+/// Variables:
+/// - [shouldRefresh]: A boolean indicating whether the UI should refresh.
+/// - [_scaffoldKey]: A global key used for the Scaffold widget.
+/// - [pendingRequests]: A list of widgets representing pending trip requests.
+/// - [acceptedRequests]: A list of widgets representing accepted trip requests.
+/// - [recentRequests]: A list of widgets representing recent trip requests.
+/// - [_isFetched]: A boolean indicating whether the trip requests have been fetched.
+/// - [_isFetchedFull]: A boolean indicating whether all trip requests have been fetched.
+/// - [_isLoading]: A boolean indicating whether data is being loaded.
+/// - [_pageLoading]: A boolean indicating whether the page is still loading.
+/// - [_buttonpressed]: A boolean indicating whether a button has been pressed.
+/// - [_errorOccurred]: A boolean indicating whether an error has occurred during fetching.
+/// - [userName]: A string holding the name of the user.
+/// - [organizationName]: A string holding the organization name of the user.
+/// - [photoUrl]: A string holding the URL of the user's profile photo.
+/// - [notifications]: A list of strings containing notifications for the user.
+/// - [pendingPagination]: An instance of the [Pagination] model for pending requests.
+/// - [acceptedPagination]: An instance of the [Pagination] model for accepted requests.
+/// - [recentPagination]: An instance of the [Pagination] model for recent requests.
+/// - [canFetchMorePending]: A boolean indicating if more pending requests can be fetched.
+/// - [canFetchMoreAccepted]: A boolean indicating if more accepted requests can be fetched.
+/// - [canFetchMoreRecent]: A boolean indicating if more recent requests can be fetched.
+/// - [pendingNext]: A string holding the URL for the next page of pending requests.
+/// - [acceptedNext]: A string holding the URL for the next page of accepted requests.
+/// - [recentNext]: A string holding the URL for the next page of recent requests.
+/// - [pendingPrev]: A string holding the URL for the previous page of pending requests.
+/// - [acceptedPrev]: A string holding the URL for the previous page of accepted requests.
+/// - [recentPrev]: A string holding the URL for the previous page of recent requests.
+///
+/// Actions:
+/// - [loadUserProfile()]: Fetches user profile information from SharedPreferences.
+/// - [fetchConnectionRequests()]: Fetches the initial set of connection requests.
+/// - [fetchConnectionRequestsPagination(String url)]: Fetches additional connection requests based on pagination.
 class StaffDashboardPendingTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
@@ -50,12 +80,9 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
   late Pagination pendingPagination;
   late Pagination acceptedPagination;
   late Pagination recentPagination;
-
-  // Example to check if more data can be fetched
   bool canFetchMorePending = false;
   bool canFetchMoreAccepted = false;
   bool canFetchMoreRecent = false;
-
   late String pendingNext = '';
   late String acceptedNext = '';
   late String recentNext = '';
@@ -81,12 +108,9 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
     if (_isFetched) return;
     try {
       final apiService = await DashboardAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -96,22 +120,18 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-
       pendingPagination = Pagination.fromJson(pagination['pending']);
       acceptedPagination = Pagination.fromJson(pagination['accepted']);
       recentPagination = Pagination.fromJson(pagination['recent']);
-
       print(pendingPagination.nextPage);
       print(acceptedPagination.nextPage);
       print(recentPagination.nextPage);
@@ -144,7 +164,6 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
             'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
         print('Pending Trip');
         print(request['name']);
@@ -205,8 +224,6 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetched = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
   }
 
@@ -214,12 +231,9 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
     if (_isFetchedFull) return;
     try {
       final apiService = await DashboardFullAPIService.create();
-
-      // Fetch dashboard data
       final Map<String, dynamic>? dashboardData =
           await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
-        // No data available or an error occurred
         print(
             'No data available or error occurred while fetching dashboard data');
         return;
@@ -229,22 +243,18 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
       final Map<String, dynamic>? records = dashboardData['records'] ?? [];
       print(records);
       if (records == null || records.isEmpty) {
-        // No records available
         print('No records available');
         return;
       }
 
-      // Set isLoading to true while fetching data
       setState(() {
         _isLoading = true;
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-
       pendingPagination = Pagination.fromJson(pagination['pending']);
       acceptedPagination = Pagination.fromJson(pagination['accepted']);
       recentPagination = Pagination.fromJson(pagination['recent']);
-
       print(pendingPagination.nextPage);
       print(acceptedPagination.nextPage);
       print(recentPagination.nextPage);
@@ -257,7 +267,6 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
       pendingPrev = pendingPagination.previousPage as String;
       acceptedPrev = acceptedPagination.previousPage as String;
       recentPrev = recentPagination.previousPage as String;
-
       canFetchMorePending = pendingPagination.canFetchNext;
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
       canFetchMoreRecent = recentPagination.canFetchNext;
@@ -271,7 +280,6 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
             'Pending Request at index $index: ${pendingRequestsData[index]}\n');
       }
 
-      // Map pending requests to widgets
       final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
         print('Pending Trip');
         print(request['name']);
@@ -332,37 +340,25 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
     } catch (e) {
       print('Error fetching trip requests: $e');
       _isFetchedFull = true;
-      //_errorOccurred = true;
-      // Handle error as needed
     }
-  }
-
-  // Function to check if more than 10 items are available in the list
-  bool shouldShowSeeAllButton(List list) {
-    return list.length > 10;
   }
 
   @override
   void initState() {
     super.initState();
-    // Initialize the pagination with default values
     pendingPagination = Pagination(nextPage: null, previousPage: null);
     acceptedPagination = Pagination(nextPage: null, previousPage: null);
     recentPagination = Pagination(nextPage: null, previousPage: null);
     if (!_isFetched) {
       fetchConnectionRequests();
-      //_isFetched = true; // Set _isFetched to true after the first call
     }
     print('initState called');
     loadUserProfile();
     Future.delayed(Duration(seconds: 2), () {
       if (widget.shouldRefresh && !_isFetched) {
         loadUserProfile();
-        // Refresh logic here, e.g., fetch data again
         print('Page Loading Done!!');
-        // connectionRequests = [];
       }
-      // After 5 seconds, set isLoading to false to stop showing the loading indicator
       setState(() {
         print('Page Loading');
         _pageLoading = false;
@@ -379,7 +375,6 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
         ? Scaffold(
             backgroundColor: Colors.white,
             body: Center(
-              // Show circular loading indicator while waiting
               child: CircularProgressIndicator(),
             ),
           )
@@ -773,18 +768,12 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // Clear user data from SharedPreferences
                     final prefs = await SharedPreferences.getInstance();
                     await prefs.remove('userName');
                     await prefs.remove('organizationName');
                     await prefs.remove('photoUrl');
-                    // Create an instance of LogOutApiService
                     var logoutApiService = await LogOutApiService.create();
-
-                    // Wait for authToken to be initialized
                     logoutApiService.authToken;
-
-                    // Call the signOut method on the instance
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
@@ -792,7 +781,7 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                                  LoginUI()));
                     }
                   },
                   child: Text(
