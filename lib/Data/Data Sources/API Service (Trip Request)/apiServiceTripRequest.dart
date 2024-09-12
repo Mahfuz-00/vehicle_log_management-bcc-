@@ -86,8 +86,16 @@ class TripRequestAPIService {
       print(response.body);
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
-        print('Trip request sent successfully.');
-        return jsonResponse['message'];
+        if(jsonResponse['status'] == false){
+          final error = jsonResponse['errors']['attachment_file'][0];
+          return error;
+        }
+        else if(jsonResponse['status'] == true) {
+          print('Trip request sent successfully.');
+          return jsonResponse['message'];
+        } else{
+          return 'Something went wrong';
+        }
       } else {
         print('Failed to send Trip request. Status code: ${response.statusCode}');
         return 'Failed to send Trip request';

@@ -128,13 +128,13 @@ class _LoginUIState extends State<LoginUI> {
                             child: Column(
                               children: [
                                 Container(
-                                  width: screenWidth*0.9,
+                                  width: screenWidth * 0.9,
                                   height: 70,
                                   child: TextFormField(
                                     controller: _emailController,
                                     keyboardType: TextInputType.emailAddress,
                                     onSaved: (input) =>
-                                    _loginRequest.Email = input!,
+                                        _loginRequest.Email = input!,
                                     validator: (input) {
                                       if (input!.isEmpty) {
                                         return 'Please enter your email address';
@@ -154,7 +154,8 @@ class _LoginUIState extends State<LoginUI> {
                                     ),
                                     decoration: const InputDecoration(
                                       filled: true,
-                                      fillColor: Color.fromRGBO(247, 248, 250, 1),
+                                      fillColor:
+                                          Color.fromRGBO(247, 248, 250, 1),
                                       border: OutlineInputBorder(),
                                       labelText: 'Enter your Email',
                                       labelStyle: TextStyle(
@@ -168,23 +169,22 @@ class _LoginUIState extends State<LoginUI> {
                                 ),
                                 const SizedBox(height: 15),
                                 Container(
-                                  width: screenWidth*0.9,
+                                  width: screenWidth * 0.9,
                                   height: 85,
                                   child: Column(
                                     children: [
                                       TextFormField(
                                         keyboardType: TextInputType.text,
                                         onSaved: (input) =>
-                                        _loginRequest.Password = input!,
-                                        validator: (input) =>
-                                        input!.length < 8
+                                            _loginRequest.Password = input!,
+                                        validator: (input) => input!.length < 8
                                             ? "Password should be more than 7 characters"
                                             : null,
                                         controller: _passwordController,
                                         obscureText: _isObscured,
                                         style: const TextStyle(
-                                          color: Color.fromRGBO(
-                                              143, 150, 158, 1),
+                                          color:
+                                              Color.fromRGBO(143, 150, 158, 1),
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'default',
@@ -217,8 +217,8 @@ class _LoginUIState extends State<LoginUI> {
                                       if (_passwordController.text.isNotEmpty &&
                                           _passwordController.text.length < 8)
                                         Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 8.0),
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
                                           child: Text(
                                             "Password should be more than 7 characters",
                                             style: TextStyle(color: Colors.red),
@@ -232,7 +232,8 @@ class _LoginUIState extends State<LoginUI> {
                           ),
                           Container(
                             child: Padding(
-                              padding: EdgeInsets.only(right: (screenWidth*0.1-20)),
+                              padding: EdgeInsets.only(
+                                  right: (screenWidth * 0.1 - 20)),
                               child: Container(
                                 alignment: Alignment.centerRight,
                                 child: InkWell(
@@ -240,7 +241,8 @@ class _LoginUIState extends State<LoginUI> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => const ForgotPasswordUI()));
+                                            builder: (context) =>
+                                                const ForgotPasswordUI()));
                                   },
                                   child: const Text(
                                     'Forgot Password?',
@@ -267,33 +269,47 @@ class _LoginUIState extends State<LoginUI> {
                                 if (await validateAndSave(
                                     globalfromkey, context)) {
                                   print('Checking $userType');
-                                  if(userType != null){
+                                  if (userType != null) {
                                     if (userType == 'vlm_staff') {
-                                      Navigator.pushReplacement(
+                                      Navigator.pushAndRemoveUntil(
                                         context,
-                                        MaterialPageRoute(builder: (context) => StaffDashboardUI(shouldRefresh: true)),
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                StaffDashboardUI(
+                                                    shouldRefresh: true)),
+                                        (route) => false,
                                       );
-                                    }
-                                    else if (userType == 'vlm_driver') {
-                                      Navigator.pushReplacement(
+                                    } else if (userType == 'vlm_driver') {
+                                      Navigator.pushAndRemoveUntil(
                                         context,
-                                        MaterialPageRoute(builder: (context) => DriverDashboardUI(shouldRefresh: true)),
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                DriverDashboardUI(
+                                                    shouldRefresh: true)),
+                                        (route) => false,
                                       );
-                                    }
-                                    else if (userType == 'vlm_senior_officer') {
-                                      Navigator.pushReplacement(
+                                    } else if (userType ==
+                                        'vlm_senior_officer') {
+                                      Navigator.pushAndRemoveUntil(
                                         context,
-                                        MaterialPageRoute(builder: (context) => SROfficerDashboardUI(shouldRefresh: true)),
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SROfficerDashboardUI(
+                                                    shouldRefresh: true)),
+                                        (route) => false,
                                       );
-                                    }
-                                    else if (userType == 'vlm_admin') {
-                                      Navigator.pushReplacement(
+                                    } else if (userType == 'vlm_admin') {
+                                      Navigator.pushAndRemoveUntil(
                                         context,
-                                        MaterialPageRoute(builder: (context) => AdminDashboardUI(shouldRefresh: true)),
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AdminDashboardUI(
+                                                    shouldRefresh: true)),
+                                        (route) => false,
                                       );
-                                    }
-                                    else{
-                                      String errorMessage = 'Invalid User!, Please enter a valid email address.';
+                                    } else {
+                                      String errorMessage =
+                                          'Invalid User!, Please enter a valid email address.';
                                       showTopToast(context, errorMessage);
                                     }
                                   }
@@ -303,29 +319,30 @@ class _LoginUIState extends State<LoginUI> {
                                 });
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+                                backgroundColor:
+                                    const Color.fromRGBO(25, 192, 122, 1),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                fixedSize: Size(screenWidth*0.9, 70),
+                                fixedSize: Size(screenWidth * 0.9, 70),
                               ),
                               child: _isButtonClicked
                                   ? CircularProgressIndicator()
                                   : const Text('Login',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontFamily: 'default',
-                                  ))),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontFamily: 'default',
+                                      ))),
                         ],
                       ),
                     ),
                   ),
                 ),
                 //SizedBox(height: 20),
-              /*  Footer(
+                /*  Footer(
                   backgroundColor: const Color.fromRGBO(246, 246, 246, 255),
                   alignment: Alignment.bottomCenter,
                   padding: const EdgeInsets.all(20.0),
@@ -376,7 +393,8 @@ class _LoginUIState extends State<LoginUI> {
     );
   }
 
-  Future<bool> validateAndSave(GlobalKey<FormState> formKey, BuildContext context) async {
+  Future<bool> validateAndSave(
+      GlobalKey<FormState> formKey, BuildContext context) async {
     final form = formKey.currentState;
     if (form != null && form.validate()) {
       form.save();
@@ -401,12 +419,12 @@ class _LoginUIState extends State<LoginUI> {
         String errorMessage = 'Incorrect Email and Password.';
         if (e.toString().contains('Invalid User')) {
           errorMessage = 'Invalid User!, Please enter a valid email address.';
-        }
-        else if (e.toString().contains('Invalid Credentials')) {
+        } else if (e.toString().contains('Invalid Credentials')) {
           errorMessage = 'Incorrect Password. Try again.';
-        }
-        else if (e.toString().contains('The email field is required') || e.toString().contains('The password field is required')) {
-          errorMessage = 'Email or password is empty. Please fill in both fields.';
+        } else if (e.toString().contains('The email field is required') ||
+            e.toString().contains('The password field is required')) {
+          errorMessage =
+              'Email or password is empty. Please fill in both fields.';
         }
         showTopToast(context, errorMessage);
         return false;

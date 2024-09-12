@@ -56,6 +56,7 @@ class DashboardAPIService{
         print(jsonData);
         return jsonData;
       } else {
+        print(response.statusCode);
         throw Exception('Failed to load dashboard items');
       }
     } catch (e) {

@@ -372,7 +372,7 @@ class _DriverDashboardUIState extends State<DriverDashboardUI> {
                 final userProfile = state.userProfile;
                 return InternetConnectionChecker(
                   child: PopScope(
-                    canPop: false,
+                  /*  canPop: false,*/
                     child: Scaffold(
                       extendBody: true,
                       key: _scaffoldKey,

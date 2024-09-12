@@ -161,6 +161,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
             'Accepted Request at index $index: ${acceptedRequestsData[index]}\n');
       }
       final List<dynamic> recentTripData = records['Recent'] ?? [];
+      print('Recent : ${records['Recent']}');
       for (var index = 0; index < recentTripData.length; index++) {
         print('Recent Trip at index $index: ${recentTripData[index]}\n');
       }
@@ -363,7 +364,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                 final userProfile = state.userProfile;
                 return InternetConnectionChecker(
                   child: PopScope(
-                    canPop: false,
+                   /* canPop: false,*/
                     child: Scaffold(
                       key: _scaffoldKey,
                       appBar: AppBar(

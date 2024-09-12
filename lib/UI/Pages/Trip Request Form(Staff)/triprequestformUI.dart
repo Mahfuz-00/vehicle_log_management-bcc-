@@ -108,12 +108,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
           titleSpacing: 5,
           leading: IconButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => StaffDashboardUI(
-                              shouldRefresh: true,
-                            )));
+                Navigator.pop(context);
               },
               icon: Icon(
                 Icons.arrow_back_ios_new_outlined,
@@ -248,7 +243,8 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                             initialTime: TimeOfDay.now(),
                           ).then((selectedTime) {
                             if (selectedTime != null) {
-                              String formattedTime = DateFormat('h:mm a').format(
+                              String formattedTime =
+                                  DateFormat('h:mm a').format(
                                 DateTime(
                                   2020,
                                   1,
@@ -279,7 +275,8 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                             initialTime: TimeOfDay.now(),
                           ).then((selectedTime) {
                             if (selectedTime != null) {
-                              String formattedTime = DateFormat('h:mm a').format(
+                              String formattedTime =
+                                  DateFormat('h:mm a').format(
                                 DateTime(
                                   2020,
                                   1,
@@ -312,47 +309,27 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                             lastDate: DateTime(2101),
                           ).then((selectedDate) {
                             if (selectedDate != null) {
-                              String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+                              String formattedDate =
+                                  DateFormat('yyyy-MM-dd').format(selectedDate);
                               _Datecontroller.text = formattedDate;
                             }
                           });
                         },
                       ),
                       SizedBox(height: 10),
-                      Container(
-                        width: screenWidth * 0.9,
-                        height: screenHeight * 0.075,
-                        child: TextFormField(
-                          controller: _distanceController,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          validator: (input) {
-                            if (input == null || input.isEmpty) {
-                              return 'Please enter approximate distance(in KM)';
-                            }
-                            return null;
-                          },
-                          style: const TextStyle(
-                            color: Color.fromRGBO(143, 150, 158, 1),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'default',
-                          ),
-                          decoration: InputDecoration(
-                            labelText: 'Approx. Distance of the Trip (in KM)',
-                            labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              fontFamily: 'default',
-                            ),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5))),
-                          ),
-                        ),
+                      CustomTextFormField(
+                        controller: _distanceController,
+                        labelText: 'Approx. Distance of the Trip (in KM)',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter approximate distance(in KM)';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                       ),
                       SizedBox(height: 20),
                       Padding(
@@ -416,7 +393,9 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                         ),
                       ),
                       if (tripCatagory == 'Official') ...[
-                        SizedBox(height: 15,),
+                        SizedBox(
+                          height: 15,
+                        ),
                         Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -562,19 +541,27 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
           type: triptype,
           category: tripCatagory);
 
-      TripRequestAPIService().postTripRequest(_tripRequest, _file).then((response) {
+      TripRequestAPIService()
+          .postTripRequest(_tripRequest, _file)
+          .then((response) {
         print('Trip request sent successfully!!');
         print(response);
         if (response != null && response == "Trip request successfully") {
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
                 builder: (context) => StaffDashboardUI(
                       shouldRefresh: true,
                     )),
+            (route) => false,
           );
           const snackBar = SnackBar(
             content: Text('Request Submitted!'),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        } else {
+          final snackBar = SnackBar(
+            content: Text('$response'),
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
@@ -590,7 +577,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
         content: Text('Please fill all required fields'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      return ;
+      return;
     }
   }
 
