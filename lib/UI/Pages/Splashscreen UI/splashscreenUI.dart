@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../../Data/Data Sources/API Service (Profile)/apiserviceprofile.dart';
+import '../../../Data/Models/profilemodel.dart';
+import '../../Bloc/auth_cubit.dart';
+import '../Admin Dashboard/admindashboardUI.dart';
+import '../Driver Dashboard/driverdashboardUI.dart';
 import '../Login UI/loginUI.dart';
+import '../Senior Officer Dashboard/srofficerdashboardUI.dart';
+import '../Staff Dashboard/staffdashboardUI.dart';
 
 /// A [SplashScreenUI] class that provides a splash screen for the Vehicle Log Management App.
 ///
@@ -35,13 +44,165 @@ class _SplashScreenUIState extends State<SplashScreenUI>
     super.initState();
     animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1500));
-    SlideAnimation = Tween(begin: const Offset(0, 3), end: const Offset(0, 0)).animate(
-        CurvedAnimation(parent: animationController, curve: Curves.easeInOutCirc));
-    FadeAnimation = Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(parent: animationController, curve: Curves.easeInOut));
-    animatedpadding = Tween(begin: const Offset(0, 0.3), end:Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.easeIn));
+    SlideAnimation = Tween(begin: const Offset(0, 3), end: const Offset(0, 0))
+        .animate(CurvedAnimation(
+            parent: animationController, curve: Curves.easeInOutCirc));
+    FadeAnimation = Tween(begin: 1.0, end: 0.0).animate(
+        CurvedAnimation(parent: animationController, curve: Curves.easeInOut));
+    animatedpadding = Tween(begin: const Offset(0, 0.3), end: Offset.zero)
+        .animate(
+            CurvedAnimation(parent: animationController, curve: Curves.easeIn));
 
-    Future.delayed(const Duration(seconds: 5), () {
-      animationController.forward();
+    _checkAuthAndNavigate(context);
+  }
+
+  final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+
+// In the SplashScreen widget:
+  Future<void> _checkAuthAndNavigate(BuildContext context) async {
+    final authCubit = context.read<AuthCubit>();
+    print('Auth Invoked');
+    try {
+      // Retrieve the token and user type from secure storage
+      final token = await _secureStorage.read(key: 'auth_token');
+      final userType = await _secureStorage.read(key: 'user_type');
+
+      print(token);
+      print(userType);
+
+      // If token or userType is missing, handle this case appropriately
+      if (token == null ||
+          token.isEmpty ||
+          userType == null ||
+          userType.isEmpty) {
+        print('No token or user type found, staying on current screen');
+        animationController.forward();
+        // You can either show a message, keep the user on the page, or handle differently
+        return; // Stay on the current screen without navigating
+      }
+
+      // If token and userType exist, check if the state is AuthInitial or AuthAuthenticated
+      if (authCubit.state is AuthInitial) {
+        // Proceed with fetching the user profile
+        await _fetchUserProfile(token, userType, context);
+      } else if (authCubit.state is AuthAuthenticated) {
+        // If already authenticated, navigate based on the user type
+        final currentState = authCubit.state as AuthAuthenticated;
+        final userType = currentState.usertype;
+        final userProfile = currentState.userProfile;
+        print('Usertype from State: ' + userType);
+
+        print(
+            'User Profile from State: ${userProfile.name}, ${userProfile.Id}, ${userProfile.photo}');
+        await _fetchUserProfile(token, userType, context);
+        print(
+            'User Profile from State: ${userProfile.name}, ${userProfile.Id}, ${userProfile.photo}');
+        _navigateToAppropriateDashboard(context, userType);
+      }
+    } catch (e) {
+      print('Error while checking authentication: $e');
+      _navigateToLogin(context);
+    }
+  }
+
+  Future<void> _fetchUserProfile(
+      String token, String userType, BuildContext context) async {
+    try {
+      // Fetch user profile from the API
+      final apiService = ProfileAPIService();
+      final profile = await apiService.fetchUserProfile(token);
+
+      // If profile is fetched successfully, create the UserProfile and login
+      final userProfile = UserProfile.fromJson(profile);
+
+      print('Profile Loaded: $userProfile');
+
+      // Log the user in via the AuthCubit
+      context.read<AuthCubit>().login(userProfile, token, userType);
+      print('User successfully logged in with type: $userType');
+
+      // Navigate to the appropriate dashboard after login
+      _navigateToAppropriateDashboard(context, userType);
+    } catch (e) {
+      print('Error fetching user profile: $e');
+      _navigateToLogin(context);
+    }
+  }
+
+  void _navigateToLogin(BuildContext context) {
+    print('Navigating to login');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginUI()),
+    );
+  }
+
+  void _navigateToAppropriateDashboard(BuildContext context, String userType) {
+    print('Navigating to appropriate dashboard based on user type: $userType');
+    if (userType == 'vlm_staff') {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => StaffDashboardUI(shouldRefresh: true)),
+        (route) => false,
+      );
+    } else if (userType == 'vlm_driver') {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DriverDashboardUI(shouldRefresh: true)),
+        (route) => false,
+      );
+    } else if (userType == 'vlm_senior_officer') {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SROfficerDashboardUI(shouldRefresh: true)),
+        (route) => false,
+      );
+    } else if (userType == 'vlm_admin') {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AdminDashboardUI(shouldRefresh: true)),
+        (route) => false,
+      );
+    } else {
+      String errorMessage = 'Invalid User! Please enter a valid email address.';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showTopToast(context, errorMessage);
+      });
+    }
+  }
+
+  void showTopToast(BuildContext context, String message) {
+    OverlayState? overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              message,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlayState?.insert(overlayEntry);
+
+    Future.delayed(Duration(seconds: 3)).then((_) {
+      overlayEntry.remove();
     });
   }
 
@@ -126,11 +287,12 @@ class _SplashScreenUIState extends State<SplashScreenUI>
                                     builder: (context) => const LoginUI()));
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
+                            backgroundColor:
+                                const Color.fromRGBO(25, 192, 122, 1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            fixedSize: Size(screenWidth*0.7, 70),
+                            fixedSize: Size(screenWidth * 0.7, 70),
                           ),
                           child: const Text('Login',
                               textAlign: TextAlign.center,

@@ -23,12 +23,14 @@ class AuthInitial extends AuthState {}
 class AuthAuthenticated extends AuthState {
   final UserProfile userProfile;
   final String token;
+  final String usertype;
 
   const AuthAuthenticated({
     required this.userProfile,
     required this.token,
+    required this.usertype,
   });
 
   @override
-  List<Object> get props => [userProfile, token];
+  List<Object> get props => [userProfile, token, usertype];
 }
