@@ -57,7 +57,7 @@ class _RadioListTileGroupState extends State<RadioListTileGroup> {
         children: widget.options.map((option) {
           return SizedBox(
             height: MediaQuery.of(context).size.height * 0.06,
-            width: MediaQuery.of(context).size.width * 0.45,
+            width: MediaQuery.of(context).size.width * 0.40,
             child: RadioListTile<String>.adaptive(
               title: Text(
                 option,
