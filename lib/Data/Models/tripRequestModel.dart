@@ -28,16 +28,22 @@ class TripRequest {
   String name;
   String designation;
   String department;
-  String purpose;
+  String? purpose;
   String phone;
-  String destinationFrom;
-  String destinationTo;
-  String date;
-  String startTime;
-  String endTime;
-  String distance;
+  String? destinationFrom;
+  String? destinationTo;
+  String? date;
+  String? startTime;
+  String? endTime;
+  String? distance;
   String category;
-  String type;
+  String? type;
+  String? route;
+  String? stoppage;
+  String? startDate;
+  String? endDate;
+  String? fare;
+  String? paymentMode;
 
   TripRequest({
     required this.name,
@@ -53,6 +59,12 @@ class TripRequest {
     required this.distance,
     required this.category,
     required this.type,
+    this.route,
+    this.stoppage,
+    this.startDate,
+    this.endDate,
+    this.fare,
+    this.paymentMode,
   });
 
   factory TripRequest.fromJson(Map<String, dynamic> json) {
@@ -70,6 +82,12 @@ class TripRequest {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
+      route: json['route'],
+      stoppage: json['stoppage'],
+      startDate: json['start_date'],
+      endDate: json['end_date'],
+      fare: json['fare'],
+      paymentMode: json['payment_mode'],
     );
   }
 
@@ -88,6 +106,12 @@ class TripRequest {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
+    data['route'] = this.route;
+    data['stoppage'] = this.stoppage;
+    data['start_date'] = this.startDate;
+    data['end_date'] = this.endDate;
+    data['fare'] = this.fare;
+    data['payment_mode'] = this.paymentMode;
     return data;
   }
 

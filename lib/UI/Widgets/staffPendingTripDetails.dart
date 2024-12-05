@@ -82,14 +82,23 @@ class PendingStaffTrip extends StatelessWidget {
                 _buildRow('Designation', staff.designation),
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
-                _buildRow('Trip Type', staff.type),
-                _buildRowTime('Date', staff.date),
-                _buildRow('Start Time', staff.startTime),
-                _buildRow('End Time', staff.endTime),
-                _buildRow('Distance', '${staff.distance} KM'),
-                _buildRow('Trip Type', staff.category),
-                _buildRow('Destination From', staff.destinationFrom),
-                _buildRow('Destination To', staff.destinationTo),
+                _buildRow('Trip Category', staff.category),
+                if (staff.type != null && staff.type!.isNotEmpty)
+                  _buildRow('Trip Type', staff.type!),
+                if (staff.date != null && staff.date!.isNotEmpty)
+                  _buildRowTime('Date', staff.date!),
+                if (staff.startTime != null && staff.startTime!.isNotEmpty)
+                  _buildRow('Start Time', staff.startTime!),
+                if (staff.endTime != null && staff.endTime!.isNotEmpty)
+                  _buildRow('End Time', staff.endTime!),
+                if (staff.distance != null && staff.distance!.isNotEmpty)
+                  _buildRow('Distance', '${staff.distance} KM'),
+                if (staff.destinationFrom != null &&
+                    staff.destinationFrom!.isNotEmpty)
+                  _buildRow('Destination From', staff.destinationFrom!),
+                if (staff.destinationTo != null &&
+                    staff.destinationTo!.isNotEmpty)
+                  _buildRow('Destination To', staff.destinationTo!),
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(

@@ -1,14 +1,32 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_sslcommerz/model/SSLCAdditionalInitializer.dart';
+import 'package:flutter_sslcommerz/model/SSLCCustomerInfoInitializer.dart';
+import 'package:flutter_sslcommerz/model/SSLCSdkType.dart';
+import 'package:flutter_sslcommerz/model/SSLCommerzInitialization.dart';
+import 'package:flutter_sslcommerz/model/SSLCurrencyType.dart';
+import 'package:flutter_sslcommerz/model/sslproductinitilizer/General.dart';
+import 'package:flutter_sslcommerz/model/sslproductinitilizer/NonPhysicalGoods.dart';
+import 'package:flutter_sslcommerz/model/sslproductinitilizer/SSLCProductInitializer.dart';
+import 'package:flutter_sslcommerz/sslcommerz.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:vehicle_log_management/UI/Pages/Trip%20Request%20Form(Staff)/paymentConfirmation.dart';
 import 'package:vehicle_log_management/UI/Widgets/labelText.dart';
 import 'package:vehicle_log_management/UI/Widgets/labelTextTemplate.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Payment Gateway)/apiServicePaymentGateway.dart';
 import '../../../Data/Data Sources/API Service (Trip Request)/apiServiceTripRequest.dart';
 import '../../../Data/Models/tripRequestModel.dart';
+import '../../Bloc/auth_email_cubit.dart';
 import '../../Widgets/CustomTextField.dart';
+import '../../Widgets/DateRange.dart';
 import '../../Widgets/radiooption.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
 
@@ -58,15 +76,23 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
   late TextEditingController _departmentController = TextEditingController();
   late TextEditingController _purposeController = TextEditingController();
   late TextEditingController _phoneController = TextEditingController();
+  late TextEditingController _fareController = TextEditingController();
   late TextEditingController _destinationfromController =
       TextEditingController();
   late TextEditingController _destinationtoController = TextEditingController();
   late String triptype = '';
+  late String paymentMethod = '';
   late String tripCatagory = '';
   late TripRequest _tripRequest;
   late DateTime? Date;
   File? _file;
+  File? _challanfile;
   bool _isbuttonclicked = false;
+  String? startMonth;
+  int? startYear;
+  String? endMonth;
+  int? endYear;
+  double totalFare = 0;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
@@ -149,236 +175,12 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                           )),
                     ),
                     SizedBox(height: 20),
-                    Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            LabeledTextWithAsterisk(text: 'Full Name'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _nameController,
-                              labelText: 'Full Name',
-                              validator: (input) {
-                                if (input == null || input.isEmpty) {
-                                  return 'Please enter your name';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(text: 'Designation'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _desinationController,
-                              labelText: 'Designation',
-                              validator: (input) {
-                                if (input == null || input.isEmpty) {
-                                  return 'Please enter your designation';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(text: 'Department'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _departmentController,
-                              labelText: 'Department',
-                              validator: (input) {
-                                if (input == null || input.isEmpty) {
-                                  return 'Please enter the department you are affiliated with';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(
-                                text: 'Trip Purpose and Trip Details'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _purposeController,
-                              labelText: 'Purpose and Trip details',
-                              validator: (input) {
-                                if (input == null || input.isEmpty) {
-                                  return 'Please enter the purpose of your trip and trip details';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(text: 'Mobile Number'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _phoneController,
-                              labelText: 'Mobile Number',
-                              keyboardType: TextInputType.phone,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(11),
-                              ],
-                              validator: (input) {
-                                if (input == null || input.isEmpty) {
-                                  return 'Please enter your mobile number';
-                                }
-                                if (input.length != 11) {
-                                  return 'Mobile number must be 11 digits';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(text: 'Trip Pick up'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _destinationfromController,
-                              labelText: 'Destination From',
-                              validator: (input) {
-                                if (input == null || input.isEmpty) {
-                                  return 'Please enter where the trip will start';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(text: 'Trip Destination'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _destinationtoController,
-                              labelText: 'Destination To',
-                              validator: (input) {
-                                if (input == null || input.isEmpty) {
-                                  return 'Please enter the destination of the trip';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(text: 'Trip Start Time'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _StartTimecontroller,
-                              labelText: 'Start Trip Time',
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please select the start time';
-                                }
-                                return null;
-                              },
-                              onTap: () {
-                                showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                ).then((selectedTime) {
-                                  if (selectedTime != null) {
-                                    String formattedTime =
-                                        DateFormat('h:mm a').format(
-                                      DateTime(
-                                        2020,
-                                        1,
-                                        1,
-                                        selectedTime.hour,
-                                        selectedTime.minute,
-                                      ),
-                                    );
-                                    _StartTimecontroller.text = formattedTime;
-                                  }
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(text: 'Trip Stop Time'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _EndTimecontroller,
-                              labelText: 'Stop Trip Time',
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please select the end time';
-                                }
-                                return null;
-                              },
-                              onTap: () {
-                                showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.now(),
-                                ).then((selectedTime) {
-                                  if (selectedTime != null) {
-                                    String formattedTime =
-                                        DateFormat('h:mm a').format(
-                                      DateTime(
-                                        2020,
-                                        1,
-                                        1,
-                                        selectedTime.hour,
-                                        selectedTime.minute,
-                                      ),
-                                    );
-                                    _EndTimecontroller.text = formattedTime;
-                                  }
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            LabeledTextWithAsterisk(text: 'Trip Date'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _Datecontroller,
-                              labelText: 'Trip Date',
-                              readOnly: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please select a date';
-                                }
-                                return null;
-                              },
-                              onTap: () {
-                                showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2101),
-                                ).then((selectedDate) {
-                                  if (selectedDate != null) {
-                                    String formattedDate =
-                                        DateFormat('yyyy-MM-dd')
-                                            .format(selectedDate);
-                                    _Datecontroller.text = formattedDate;
-                                  }
-                                });
-                              },
-                            ),
-                            SizedBox(height: 10),
-                            LabeledTextWithAsterisk(
-                                text: 'Approx. Distance of the Trip (in KM)'),
-                            SizedBox(height: 5),
-                            CustomTextFormField(
-                              controller: _distanceController,
-                              labelText:
-                                  'Approx. Distance of the Trip (in KM)',
-                              validator: (input) {
-                                if (input == null || input.isEmpty) {
-                                  return 'Please enter approximate distance(in KM)';
-                                }
-                                return null;
-                              },
-                              keyboardType: TextInputType.phone,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                            ),
-                          ],
-                        )),
-                    SizedBox(height: 20),
                     LabeledTextWithAsterisk(text: 'Trip Type'),
                     SizedBox(height: 5),
                     Padding(
                       padding: EdgeInsets.only(left: 30),
                       child: RadioListTileGroup(
-                        options: ['Personal', 'Official'],
+                        options: ['Personal', 'Official', 'Pick-Drop'],
                         selectedOption: tripCatagory,
                         onChanged: (String value) {
                           print('Selected option: $value');
@@ -390,19 +192,244 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                       ),
                     ),
                     SizedBox(height: 5),
-                    LabeledTextWithAsterisk(text: 'Trip Mode'),
-                    SizedBox(height: 5),
-                    Padding(
-                      padding: EdgeInsets.only(left: 30),
-                      child: RadioListTileGroup(
-                        options: ['One-Way', 'Round-Trip'],
-                        selectedOption: triptype,
-                        onChanged: (String value) {
-                          print('Selected option: $value');
-                          triptype = value;
-                        },
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          LabeledTextWithAsterisk(text: 'Full Name'),
+                          SizedBox(height: 5),
+                          CustomTextFormField(
+                            controller: _nameController,
+                            labelText: 'Full Name',
+                            validator: (input) {
+                              if (input == null || input.isEmpty) {
+                                return 'Please enter your name';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          LabeledTextWithAsterisk(text: 'Designation'),
+                          SizedBox(height: 5),
+                          CustomTextFormField(
+                            controller: _desinationController,
+                            labelText: 'Designation',
+                            validator: (input) {
+                              if (input == null || input.isEmpty) {
+                                return 'Please enter your designation';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          LabeledTextWithAsterisk(text: 'Department'),
+                          SizedBox(height: 5),
+                          CustomTextFormField(
+                            controller: _departmentController,
+                            labelText: 'Department',
+                            validator: (input) {
+                              if (input == null || input.isEmpty) {
+                                return 'Please enter the department you are affiliated with';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          LabeledTextWithAsterisk(text: 'Mobile Number'),
+                          SizedBox(height: 5),
+                          CustomTextFormField(
+                            controller: _phoneController,
+                            labelText: 'Mobile Number',
+                            keyboardType: TextInputType.phone,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(11),
+                            ],
+                            validator: (input) {
+                              if (input == null || input.isEmpty) {
+                                return 'Please enter your mobile number';
+                              }
+                              if (input.length != 11) {
+                                return 'Mobile number must be 11 digits';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                        ],
                       ),
                     ),
+                    if (tripCatagory != 'Pick-Drop') ...[
+                      LabeledTextWithAsterisk(
+                          text: 'Trip Purpose and Trip Details'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _purposeController,
+                        labelText: 'Purpose and Trip details',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter the purpose of your trip and trip details';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Trip Pick up'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _destinationfromController,
+                        labelText: 'Destination From',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter where the trip will start';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Trip Destination'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _destinationtoController,
+                        labelText: 'Destination To',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter the destination of the trip';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Trip Start Time'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _StartTimecontroller,
+                        labelText: 'Start Trip Time',
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select the start time';
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          ).then((selectedTime) {
+                            if (selectedTime != null) {
+                              String formattedTime =
+                                  DateFormat('h:mm a').format(
+                                DateTime(
+                                  2020,
+                                  1,
+                                  1,
+                                  selectedTime.hour,
+                                  selectedTime.minute,
+                                ),
+                              );
+                              _StartTimecontroller.text = formattedTime;
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Trip Stop Time'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _EndTimecontroller,
+                        labelText: 'Stop Trip Time',
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select the end time';
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          ).then((selectedTime) {
+                            if (selectedTime != null) {
+                              String formattedTime =
+                                  DateFormat('h:mm a').format(
+                                DateTime(
+                                  2020,
+                                  1,
+                                  1,
+                                  selectedTime.hour,
+                                  selectedTime.minute,
+                                ),
+                              );
+                              _EndTimecontroller.text = formattedTime;
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Trip Date'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _Datecontroller,
+                        labelText: 'Trip Date',
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select a date';
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2101),
+                          ).then((selectedDate) {
+                            if (selectedDate != null) {
+                              String formattedDate =
+                                  DateFormat('yyyy-MM-dd').format(selectedDate);
+                              _Datecontroller.text = formattedDate;
+                            }
+                          });
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      LabeledTextWithAsterisk(
+                          text: 'Approx. Distance of the Trip (in KM)'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _distanceController,
+                        labelText: 'Approx. Distance of the Trip (in KM)',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter approximate distance(in KM)';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      LabeledTextWithAsterisk(text: 'Trip Mode'),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: EdgeInsets.only(left: 30),
+                        child: RadioListTileGroup(
+                          options: ['One-Way', 'Round-Trip'],
+                          selectedOption: triptype,
+                          onChanged: (String value) {
+                            print('Selected option: $value');
+                            triptype = value;
+                          },
+                        ),
+                      ),
+                    ],
                     if (tripCatagory == 'Official') ...[
                       SizedBox(
                         height: 15,
@@ -462,6 +489,142 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                         ),
                       ),
                     ],
+                    if (tripCatagory == 'Pick-Drop') ...[
+                      LabeledTextWithAsterisk(text: 'Route'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _desinationController,
+                        labelText: 'Designation',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter your designation';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Stoppage'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _desinationController,
+                        labelText: 'Designation',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter your designation';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Select Date'),
+                      SizedBox(height: 5),
+                      DateRangeWithFareWidget(
+                        farePerMonth: 5.0,
+                        onDateChange: (String? startM, int? startY,
+                            String? endM, int? endY, double fare) {
+                          setState(() {
+                            startMonth = startM;
+                            startYear = startY;
+                            endMonth = endM;
+                            endYear = endY;
+                            totalFare = fare;
+                            _fareController.text = '${totalFare.toString()} TK';
+                            print('Start Month: $startMonth, Start Year: $startYear, End Month: $endMonth, End Year: $endYear, Total Fare: $totalFare');
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Fare'),
+                      SizedBox(height: 5),
+                      CustomTextFormField(
+                        controller: _fareController,
+                        labelText: 'Total Fare',
+                        validator: (input) {
+                          if (input == null || input.isEmpty) {
+                            return 'Please enter your designation';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      LabeledTextWithAsterisk(text: 'Payment Mode'),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: EdgeInsets.only(left: 30),
+                        child: RadioListTileGroup(
+                          options: ['Online', 'Offline'],
+                          selectedOption: paymentMethod,
+                          onChanged: (String value) {
+                            setState(() {
+                              print(
+                                  'Selected Payment option: $value and Trip Category: $tripCatagory');
+                              paymentMethod = value;
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      if (/*tripCatagory == 'Pick-Drop' &&*/ paymentMethod ==
+                          'Offline') ...[
+                        LabeledTextWithAsterisk(
+                            text: 'Upload Necessary Document'),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromRGBO(25, 192, 122, 1),
+                                    fixedSize: Size(
+                                        MediaQuery.of(context).size.width * 0.8,
+                                        MediaQuery.of(context).size.height *
+                                            0.075),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                  onPressed: _pickChallanFile,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (_challanfile == null) ...[
+                                        Icon(
+                                          Icons.document_scanner,
+                                          color: Colors.white,
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text('Upload File',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'default',
+                                            )),
+                                      ],
+                                      if (_challanfile != null) ...[
+                                        Text('File Picked',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'default',
+                                            )),
+                                      ]
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                     SizedBox(height: 20),
                     Center(
                       child: ElevatedButton(
@@ -475,9 +638,11 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () {
-                          _tripRequestForm();
-                        },
+                        onPressed: tripCatagory != ''
+                            ? () {
+                                _tripRequestForm();
+                              }
+                            : null,
                         child: _isbuttonclicked
                             ? CircularProgressIndicator()
                             : Text('Submit',
@@ -509,6 +674,25 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
       if (result != null) {
         setState(() {
           _file = File(result.files.single.path!);
+        });
+      } else {
+        const snackBar = SnackBar(
+          content: Text('File is not available'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    } catch (e) {
+      print('Error picking file: $e');
+    }
+  }
+
+  Future<void> _pickChallanFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+      if (result != null) {
+        setState(() {
+          _challanfile = File(result.files.single.path!);
         });
       } else {
         const snackBar = SnackBar(
@@ -560,8 +744,15 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
           type: triptype,
           category: tripCatagory);
 
+      File? file;
+      if (tripCatagory != 'Pick-Drop') {
+        file = _file;
+      } else if (tripCatagory == 'Pick-Drop') {
+        file = _challanfile;
+      }
+
       TripRequestAPIService()
-          .postTripRequest(_tripRequest, _file)
+          .postTripRequest(_tripRequest, file)
           .then((response) {
         setState(() {
           _isbuttonclicked = false;
@@ -569,18 +760,43 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
         print('Trip request sent successfully!!');
         print(response);
         if (response != null && response == "Trip request successfully") {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-                builder: (context) => StaffDashboardUI(
-                      shouldRefresh: true,
-                    )),
-            (route) => false,
-          );
-          const snackBar = SnackBar(
-            content: Text('Request Submitted!'),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          if (tripCatagory != 'Pick-Drop') {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => StaffDashboardUI(
+                        shouldRefresh: true,
+                      )),
+              (route) => false,
+            );
+            const snackBar = SnackBar(
+              content: Text('Request Submitted!'),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
+          if (tripCatagory == 'Pick-Drop') {
+            if (triptype == 'Online') {
+              final email =
+                  (context.read<AuthEmailCubit>().state as AuthEmailSaved)
+                      .email;
+              print('Retrieved email from Cubit: $email');
+              startPayment(context, _nameController.text, email,
+                  _phoneController.text, ', Dhaka');
+            } else if (triptype == 'Offline') {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => StaffDashboardUI(
+                          shouldRefresh: true,
+                        )),
+                (route) => false,
+              );
+              const snackBar = SnackBar(
+                content: Text('Request Submitted!'),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
+          }
         } else {
           final snackBar = SnackBar(
             content: Text('$response'),
@@ -622,22 +838,258 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
       final TripTypeIsValid = triptype.isNotEmpty;
       final DateIsValid = _Datecontroller.text.isNotEmpty;
 
-      final allFieldsAreValid = NameIsValid &&
-          DesignationIsValid &&
-          DepartmentIsValid &&
-          PurposeIsValid &&
-          PhoneIsValid &&
-          DestinationFromIsValid &&
-          DestinationToIsValid &&
-          TripStartTimeIsValid &&
-          TripEndTimeIsValid &&
-          DistanceIsValid &&
-          TripCategoryIsValid &&
-          TripTypeIsValid &&
-          DateIsValid;
-      return allFieldsAreValid;
+      if (tripCatagory == 'Pick-Drop') {
+        bool FileisValid = _file != null;
+        final allFieldsAreValid = NameIsValid &&
+            DesignationIsValid &&
+            DepartmentIsValid &&
+            PurposeIsValid &&
+            PhoneIsValid &&
+            DestinationFromIsValid &&
+            DestinationToIsValid &&
+            TripStartTimeIsValid &&
+            TripEndTimeIsValid &&
+            DistanceIsValid &&
+            TripCategoryIsValid &&
+            TripTypeIsValid &&
+            DateIsValid &&
+            FileisValid;
+        return allFieldsAreValid;
+      } else {
+        final allFieldsAreValid = NameIsValid &&
+            DesignationIsValid &&
+            DepartmentIsValid &&
+            PurposeIsValid &&
+            PhoneIsValid &&
+            DestinationFromIsValid &&
+            DestinationToIsValid &&
+            TripStartTimeIsValid &&
+            TripEndTimeIsValid &&
+            DistanceIsValid &&
+            TripCategoryIsValid &&
+            TripTypeIsValid &&
+            DateIsValid;
+        return allFieldsAreValid;
+      }
     } else {
       return false;
+    }
+  }
+
+  static const String storeId = "registrationbditecgovbdlive";
+  static const String storePassword = "65A78606493BB44737";
+
+/*  static const String storeId = "mrtou66baeda11df08";
+  static const String storePassword = "mrtou66baeda11df08@ssl";*/
+  static const String apiUrl =
+      "https://sandbox.sslcommerz.com/gwprocess/v3/api.php";
+  static const String requestedUrl =
+      "https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php?val_id=\$val_id&store_id=\$store_id&store_passwd=\$store_passwd&v=1&format=json";
+
+  void startPayment(BuildContext context, String Name, String Email,
+      String Mobile, String Address) async {
+    String tranId = generateTransactionId();
+
+    Sslcommerz sslcommerz = await Sslcommerz(
+      initializer: SSLCommerzInitialization(
+        ipn_url: "",
+        multi_card_name: "visa,master,bkash,nagad,rocket",
+        currency: SSLCurrencyType.BDT,
+        product_category: "Exam Registration Fee",
+        sdkType: SSLCSdkType.LIVE,
+        store_id: storeId,
+        store_passwd: storePassword,
+        total_amount: totalFare,
+        tran_id: tranId,
+      ),
+    )
+      ..addCustomerInfoInitializer(
+        customerInfoInitializer: SSLCCustomerInfoInitializer(
+          customerState: "Unknown",
+          customerName: Name,
+          customerEmail: Email,
+          customerAddress1: Address,
+          customerAddress2: "N/A",
+          customerCity: "Unknown",
+          customerPostCode: "Unknown",
+          customerCountry: "Bangladesh",
+          customerPhone: Mobile,
+          customerFax: 'N/A',
+        ),
+      )
+      ..addProductInitializer(
+        sslcProductInitializer: SSLCProductInitializer(
+          productName: "ICT Division Pick-Drop Fare Payment",
+          productCategory: "Fare",
+          general: General(
+            productProfile: "ICT Division Pick-Drop Fare Payment",
+            general: "Fare",
+          ),
+        ),
+      )
+      ..addProductInitializer(
+          sslcProductInitializer:
+              SSLCProductInitializer.WithNonPhysicalGoodsProfile(
+                  productName: "ICT Division Pick-Drop Fare Payment",
+                  productCategory: "Fare",
+                  nonPhysicalGoods: NonPhysicalGoods(
+                    productProfile: "ICT Division Pick-Drop Fare Payment",
+                    nonPhysicalGoods: "Fare",
+                  )))
+      ..addAdditionalInitializer(
+        sslcAdditionalInitializer: SSLCAdditionalInitializer(
+          valueA: "N/A",
+          valueB: "N/A",
+          valueC: "N/A",
+          valueD: "N/A",
+          campaign_code: 'N/A',
+          invoice_id: 'N/A',
+          bill_number: 'N/A',
+          no_offer: 0,
+          user_refer: 'N/A',
+          extras: {
+            'extraInfo': 'N/A',
+          },
+        ),
+      );
+
+    try {
+      var result = await sslcommerz.payNow();
+      print("result :: ${jsonEncode(result)}");
+      print("result status :: ${result.status ?? ""}");
+      print(
+          "Transaction is ${result.status} and Amount is ${result.amount ?? 0}");
+
+      var jsonData = result.toJson();
+      String transactionId = jsonData['tran_id'] ?? 'N/A';
+      String transactionDate = jsonData['tran_date'] ?? 'N/A';
+      String transactionType = jsonData['card_type'] ?? 'N/A';
+
+      if (result.status!.toLowerCase() == "failed") {
+        Fluttertoast.showToast(
+          msg: "Transaction is Failed....",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      } else if (result.status!.toLowerCase() == "closed") {
+        Fluttertoast.showToast(
+          msg: "SDK Closed by User",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      } else {
+        await submitTransaction(
+                transactionId, transactionDate, transactionType, totalFare)
+            .then((_) {
+          Fluttertoast.showToast(
+            msg:
+                "Transaction is ${result.status} and Amount is ${result.amount ?? 0}",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => PaymentConfirmationUI()),
+              (route) => false);
+        });
+
+        if (result.status!.toLowerCase() == "valid") {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Payment successful!'),
+          ));
+        }
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Payment error: $e'),
+      ));
+    }
+  }
+
+  String generateTransactionId() {
+    const String chars = '0123456789';
+    final Random random = Random();
+    String randomId = '';
+
+    for (int i = 0; i < 10; i++) {
+      randomId += chars[random.nextInt(chars.length)];
+    }
+
+    String date = DateFormat('yyMMdd').format(DateTime.now());
+    String transactionId = 'ICTVLM$date$randomId';
+
+    print(transactionId);
+    return transactionId;
+  }
+
+  bool _isSubmit = false;
+  bool _isLoading = false;
+
+  Future<void> submitTransaction(
+      String TransID, String TransDate, String TransType, double Amount) async {
+    _isSubmit = false;
+    if (_isSubmit) return;
+    try {
+      final apiService = await SubmitTransactionAPIService.create();
+
+      final Map<String, dynamic>? dashboardData =
+          await apiService.submitTransaction(
+              transactionId: TransID,
+              transactionDate: TransDate,
+              transactionType: TransType,
+              transactionAmount: Amount);
+      if (dashboardData == null || dashboardData.isEmpty) {
+        print(
+            'No data available or error occurred while fetching dashboard data');
+        return;
+      }
+      print(dashboardData);
+
+      final String message = dashboardData['message'];
+      if (message == 'Transaction data save successfully') {
+        print('Transaction data save successfully');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Transaction Completed'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        return;
+      } else if (message == 'Transaction data save error') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Transaction is not Completed'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else if (message == 'Trip is not found') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Trip is not found'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+
+      setState(() {
+        _isSubmit = true;
+      });
+    } catch (e) {
+      print('Error fetching connection requests: $e');
+      _isSubmit = true;
     }
   }
 }

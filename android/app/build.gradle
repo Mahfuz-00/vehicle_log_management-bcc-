@@ -78,7 +78,7 @@ android {
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
                     //outputFileName = "npo-final-v${versionCode}($versionName).apk"
-                    outputFileName = "vehicle-management-app-v${variant.versionCode}.${variant.versionName}.apk"
+                    outputFileName = "ict-division-vehicle-management-app-v${variant.versionCode}.${variant.versionName}.apk"
                 }
             }
         }

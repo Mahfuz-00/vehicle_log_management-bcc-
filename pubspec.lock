@@ -366,6 +366,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  flutter_sslcommerz:
+    dependency: "direct main"
+    description:
+      name: flutter_sslcommerz
+      sha256: "687f267ba34a579cdc96cbb286a5a1e030cb08d6b49e3d7771fd0186ab9da8b2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.6"
   flutter_test:
     dependency: "direct dev"
     description: flutter

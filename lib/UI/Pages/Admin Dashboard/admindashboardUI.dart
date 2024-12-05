@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/availabledriverlistfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/ongoingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/pendingtriprequestfull.dart';
+import 'package:vehicle_log_management/UI/Pages/Advance%20Search%20Report/searchReport.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
@@ -384,7 +385,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                 final userProfile = state.userProfile;
                 return InternetConnectionChecker(
                   child: PopScope(
-               /*  canPop: false,*/
+                    /*  canPop: false,*/
                     child: Scaffold(
                       key: _scaffoldKey,
                       appBar: AppBar(
@@ -442,6 +443,15 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                 ),
                             ],
                           ),
+                          IconButton(
+                            onPressed: () {
+                              _showLogoutDialog(context);
+                            },
+                            icon: const Icon(
+                              Icons.logout,
+                              color: Colors.white,
+                            ),
+                          ),
                         ],
                       ),
                       body: SingleChildScrollView(
@@ -486,7 +496,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                     pagination: canFetchMoreDrivers,
                                   ),
                                   SizedBox(height: screenHeight * 0.025),
-                                  Text('New Trip',
+                                  Text('New Trips',
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
@@ -511,7 +521,31 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                     pagination: canFetchMorePending,
                                   ),
                                   SizedBox(height: screenHeight * 0.025),
-                                  Text('Ongoing Trip',
+                                  Text('Ongoing Trips',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 30,
+                                        fontFamily: 'default',
+                                      )),
+                                  SizedBox(height: screenHeight * 0.01),
+                                  RequestsWidget(
+                                    loading: _isLoading,
+                                    fetch: _isFetched,
+                                    errorText: 'No trip onging.',
+                                    listWidget: acceptedRequests,
+                                    fetchData: fetchConnectionRequests(),
+                                    numberOfWidgets: 5,
+                                    showSeeAllButton: (shouldShowSeeAllButton(
+                                        acceptedRequests)),
+                                    seeAllButtonText: 'See All Ongoing Trips',
+                                    nextView: AdminDashboardOngoingTripsUI(
+                                      shouldRefresh: true,
+                                    ),
+                                    pagination: canFetchMoreAccepted,
+                                  ),
+                                  SizedBox(height: screenHeight * 0.025),
+                                  Text('Pick-Drop Trips',
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
@@ -633,7 +667,12 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                             GestureDetector(
                               behavior: HitTestBehavior.translucent,
                               onTap: () {
-                                _showLogoutDialog(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AdvancedSearchUI(
+                                            /*   shouldRefresh: true,*/
+                                            )));
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -649,7 +688,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     const Icon(
-                                      Icons.logout,
+                                      Icons.search,
                                       size: 30,
                                       color: Colors.white,
                                     ),
@@ -657,7 +696,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                       height: 5,
                                     ),
                                     Text(
-                                      'Logout',
+                                      'Search',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
@@ -817,11 +856,8 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  LoginUI()));
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

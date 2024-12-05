@@ -6,6 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:rename_app/rename_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'UI/Bloc/auth_cubit.dart';
+import 'UI/Bloc/auth_email_cubit.dart';
 import 'UI/Bloc/email_cubit.dart';
 import 'UI/Pages/Splashscreen UI/splashscreenUI.dart';
 
@@ -69,10 +70,11 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => EmailCubit()),
+        BlocProvider(create: (context) => AuthEmailCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'BCC Vehicle Management App',
+        title: 'ICT Division Vehicle Management App',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
               seedColor: Color.fromRGBO(25, 192, 122, 1)),

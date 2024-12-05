@@ -28,8 +28,11 @@ class StaffTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime parsedDate = DateTime.parse(staff.date);
-    String formattedDate = dateFormat.format(parsedDate);
+    String formattedDate = '';
+    if (staff.date != null && staff.date!.isNotEmpty) {
+      DateTime parsedDate = DateTime.parse(staff.date!);  // Use the non-nullable string
+      formattedDate = dateFormat.format(parsedDate); // Format the date
+    }
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Column(

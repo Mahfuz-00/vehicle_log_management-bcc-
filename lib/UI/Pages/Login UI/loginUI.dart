@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:footer/footer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vehicle_log_management/UI/Pages/Login%20UI/OTPConfirmation.dart';
 
 import '../../../Data/Data Sources/API Service (Login)/apiservicelogin.dart';
 import '../../../Data/Data Sources/API Service (Profile)/apiserviceprofile.dart';
 import '../../../Data/Models/loginmodels.dart';
 import '../../../Data/Models/profilemodel.dart';
 import '../../Bloc/auth_cubit.dart';
+import '../../Bloc/auth_email_cubit.dart';
 import '../Admin Dashboard/admindashboardUI.dart';
 import '../Driver Dashboard/driverdashboardUI.dart';
 import '../Forgot Password UI/forgotpasswordUI.dart';
@@ -342,7 +344,7 @@ class _LoginUIState extends State<LoginUI> {
                   ),
                 ),
                 //SizedBox(height: 20),
-                /*  Footer(
+                  Footer(
                   backgroundColor: const Color.fromRGBO(246, 246, 246, 255),
                   alignment: Alignment.bottomCenter,
                   padding: const EdgeInsets.all(20.0),
@@ -353,7 +355,7 @@ class _LoginUIState extends State<LoginUI> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            'Don\'t have an account?  ',
+                            'Want to Login with OTP?  ',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Color.fromRGBO(143, 150, 158, 1),
@@ -367,10 +369,10 @@ class _LoginUIState extends State<LoginUI> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const Signup()));
+                                      builder: (context) => const LoginOPTVerficationUI()));
                             },
                             child: const Text(
-                              'Register now',
+                              'OTP Login',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Color.fromRGBO(25, 192, 122, 1),
@@ -384,7 +386,7 @@ class _LoginUIState extends State<LoginUI> {
                       ),
                     ],
                   ),
-                ),*/
+                ),
               ],
             ),
           ),
@@ -410,6 +412,9 @@ class _LoginUIState extends State<LoginUI> {
           userType = response.userType;
           print('UserType :: $userType');
           _fetchUserProfile(response.token);
+          String email = _emailController.text;
+          final emailauthCubit = context.read<AuthEmailCubit>();
+          emailauthCubit.saveAuthEmail(email);
           return true;
         } else {
           showTopToast(context, 'Email or password is not valid.');
