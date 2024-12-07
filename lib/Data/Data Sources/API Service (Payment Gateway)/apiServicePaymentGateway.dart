@@ -57,10 +57,11 @@ class SubmitTransactionAPIService {
           'Authorization': 'Bearer $authToken',
         },
         body: {
+          'trip_id' : '',
           'transaction_id': transactionId,
           'transaction_date': transactionDate,
           'transaction_type': transactionType,
-          'amount': transactionAmount,
+          'transaction_amount': transactionAmount,
         },
       );
       print(response.request);
