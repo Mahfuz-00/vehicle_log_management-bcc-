@@ -79,7 +79,7 @@ class ApprovedStaffTrip extends StatelessWidget {
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
                 _buildRow('Trip Type', staff.type),
-                _buildRowTime('Date', staff.date),
+                _buildRow('Date', staff.date),
                 _buildRow('Start Time', staff.startTime),
                 _buildRow('End Time', staff.endTime),
                 _buildRow('Distance', '${staff.distance} KM'),
@@ -120,7 +120,59 @@ class ApprovedStaffTrip extends StatelessWidget {
     );
   }
 
-  Widget _buildRowTime(String label, String value) {
+  Widget _buildRowTime(String label, dynamic value) {
+
+    // Check if the value is null, empty, or "None"
+    if (value == null || value.isEmpty || value == 'None') {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: label,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      height: 1.6,
+                      letterSpacing: 1.3,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'default',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              ":",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              "No Date", // Display "No Date" if value is null
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                height: 1.6,
+                letterSpacing: 1.3,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'default',
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
 
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);

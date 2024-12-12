@@ -53,6 +53,11 @@ dependencies:
   package_info_plus: ^5.0.1
   flutter_secure_storage:
   flutter_sslcommerz: ^2.3.6
+  in_app_update:
+  printing: ^5.12.0
+  path_provider:
+  open_file:
+  permission_handler:
 
 dev_dependencies:
   flutter_test:

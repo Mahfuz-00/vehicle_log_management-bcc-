@@ -18,6 +18,7 @@ import '../../Widgets/StaffApprovedTripDetails.dart';
 import '../../Widgets/requestWidget.dart';
 import '../../Widgets/staffPendingTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import '../Trip Request Form(Staff)/triprequestformUI.dart';
@@ -192,7 +193,11 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type']),
+              type: request['trip_type'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],),
           onPressed: () {
             Navigator.push(
               context,
@@ -211,7 +216,8 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                       endTime: request['end_time'],
                       distance: request['approx_distance'],
                       category: request['trip_category'],
-                      type: request['trip_type']),
+                      type: request['trip_type'],
+                  ),
                 ),
               ),
             );
@@ -234,7 +240,11 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type']),
+              type: request['trip_type'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],),
           onPressed: () {
             Navigator.push(
               context,
@@ -280,7 +290,11 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type']),
+              type: request['trip_type'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],),
           onPressed: () {
             Navigator.push(
               context,
@@ -310,7 +324,6 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
           },
         );
       }).toList();
-
       setState(() {
         pendingRequests = pendingWidgets;
         acceptedRequests = acceptedWidgets;
@@ -446,6 +459,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                                     Center(
                                       child:
                                           Text('Welcome, ${userProfile.name}',
+                                              textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.bold,
@@ -860,7 +874,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI()));
+                                  LoginwithEmailUI()));
                     }
                   },
                   child: Text(

@@ -2,10 +2,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:footer/footer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Forgot Password)/apiServiceForgotPassword.dart';
 import '../../../Data/Data Sources/API Service (Forgot Password)/apiServiceOTPVerification.dart';
+import '../../../Data/Data Sources/API Service (Login With OTP)/apiserviceEmailOtp.dart';
+import '../../../Data/Data Sources/API Service (Login With OTP)/apiserviceOtpLogin.dart';
+import '../../../Data/Data Sources/API Service (Profile)/apiserviceprofile.dart';
+import '../../../Data/Models/profilemodel.dart';
+import '../../Bloc/auth_cubit.dart';
 import '../../Bloc/email_cubit.dart';
+import '../../Widgets/CustomBoxContainer.dart';
 import '../../Widgets/forgotpasswordotpbox.dart';
 import '../Admin Dashboard/admindashboardUI.dart';
 import '../Driver Dashboard/driverdashboardUI.dart';
@@ -44,13 +51,15 @@ class LoginOPTVerficationUI extends StatefulWidget {
 class _LoginOPTVerficationUIState extends State<LoginOPTVerficationUI> {
   bool _isLoading = true;
   bool _pageloading = false;
+  late AuthCubit authCubit;
   final List<TextEditingController> _controllers =
-  List.generate(4, (index) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
+  List.generate(8, (index) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(8, (index) => FocusNode());
 
   @override
   void initState() {
     super.initState();
+    authCubit = context.read<AuthCubit>();
     Future.delayed(Duration(seconds: 3), () {
       setState(() {
         _isLoading = false;
@@ -61,9 +70,9 @@ class _LoginOPTVerficationUIState extends State<LoginOPTVerficationUI> {
   late String userType;
 
   Future<void> _sendCode(String email) async {
-    final apiService = await ForgotPasswordAPIService();
+    final apiService = await LoginWithEmailAPIService();
     apiService.sendForgotPasswordOTP(email).then((response) {
-      if (response == 'Forget password otp send successfully') {
+      if (response == 'Login otp send successfully') {
         const snackBar = SnackBar(
           content: Text('Code Sent to your Email.'),
         );
@@ -83,13 +92,62 @@ class _LoginOPTVerficationUIState extends State<LoginOPTVerficationUI> {
     });
   }
 
+  // Function to parse the response string and separate the data.
+  Map<String, String> parseResponse(String response) {
+    // Initialize an empty map to store the extracted data.
+    Map<String, String> data = {};
+
+    // Use regular expressions or string splitting to extract values.
+    final messageRegExp = RegExp(r'Message:\s*(.*?),');
+    final userTypeRegExp = RegExp(r'User Type:\s*(.*?),');
+    final tokenRegExp = RegExp(r'Token:\s*(.*)');
+
+    // Match the values using regular expressions.
+    final messageMatch = messageRegExp.firstMatch(response);
+    final userTypeMatch = userTypeRegExp.firstMatch(response);
+    final tokenMatch = tokenRegExp.firstMatch(response);
+
+    // Store the extracted data in the map.
+    if (messageMatch != null) {
+      data['Message'] = messageMatch.group(1) ?? 'Unknown';
+    }
+    if (userTypeMatch != null) {
+      data['User Type'] = userTypeMatch.group(1) ?? 'Unknown';
+    }
+    if (tokenMatch != null) {
+      data['Token'] = tokenMatch.group(1) ?? 'Unknown';
+    }
+
+    return data;
+  }
+
   Future<void> _sendOTP(String email, String OTP) async {
     setState(() {
       _pageloading = true;
     });
-    final apiService = await OTPVerificationAPIService.create();
-    apiService.OTPVerification(email, OTP).then((response) {
-      if (response == 'Otp Verified Successfully') {
+    final apiService = await OTPLoginAPIService.create();
+    apiService.OTPVerification(email, OTP).then((response) async {
+
+      // Process the response string to separate the data.
+      Map<String, String> extractedData = parseResponse(response);
+
+      // Access individual values.
+      String message = extractedData['Message'] ?? 'No Message';
+      String userType = extractedData['User Type'] ?? 'No User Type';
+      String token = extractedData['Token'] ?? 'No Token';
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', token);
+      print(prefs.getString('token'));
+
+      _fetchUserProfile(token, userType);
+      // Print the extracted values.
+      print('Message: $message');
+      print('User Type: $userType');
+      print('Token: $token');
+
+
+      if (message == 'User Login Successfully') {
         setState(() {
           _pageloading = false;
         });
@@ -138,8 +196,8 @@ class _LoginOPTVerficationUIState extends State<LoginOPTVerficationUI> {
               showTopToast(context, errorMessage);
             }
           }
-      } else if (response ==
-          'Otp not match. Please resend forget password otp') {
+      } else if (message ==
+          'Invalid OTP') {
         setState(() {
           _pageloading = false;
         });
@@ -158,6 +216,29 @@ class _LoginOPTVerficationUIState extends State<LoginOPTVerficationUI> {
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     });
+  }
+
+  Future<void> _fetchUserProfile(String token, String userType) async {
+    try {
+      final apiService = await ProfileAPIService();
+
+      if (!mounted) return;
+
+      print('Mounted');
+
+      final profile = await apiService.fetchUserProfile(token);
+      final userProfile = UserProfile.fromJson(profile);
+
+      print(userProfile.name);
+      print(userProfile.photo);
+      print(userProfile.Id);
+
+      print('Mounted Again');
+
+      authCubit.login(userProfile, token, userType);
+    } catch (e) {
+      print('Error fetching user profile: $e');
+    }
   }
 
   void showTopToast(BuildContext context, String message) {
@@ -282,18 +363,18 @@ class _LoginOPTVerficationUIState extends State<LoginOPTVerficationUI> {
                                     horizontal: 20),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: List.generate(4, (index) {
+                                  children: List.generate(8, (index) {
                                     return Row(
                                       children: [
-                                        CustomTextBox(
+                                        LoginOTPCustomTextBox(
                                           textController: _controllers[index],
                                           currentFocusNode:
                                           _focusNodes[index],
-                                          nextFocusNode: index < 3
+                                          nextFocusNode: index < 7
                                               ? _focusNodes[index + 1]
                                               : null,
                                         ),
-                                        if (index < 3) SizedBox(width: 10),
+                                        if (index < 7) SizedBox(width: 5),
                                       ],
                                     );
                                   }),

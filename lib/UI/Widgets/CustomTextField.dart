@@ -22,6 +22,7 @@ class CustomTextFormField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final bool readOnly;
   final VoidCallback? onTap;
+  final String? prefixText;
 
   const CustomTextFormField({
     Key? key,
@@ -32,6 +33,7 @@ class CustomTextFormField extends StatelessWidget {
     this.inputFormatters,
     this.readOnly = false,
     this.onTap,
+    this.prefixText,
   }) : super(key: key);
 
   @override
@@ -66,16 +68,17 @@ class CustomTextFormField extends StatelessWidget {
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(5)),
               ),
+              prefixText: prefixText,
               suffixIcon: readOnly
                   ? Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Icon(
-                  keyboardType == TextInputType.phone
-                      ? Icons.phone
-                      : Icons.calendar_today_outlined,
-                  size: 25,
-                ),
-              )
+                      padding: const EdgeInsets.all(12.0),
+                      child: Icon(
+                        keyboardType == TextInputType.phone
+                            ? Icons.phone
+                            : Icons.calendar_today_outlined,
+                        size: 25,
+                      ),
+                    )
                   : null,
             ),
             onTap: onTap,

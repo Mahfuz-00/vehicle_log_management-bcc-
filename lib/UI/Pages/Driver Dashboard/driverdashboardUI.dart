@@ -16,6 +16,7 @@ import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../../Widgets/templateerrorcontainer.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import 'driverStartTrip.dart';
@@ -445,6 +446,7 @@ class _DriverDashboardUIState extends State<DriverDashboardUI> {
                                     Center(
                                       child:
                                           Text('Welcome, ${userProfile.name}',
+                                              textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.bold,
@@ -833,7 +835,7 @@ class _DriverDashboardUIState extends State<DriverDashboardUI> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI()));
+                                  LoginwithEmailUI()));
                     }
                   },
                   child: Text(

@@ -40,6 +40,7 @@ class SubmitTransactionAPIService {
   }
 
   Future<Map<String, dynamic>?> submitTransaction({
+    required String tripId,
     required String transactionId,
     required String transactionDate,
     required String transactionType,
@@ -51,13 +52,13 @@ class SubmitTransactionAPIService {
         throw Exception('Authentication token is empty.');
       }
       final response = await http.post(
-        Uri.parse('$baseUrl/itee/payment/exam/registration'),
+        Uri.parse('$baseUrl/vlm/trip/payment'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $authToken',
         },
         body: {
-          'trip_id' : '',
+          'trip_id' : tripId,
           'transaction_id': transactionId,
           'transaction_date': transactionDate,
           'transaction_type': transactionType,

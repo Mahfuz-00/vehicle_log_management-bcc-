@@ -17,16 +17,20 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:vehicle_log_management/Data/Data%20Sources/API%20Service%20(Route%20and%20Stoppage)/apiserviceRouteandStoppage.dart';
 import 'package:vehicle_log_management/UI/Pages/Trip%20Request%20Form(Staff)/paymentConfirmation.dart';
 import 'package:vehicle_log_management/UI/Widgets/labelText.dart';
 import 'package:vehicle_log_management/UI/Widgets/labelTextTemplate.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Payment Gateway)/apiServicePaymentGateway.dart';
 import '../../../Data/Data Sources/API Service (Trip Request)/apiServiceTripRequest.dart';
+import '../../../Data/Models/route.dart';
 import '../../../Data/Models/tripRequestModel.dart';
+import '../../Bloc/auth_cubit.dart';
 import '../../Bloc/auth_email_cubit.dart';
 import '../../Widgets/CustomTextField.dart';
 import '../../Widgets/DateRange.dart';
+import '../../Widgets/dropdowns.dart';
 import '../../Widgets/radiooption.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
 
@@ -80,6 +84,11 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
   late TextEditingController _destinationfromController =
       TextEditingController();
   late TextEditingController _destinationtoController = TextEditingController();
+  late TextEditingController _startMonthController = TextEditingController();
+  late TextEditingController _startYearController = TextEditingController();
+  late TextEditingController _endYearController = TextEditingController();
+  late TextEditingController _endMonthController = TextEditingController();
+  late TextEditingController _TotalfareController = TextEditingController();
   late String triptype = '';
   late String paymentMethod = '';
   late String tripCatagory = '';
@@ -88,18 +97,178 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
   File? _file;
   File? _challanfile;
   bool _isbuttonclicked = false;
+  String? startMonthYear;
   String? startMonth;
   int? startYear;
+  String? endMonthYear;
   String? endMonth;
   int? endYear;
   double totalFare = 0;
 
+  List<Routes>? routes = [];
+  List<Stoppages>? stoppages = [];
+  String? selectedRoute;
+  String? selectedStoppage;
+  bool isLoadingRoute = false;
+  bool isLoadingStoppage = false;
+  late String _routeID = '';
+  late String _stoppageID = '';
+  late String _tripRequestID = '';
+
+  // Define a list of month names in order
+  final List<String> monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+
+  int? startMonthNumber;
+  int? endMonthNumber;
+  String? startMonthFormatted;
+  String? endMonthFormatted;
+
+// Use it in your code
+  void convertMonths(String startM, String endM) {
+    startMonthNumber = monthNames.indexOf(startMonth!) + 1;
+    endMonthNumber = monthNames.indexOf(endMonth!) + 1;
+
+    startMonthFormatted = startMonthNumber.toString().padLeft(2, '0');
+    endMonthFormatted = endMonthNumber.toString().padLeft(2, '0');
+
+    if (startMonthNumber == 0 || endMonthNumber == 0) {
+      print('Invalid month name provided');
+    } else {
+      print('Start Month: $startMonthNumber, End Month: $endMonthNumber');
+    }
+  }
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
+
+  late RouteAndStoppageAPIService apiService;
+
+  Future<RouteAndStoppageAPIService> initializeApiService() async {
+    final authCubit = context.read<AuthCubit>();
+    final token = (authCubit.state as AuthAuthenticated).token;
+    apiService = await RouteAndStoppageAPIService.create(token);
+    return apiService;
+  }
+
+  Future<void> fetchRoute() async {
+    setState(() {
+      isLoadingRoute = true;
+      selectedRoute = null;
+      selectedStoppage = null;
+      routes = null;
+      stoppages = null;
+      routes = [];
+      _routeID = '';
+      _stoppageID = '';
+    });
+    try {
+      await initializeApiService();
+      final List<Routes> fetchedRoutes = await apiService.fetchRoutes();
+      setState(() {
+        routes = fetchedRoutes;
+        for (Routes routes in fetchedRoutes) {
+          print('Route Start Point: ${routes.startpoint}');
+          print('Route End Point: ${routes.endpoint}');
+          print('Route ID: ${routes.id}');
+        }
+        isLoadingRoute = false;
+        selectedRoute = null;
+        selectedStoppage = null;
+        stoppages = null;
+        _routeID = '';
+        _stoppageID = '';
+      });
+    } catch (e) {
+      print('Error fetching routes: $e');
+    }
+  }
+
+  Future<void> fetchStoppages(String routeId) async {
+    print(routeId);
+    setState(() {
+      isLoadingStoppage = true;
+      selectedStoppage = null;
+      stoppages = null;
+      _stoppageID = '';
+    });
+    try {
+      final List<Stoppages> fetchedStoppages =
+          await apiService.fetchStoppages(routeId);
+      setState(() {
+        stoppages = fetchedStoppages;
+        for (Stoppages stoppages in fetchedStoppages) {
+          print('Stoppage Name: ${stoppages.name}');
+          print('Stoppage ID: ${stoppages.id}');
+        }
+        print(stoppages);
+        isLoadingStoppage = false;
+        selectedStoppage = null;
+        _stoppageID = '';
+      });
+    } catch (e) {
+      print('Error fetching Stoppages: $e');
+    }
+  }
+
+  int calculatePayment({
+    required int startMonth,
+    required int startYear,
+    required int endMonth,
+    required int endYear,
+    required int fareForEachDay,
+  }) {
+    // Calculate the total number of months between the start and end date
+    int totalMonths = ((endYear - startYear) * 12) + (endMonth - startMonth + 1);
+
+    // Calculate the total fare for the period
+    int totalFare = totalMonths * fareForEachDay * 2;
+    _TotalfareController.text = totalFare.toString();
+    print(totalFare.toString());
+
+    return totalFare;
+  }
+
+  void _recalculateFare() {
+    // Parse values from text controllers
+    int startMonth = int.tryParse(_startMonthController.text) ?? 0;
+    int startYear = int.tryParse(_startYearController.text) ?? 0;
+    int endMonth = int.tryParse(_endMonthController.text) ?? 0;
+    int endYear = int.tryParse(_endYearController.text) ?? 0;
+    int fareForEachDay = int.tryParse(_fareController.text) ?? 0;
+
+    // Recalculate and update the total fare
+    calculatePayment(
+      startMonth: startMonth,
+      startYear: startYear,
+      endMonth: endMonth,
+      endYear: endYear,
+      fareForEachDay: fareForEachDay,
+    );
+  }
+
 
   @override
   void initState() {
     super.initState();
+    // Add listeners to recalculate fare when any input changes
+    _fareController.addListener(_recalculateFare);
+    _startMonthController.addListener(_recalculateFare);
+    _startYearController.addListener(_recalculateFare);
+    _endMonthController.addListener(_recalculateFare);
+    _endYearController.addListener(_recalculateFare);
     Date = null;
     _tripRequest = TripRequest(
         name: '',
@@ -187,6 +356,9 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                           tripCatagory = value;
                           setState(() {
                             tripCatagory = value;
+                            if (tripCatagory == 'Pick-Drop') {
+                              fetchRoute();
+                            }
                           });
                         },
                       ),
@@ -492,44 +664,154 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                     if (tripCatagory == 'Pick-Drop') ...[
                       LabeledTextWithAsterisk(text: 'Route'),
                       SizedBox(height: 5),
-                      CustomTextFormField(
-                        controller: _desinationController,
-                        labelText: 'Designation',
-                        validator: (input) {
-                          if (input == null || input.isEmpty) {
-                            return 'Please enter your designation';
-                          }
-                          return null;
-                        },
+                      Material(
+                        elevation: 5,
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                            width: screenWidth * 0.9,
+                            height: screenHeight * 0.075,
+                            padding: EdgeInsets.only(left: 10, top: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey),
+                            ),
+                            child: Stack(
+                              children: [
+                                DropdownFormField(
+                                  hintText: 'Select Route',
+                                  dropdownItems: routes != null
+                                      ? routes!
+                                          .map((route) =>
+                                              (route.startpoint ?? 'N/A') +
+                                              ' - ' +
+                                              (route.endpoint ?? 'N/A'))
+                                          .toList()
+                                      : null,
+                                  initialValue: selectedRoute,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      selectedStoppage = null;
+                                      stoppages = null;
+                                      _routeID = '';
+                                      _stoppageID = '';
+                                      selectedRoute = newValue;
+                                    });
+                                    if (newValue != null) {
+                                      // Find the selected Route object
+                                      Routes selectedRouteObject =
+                                          routes!.firstWhere(
+                                        (routes) =>
+                                            (routes.startpoint ?? 'N/A') +
+                                                ' - ' +
+                                                (routes.endpoint ?? 'N/A') ==
+                                            newValue,
+                                      );
+                                      if (selectedRouteObject != null) {
+                                        _routeID =
+                                            selectedRouteObject.id.toString();
+                                        print(_routeID);
+                                        fetchStoppages(
+                                            selectedRouteObject.id.toString());
+                                      }
+                                    }
+                                  },
+                                ),
+                                if (isLoadingRoute)
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: CircularProgressIndicator(
+                                      color:
+                                          const Color.fromRGBO(25, 192, 122, 1),
+                                    ),
+                                  ),
+                              ],
+                            )),
                       ),
                       const SizedBox(height: 10),
                       LabeledTextWithAsterisk(text: 'Stoppage'),
                       SizedBox(height: 5),
-                      CustomTextFormField(
-                        controller: _desinationController,
-                        labelText: 'Designation',
-                        validator: (input) {
-                          if (input == null || input.isEmpty) {
-                            return 'Please enter your designation';
-                          }
-                          return null;
-                        },
+                      Material(
+                        elevation: 5,
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                            width: screenWidth * 0.9,
+                            height: screenHeight * 0.075,
+                            padding: EdgeInsets.only(left: 10, top: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey),
+                            ),
+                            child: Stack(
+                              children: [
+                                DropdownFormField(
+                                  hintText: 'Select Stoppage',
+                                  dropdownItems: stoppages != null
+                                      ? stoppages!
+                                          .map((Stoppages) => Stoppages.name)
+                                          .toList()
+                                      : null,
+                                  initialValue: selectedStoppage,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      _stoppageID = '';
+                                      selectedStoppage = newValue;
+                                      print(selectedStoppage);
+                                    });
+                                    if (newValue != null) {
+                                      // Find the selected Route object
+                                      Stoppages selectedStoppageObject =
+                                          stoppages!.firstWhere(
+                                        (Stoppages) =>
+                                            Stoppages.name == newValue,
+                                      );
+                                      if (selectedStoppageObject != null) {
+                                        _stoppageID = selectedStoppageObject.id
+                                            .toString();
+                                        print(_stoppageID);
+                                        _fareController.text =
+                                            selectedStoppageObject.fare
+                                                .toString();
+                                        print(_fareController.text);
+                                      }
+                                    }
+                                  },
+                                ),
+                                if (isLoadingStoppage)
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: CircularProgressIndicator(
+                                      color:
+                                          const Color.fromRGBO(25, 192, 122, 1),
+                                    ),
+                                  ),
+                              ],
+                            )),
                       ),
                       const SizedBox(height: 10),
                       LabeledTextWithAsterisk(text: 'Select Date'),
                       SizedBox(height: 5),
                       DateRangeWithFareWidget(
-                        farePerMonth: 5.0,
+                        farePerDay: 5.0,
                         onDateChange: (String? startM, int? startY,
                             String? endM, int? endY, double fare) {
                           setState(() {
                             startMonth = startM;
+                            //_startMonthController.text = startMonth!;
                             startYear = startY;
+                            //_startYearController.text = startYear.toString()!;
                             endMonth = endM;
+                            //_endMonthController.text = endMonth!;
                             endYear = endY;
+                            //_endYearController.text = endYear.toString()!;
                             totalFare = fare;
+                            convertMonths(startMonth!, endMonth!);
+                            startMonthYear = '$startYear-$startMonthFormatted-01';
+                            endMonthYear = '$endYear-$endMonthFormatted-01';
                             _fareController.text = '${totalFare.toString()} TK';
-                            print('Start Month: $startMonth, Start Year: $startYear, End Month: $endMonth, End Year: $endYear, Total Fare: $totalFare');
+                            print(
+                                'Start Month: $startMonth, Start Year: $startYear, Start Month Year: $startMonthYear End Month: $endMonth, End Year: $endYear, End Month Year: $endMonthYear, Total Fare: $totalFare');
                           });
                         },
                       ),
@@ -545,6 +827,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                           }
                           return null;
                         },
+                        prefixText: 'TK ',
                       ),
                       const SizedBox(height: 10),
                       LabeledTextWithAsterisk(text: 'Payment Mode'),
@@ -729,6 +1012,27 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
       print('Type: ${triptype}');
       print('Distance: ${_distanceController.text}');
       print('Trip Catagory: ${tripCatagory}');
+      print('Route ID: ${_routeID}');
+      print('Stoppage ID: ${_stoppageID}');
+      print('Start Month: ${startMonthYear}');
+      print('End Month: ${endMonthYear}');
+      print('Payment Method: ${paymentMethod}');
+      print('File: ${_file?.path}');
+      print('Challan File: ${_challanfile?.path}');
+
+      var tripCatagoryFinal;
+
+      File? file;
+      if (tripCatagory != 'Pick-Drop') {
+        file = _file;
+        tripCatagoryFinal = tripCatagory;
+      } else if (tripCatagory == 'Pick-Drop') {
+        file = _challanfile;
+        _purposeController.text = 'Pick-Drop';
+        tripCatagoryFinal = 'Pick Drop';
+        triptype = paymentMethod;
+      }
+
       _tripRequest = TripRequest(
           name: _nameController.text,
           designation: _desinationController.text,
@@ -742,14 +1046,15 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
           endTime: _EndTimecontroller.text,
           distance: _distanceController.text,
           type: triptype,
-          category: tripCatagory);
+          category: tripCatagoryFinal,
+          route: _routeID,
+          stoppage: _stoppageID,
+          startMonth: startMonthYear,
+          endMonth: endMonthYear,
+          paymentMode: paymentMethod);
 
-      File? file;
-      if (tripCatagory != 'Pick-Drop') {
-        file = _file;
-      } else if (tripCatagory == 'Pick-Drop') {
-        file = _challanfile;
-      }
+      print(_tripRequest.startMonth);
+      print(_tripRequest.endMonth);
 
       TripRequestAPIService()
           .postTripRequest(_tripRequest, file)
@@ -759,7 +1064,13 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
         });
         print('Trip request sent successfully!!');
         print(response);
-        if (response != null && response == "Trip request successfully") {
+        if (response != null && response.startsWith("Trip request successfully")) {
+          String message = response.split('(')[0].trim(); // Extracts the message part before 'Trip ID'
+          String tripId = response.split('Trip ID: ')[1].replaceAll(')', '').trim(); // Extracts the trip_id
+
+          print('Response message: $message');
+          print('Trip ID: $tripId');
+          _tripRequestID = tripId;
           if (tripCatagory != 'Pick-Drop') {
             Navigator.pushAndRemoveUntil(
               context,
@@ -837,23 +1148,40 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
       final TripCategoryIsValid = tripCatagory.isNotEmpty;
       final TripTypeIsValid = triptype.isNotEmpty;
       final DateIsValid = _Datecontroller.text.isNotEmpty;
+      final PaymentMethodIsValid = paymentMethod.isNotEmpty;
+      final StartMonthIsValid = startMonthYear?.isNotEmpty;
+      final EndMonthIsValid = endMonthYear?.isNotEmpty;
+      final ChallanFileIsValid = _challanfile != null;
+      final FileIsValid = _file != null;
+      final RouteIsValid = _routeID.isNotEmpty;
+      final StoppageIsValid = _stoppageID.isNotEmpty;
+
+  /*    if(!FileIsValid && tripCatagory == 'Official'){
+        const snackBar = SnackBar(
+          content: Text('Please upload a file'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        return false;
+      }*/
+
+      if(!ChallanFileIsValid && tripCatagory == 'Pick-Drop' && paymentMethod == 'Offline'){
+        const snackBar = SnackBar(
+          content: Text('Please upload a Challan file/Bank Slip'),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        return false;
+      }
 
       if (tripCatagory == 'Pick-Drop') {
-        bool FileisValid = _file != null;
         final allFieldsAreValid = NameIsValid &&
             DesignationIsValid &&
             DepartmentIsValid &&
-            PurposeIsValid &&
             PhoneIsValid &&
-            DestinationFromIsValid &&
-            DestinationToIsValid &&
-            TripStartTimeIsValid &&
-            TripEndTimeIsValid &&
-            DistanceIsValid &&
-            TripCategoryIsValid &&
-            TripTypeIsValid &&
-            DateIsValid &&
-            FileisValid;
+            RouteIsValid &&
+            StoppageIsValid &&
+            StartMonthIsValid! &&
+            EndMonthIsValid! &&
+            PaymentMethodIsValid;
         return allFieldsAreValid;
       } else {
         final allFieldsAreValid = NameIsValid &&
@@ -888,6 +1216,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
 
   void startPayment(BuildContext context, String Name, String Email,
       String Mobile, String Address) async {
+    print('Trip ID $_tripRequestID');
     String tranId = generateTransactionId();
 
     Sslcommerz sslcommerz = await Sslcommerz(
@@ -986,8 +1315,8 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
           fontSize: 16.0,
         );
       } else {
-        await submitTransaction(
-                transactionId, transactionDate, transactionType, totalFare)
+        await submitTransaction(_tripRequestID, transactionId, transactionDate,
+                transactionType, totalFare)
             .then((_) {
           Fluttertoast.showToast(
             msg:
@@ -1038,8 +1367,8 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
   bool _isSubmit = false;
   bool _isLoading = false;
 
-  Future<void> submitTransaction(
-      String TransID, String TransDate, String TransType, double Amount) async {
+  Future<void> submitTransaction(String TripID, String TransID,
+      String TransDate, String TransType, double Amount) async {
     _isSubmit = false;
     if (_isSubmit) return;
     try {
@@ -1047,6 +1376,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
 
       final Map<String, dynamic>? dashboardData =
           await apiService.submitTransaction(
+              tripId: _tripRequestID,
               transactionId: TransID,
               transactionDate: TransDate,
               transactionType: TransType,

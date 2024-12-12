@@ -13,6 +13,7 @@ import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/OngoingTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
@@ -196,6 +197,10 @@ class _AdminDashboardOngoingTripsUIState
                     category: request['trip_category'],
                     type: request['trip_type'],
                     id: request['trip_id'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
                     startTrip: request['start'],
                   ),
                 ),
@@ -319,6 +324,10 @@ class _AdminDashboardOngoingTripsUIState
                     category: request['trip_category'],
                     type: request['trip_type'],
                     id: request['trip_id'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
                     startTrip: request['start'],
                   ),
                 ),
@@ -741,7 +750,7 @@ class _AdminDashboardOngoingTripsUIState
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI())); // Close the drawer
+                                  LoginwithEmailUI())); // Close the drawer
                     }
                   },
                   child: Text(

@@ -28,11 +28,28 @@ class StaffTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(staff.category);
     String formattedDate = '';
-    if (staff.date != null && staff.date!.isNotEmpty) {
-      DateTime parsedDate = DateTime.parse(staff.date!);  // Use the non-nullable string
-      formattedDate = dateFormat.format(parsedDate); // Format the date
+    if(staff.category != 'Pick Drop'){
+      print('Not a Pick Drop');
+      if (staff.date != null && staff.date!.isNotEmpty && staff.date != 'None') {
+        DateTime parsedDate = DateTime.parse(staff.date!);  // Use the non-nullable string
+        formattedDate = dateFormat.format(parsedDate); // Format the date
+      } else{
+        formattedDate = 'N/A'; // Default to 'N/A' if the date is empty or 'None'
+      }
+    } else if (staff.category == 'Pick Drop'){
+      print('Yes!! Pick Drop');
+      if (staff.startMonth != null && staff.startMonth!.isNotEmpty && staff.startMonth != 'None') {
+        DateTime parsedDate = DateTime.parse(staff.startMonth!);  // Use the non-nullable string
+        formattedDate = DateFormat('MMM yyyy').format(parsedDate); // Format the date
+        print('Month: $formattedDate');
+      } else{
+        formattedDate = 'N/A'; // Default to 'N/A' if the date is empty or 'None'
+      }
     }
+
+
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Column(
@@ -60,25 +77,38 @@ class StaffTile extends StatelessWidget {
             ),
             subtitle: Row(
               children: [
-                Text(
-                  'Date: $formattedDate',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    fontFamily: 'default',
+                if(staff.category != 'Pick Drop')...[
+                  Text(
+                    'Date: $formattedDate',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontFamily: 'default',
+                    ),
                   ),
-                ),
-                SizedBox(width: 5,),
-                Text(
-                  'Time : ${staff.startTime}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    fontFamily: 'default',
+                  SizedBox(width: 5,),
+                  Text(
+                    'Time : ${staff.startTime}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontFamily: 'default',
+                    ),
                   ),
-                ),
+                ],
+                if(staff.category == 'Pick Drop')...[
+                  Text(
+                    'Month : ${formattedDate}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontFamily: 'default',
+                    ),
+                  ),
+                ]
               ],
             ),
             trailing: Icon(

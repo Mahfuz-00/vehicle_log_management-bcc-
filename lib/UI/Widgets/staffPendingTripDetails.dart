@@ -27,6 +27,8 @@ class PendingStaffTrip extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    print('Staff Trip Categories: ${staff.category}');
+
     return InternetConnectionChecker(
       child: Scaffold(
         key: _scaffoldKey,
@@ -83,22 +85,21 @@ class PendingStaffTrip extends StatelessWidget {
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
                 _buildRow('Trip Category', staff.category),
-                if (staff.type != null && staff.type!.isNotEmpty)
+                if (staff.category != 'Pick Drop') ...[
                   _buildRow('Trip Type', staff.type!),
-                if (staff.date != null && staff.date!.isNotEmpty)
-                  _buildRowTime('Date', staff.date!),
-                if (staff.startTime != null && staff.startTime!.isNotEmpty)
+                  _buildRow('Date', staff.date!),
                   _buildRow('Start Time', staff.startTime!),
-                if (staff.endTime != null && staff.endTime!.isNotEmpty)
                   _buildRow('End Time', staff.endTime!),
-                if (staff.distance != null && staff.distance!.isNotEmpty)
-                  _buildRow('Distance', '${staff.distance} KM'),
-                if (staff.destinationFrom != null &&
-                    staff.destinationFrom!.isNotEmpty)
                   _buildRow('Destination From', staff.destinationFrom!),
-                if (staff.destinationTo != null &&
-                    staff.destinationTo!.isNotEmpty)
                   _buildRow('Destination To', staff.destinationTo!),
+                  _buildRow('Distance', '${staff.distance} KM'),
+                ],
+                if (staff.category == 'Pick Drop') ...[
+                  _buildRow('Route', staff.route!),
+                  _buildRow('Stoppage', staff.stoppage!),
+                  _buildRow('Start Month', staff.startMonth!),
+                  _buildRow('End Month', staff.endMonth!),
+                ],
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(
@@ -130,7 +131,58 @@ class PendingStaffTrip extends StatelessWidget {
     );
   }
 
-  Widget _buildRowTime(String label, String value) {
+  Widget _buildRowTime(String label, dynamic value) {
+    // Check if the value is null, empty, or "None"
+    if (value == null || value.isEmpty || value == 'None') {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: label,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      height: 1.6,
+                      letterSpacing: 1.3,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'default',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              ":",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              "No Date", // Display "No Date" if value is null
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                height: 1.6,
+                letterSpacing: 1.3,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'default',
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
 
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
@@ -175,7 +227,7 @@ class PendingStaffTrip extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            formattedDate, // Format date as DD/MM/YYYY
+            formattedDate ?? 'N/A', // Format date as DD/MM/YYYY
             style: TextStyle(
               color: Colors.black,
               fontSize: 18,
@@ -229,7 +281,7 @@ class PendingStaffTrip extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: value,
+                  text: value ?? 'N/A',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,

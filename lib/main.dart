@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rename_app/rename_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'UI/Bloc/auth_cubit.dart';
@@ -21,6 +22,7 @@ import 'UI/Pages/Splashscreen UI/splashscreenUI.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await checkAndClearCache();
+  requestStoragePermission();
   runApp(const MyApp());
 }
 
@@ -42,6 +44,31 @@ Future<void> checkAndClearCache() async {
     await DefaultCacheManager().emptyCache();
     await prefs.setString('app_version', currentVersion);
   }
+}
+
+Future<bool> requestStoragePermission() async {
+  // Check current permission status
+  var status = await Permission.storage.status;
+  print("Storage permission status: $status");
+
+  if (status.isDenied || status.isRestricted || status.isLimited) {
+    // Explicitly request the permission
+    status = await Permission.storage.request();
+  }
+
+  // Check the result after the request
+  if (status.isGranted) {
+    print("Storage permission granted.");
+    return true;
+  } else if (status.isPermanentlyDenied) {
+    // If permission is permanently denied, open app settings
+    print("Storage permission permanently denied.");
+    await openAppSettings();
+  } else {
+    print("Storage permission denied.");
+  }
+
+  return false;
 }
 
 /// A stateless widget that represents the main application.

@@ -95,7 +95,7 @@ class RecentTripDetails extends StatelessWidget {
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
                 _buildRow('Trip Type', staff.type),
-                _buildRowTime('Date', staff.date),
+                _buildRow('Date', staff.date),
                 _buildRow('Start Time', staff.startTime),
                 _buildRow('End Time', staff.endTime),
                 _buildRow('Distance', '${staff.distance} KM'),
@@ -137,7 +137,7 @@ class RecentTripDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildRowTime(String label, String value) {
+  Widget _buildRowTime(String label, dynamic value) {
     //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
 
     DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);

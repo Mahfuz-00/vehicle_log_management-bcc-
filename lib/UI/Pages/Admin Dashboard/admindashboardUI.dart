@@ -5,6 +5,7 @@ import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/avail
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/ongoingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Admin%20Dashboard%20(Full)/pendingtriprequestfull.dart';
 import 'package:vehicle_log_management/UI/Pages/Advance%20Search%20Report/searchReport.dart';
+import 'package:vehicle_log_management/UI/Pages/Login%20UI/loginEmailUI.dart';
 import 'package:vehicle_log_management/UI/Widgets/requestWidget.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboard.dart';
@@ -77,6 +78,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
   List<Widget> recentRequests = [];
+  List<Widget> PickDropRequests = [];
   List<Widget> drivers = [];
   bool _isFetched = false;
   bool _isLoading = false;
@@ -177,36 +179,59 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
       }
       final List<dynamic> recentTripData = records['Recent'] ?? [];
       for (var index = 0; index < recentTripData.length; index++) {
-        print('Pending Request at index $index: ${recentTripData[index]}\n');
+        print('Recent Request at index $index: ${recentTripData[index]}\n');
+      }
+
+      final List<dynamic> PickDropTripData = records['Pick_Drop'] ?? [];
+      for (var index = 0; index < PickDropTripData.length; index++) {
+        print(
+            'Pick-Drop Request at index $index: ${PickDropTripData[index]}\n');
+        print(PickDropTripData[index]['route_name']);
+        print(PickDropTripData[index]['stoppage_name']);
+        print(PickDropTripData[index]['start_month_and_year']);
+        print(PickDropTripData[index]['end_month_and_year']);
       }
 
       final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
         print('Pending Trip');
-        print(request['name']);
-        print(request['designation']);
-        print(request['department']);
-        print(request['purpose']);
-        print(request['phone']);
-        print(request['destination_from']);
-        print(request['destination_to']);
-        print(request['date']);
-        print(request['time']);
-        print(request['trip_type']);
+        print('Name: ${request['name']}');
+        print('Designation: ${request['designation']}');
+        print('Department: ${request['department']}');
+        print('Purpose: ${request['purpose']}');
+        print('Phone: ${request['phone']}');
+        print('Destination From: ${request['destination_from']}');
+        print('Destination To: ${request['destination_to']}');
+        print('Date: ${request['date']}');
+        print('Trip Type: ${request['trip_type']}');
+        print('Route Name: ${request['route_name']}');
+        print('Stoppage Name: ${request['stoppage_name']}');
+        print('Start Month and Year: ${request['start_month_and_year']}');
+        print('End Month and Year: ${request['end_month_and_year']}');
         return StaffTile(
           staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              type: request['trip_type'],
-              startTime: request['start_time'],
-              endTime: request['end_time'],
-              distance: request['approx_distance'],
-              category: request['trip_category']),
+            name: request['name'],
+            phone: request['phone'],
+            date: request['date'],
+            startTime: request['start_time'],
+            endTime: request['end_time'],
+            distance: request['approx_distance'],
+            category: request['trip_category'],
+            designation: request['designation'],
+            destinationFrom: request['destination_from'],
+            destinationTo: request['destination_to'],
+            department: request['department'],
+            type: request['trip_type'],
+            purpose: request['purpose'],
+            DateTime: request['date_time'],
+            Driver: request['driver'],
+            Car: request['car'],
+            Duration: request['duration'],
+            Start: request['start'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],
+          ),
           onPressed: () {
             Navigator.push(
               context,
@@ -214,20 +239,25 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                 builder: (context) => AdminPendingTrip(
                   shouldRefresh: true,
                   staff: SROfficerTripRequest(
-                      id: request['trip_id'],
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      startTime: request['start_time'],
-                      endTime: request['end_time'],
-                      distance: request['approx_distance'],
-                      category: request['trip_category'],
-                      type: request['trip_type']),
+                    id: request['trip_id'],
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
+                  ),
                 ),
               ),
             );
@@ -238,19 +268,29 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
           staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              startTime: request['start_time'],
-              endTime: request['end_time'],
-              distance: request['approx_distance'],
-              category: request['trip_category'],
-              type: request['trip_type']),
+            name: request['name'],
+            designation: request['designation'],
+            department: request['department'],
+            purpose: request['purpose'],
+            phone: request['phone'],
+            destinationFrom: request['destination_from'],
+            destinationTo: request['destination_to'],
+            date: request['date'],
+            startTime: request['start_time'],
+            endTime: request['end_time'],
+            distance: request['approx_distance'],
+            category: request['trip_category'],
+            type: request['trip_type'],
+            DateTime: request['date_time'],
+            Driver: request['driver'],
+            Car: request['car'],
+            Duration: request['duration'],
+            Start: request['start'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],
+          ),
           onPressed: () {
             Navigator.push(
               context,
@@ -273,6 +313,10 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                       category: request['trip_category'],
                       type: request['trip_type'],
                       id: request['trip_id'],
+                      route: request['route_name'],
+                      stoppage: request['stoppage_name'],
+                      startMonth: request['start_month_and_year'],
+                      endMonth: request['end_month_and_year'],
                       startTrip: request['start']),
                 ),
               ),
@@ -284,19 +328,29 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
       final List<Widget> recentWidgets = recentTripData.map((request) {
         return StaffTile(
           staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              startTime: request['start_time'],
-              endTime: request['end_time'],
-              distance: request['approx_distance'],
-              category: request['trip_category'],
-              type: request['trip_type']),
+            name: request['name'],
+            designation: request['designation'],
+            department: request['department'],
+            purpose: request['purpose'],
+            phone: request['phone'],
+            destinationFrom: request['destination_from'],
+            destinationTo: request['destination_to'],
+            date: request['date'],
+            startTime: request['start_time'],
+            endTime: request['end_time'],
+            distance: request['approx_distance'],
+            category: request['trip_category'],
+            type: request['trip_type'],
+            DateTime: request['date_time'],
+            Driver: request['driver'],
+            Car: request['car'],
+            Duration: request['duration'],
+            Start: request['start'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],
+          ),
           onPressed: () {
             Navigator.push(
               context,
@@ -326,12 +380,71 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
           },
         );
       }).toList();
+      final List<Widget> PickDropWidgets = PickDropTripData.map((request) {
+        return StaffTile(
+          staff: TripRequest(
+            name: request['name'],
+            designation: request['designation'],
+            department: request['department'],
+            purpose: request['purpose'],
+            phone: request['phone'],
+            destinationFrom: request['destination_from'],
+            destinationTo: request['destination_to'],
+            date: request['date'],
+            startTime: request['start_time'],
+            endTime: request['end_time'],
+            distance: request['approx_distance'],
+            category: request['trip_category'],
+            type: request['trip_type'],
+            DateTime: request['date_time'],
+            Driver: request['driver'],
+            Car: request['car'],
+            Duration: request['duration'],
+            Start: request['start'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminPendingTrip(
+                  shouldRefresh: true,
+                  staff: SROfficerTripRequest(
+                    id: request['trip_id'],
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      }).toList();
 
       setState(() {
         drivers = driverWidgets;
         pendingRequests = pendingWidgets;
         acceptedRequests = acceptedWidgets;
         recentRequests = recentWidgets;
+        PickDropRequests = PickDropWidgets;
         _isFetched = true;
       });
     } catch (e) {
@@ -463,6 +576,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                 children: [
                                   Center(
                                     child: Text('Welcome, ${userProfile.name}',
+                                        textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold,
@@ -556,13 +670,13 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                   RequestsWidget(
                                     loading: _isLoading,
                                     fetch: _isFetched,
-                                    errorText: 'No trip onging.',
-                                    listWidget: acceptedRequests,
+                                    errorText: 'No trip.',
+                                    listWidget: PickDropRequests,
                                     fetchData: fetchConnectionRequests(),
                                     numberOfWidgets: 5,
                                     showSeeAllButton: (shouldShowSeeAllButton(
                                         acceptedRequests)),
-                                    seeAllButtonText: 'See All Ongoing Trips',
+                                    seeAllButtonText: 'See All Pick-Drop Trips',
                                     nextView: AdminDashboardOngoingTripsUI(
                                       shouldRefresh: true,
                                     ),
@@ -857,7 +971,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginUI()));
+                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
                     }
                   },
                   child: Text(

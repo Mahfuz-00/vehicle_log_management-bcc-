@@ -10,6 +10,7 @@ import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
 import '../../../Data/Models/paginationModel.dart';
 import '../../Widgets/AvailableDriverDetails.dart';
 import '../Admin Dashboard/admindashboardUI.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
@@ -597,7 +598,7 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI()));
+                                  LoginwithEmailUI()));
                     }
                   },
                   child: Text(

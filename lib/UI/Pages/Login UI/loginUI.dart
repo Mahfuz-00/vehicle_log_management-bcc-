@@ -15,6 +15,7 @@ import '../Driver Dashboard/driverdashboardUI.dart';
 import '../Forgot Password UI/forgotpasswordUI.dart';
 import '../Senior Officer Dashboard/srofficerdashboardUI.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
+import 'loginEmailUI.dart';
 
 /// This [LoginUI] class represents the user interface for logging into the application.
 ///
@@ -369,7 +370,7 @@ class _LoginUIState extends State<LoginUI> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const LoginOPTVerficationUI()));
+                                      builder: (context) => const LoginwithEmailUI()));
                             },
                             child: const Text(
                               'OTP Login',

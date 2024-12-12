@@ -34,6 +34,10 @@ class SROfficerTripRequest {
   String distance;
   String category;
   String type;
+  String route;
+  String stoppage;
+  String startMonth;
+  String endMonth;
 
   SROfficerTripRequest({
     required this.id,
@@ -50,6 +54,10 @@ class SROfficerTripRequest {
     required this.distance,
     required this.category,
     required this.type,
+    required this.route,
+    required this.stoppage,
+    required this.startMonth,
+    required this.endMonth,
   });
 
   factory SROfficerTripRequest.fromJson(Map<String, dynamic> json) {
@@ -68,6 +76,10 @@ class SROfficerTripRequest {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
+      route: json['route_name'],
+      stoppage: json['stoppage_name'],
+      startMonth: json['start_month_and_year'],
+      endMonth: json['end_month_and_year'],
     );
   }
 
@@ -87,6 +99,10 @@ class SROfficerTripRequest {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
+    data['route_name'] = this.route;
+    data['stoppage_name'] = this.stoppage;
+    data['start_month_and_year'] = this.startMonth;
+    data['end_month_and_year'] = this.endMonth;
     return data;
   }
 

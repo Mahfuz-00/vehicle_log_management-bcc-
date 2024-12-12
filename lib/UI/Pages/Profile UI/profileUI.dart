@@ -15,6 +15,7 @@ import '../../../Data/Models/profileModelFull.dart';
 import '../../../Data/Models/profilemodel.dart';
 import '../../../Data/Models/userInfoUpdateModel.dart';
 import '../../Bloc/auth_cubit.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import 'passwordChange.dart';
 
@@ -546,7 +547,7 @@ class _ProfileUIState extends State<ProfileUI> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI()));
+                                  LoginwithEmailUI()));
                     }
                   },
                   child: Text(

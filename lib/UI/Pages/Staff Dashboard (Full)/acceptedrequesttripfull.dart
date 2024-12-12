@@ -12,6 +12,7 @@ import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/StaffApprovedTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 import '../Trip Request Form(Staff)/triprequestformUI.dart';
@@ -151,7 +152,11 @@ class _StaffDashboardAcceptedTripsUIState
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type']),
+              type: request['trip_type'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],),
           onPressed: () {
             Navigator.push(
               context,
@@ -252,7 +257,11 @@ class _StaffDashboardAcceptedTripsUIState
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type']),
+              type: request['trip_type'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],),
           onPressed: () {
             Navigator.push(
               context,
@@ -717,7 +726,7 @@ class _StaffDashboardAcceptedTripsUIState
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginUI()));
+                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
                     }
                   },
                   child: Text(

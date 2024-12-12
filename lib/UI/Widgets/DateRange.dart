@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class DateRangeWithFareWidget extends StatefulWidget {
-  final double farePerMonth;
+  final double farePerDay;
   final Function(String? startMonth, int? startYear, String? endMonth,
       int? endYear, double totalFare) onDateChange;
 
   const DateRangeWithFareWidget({
     Key? key,
-    required this.farePerMonth,
+    required this.farePerDay,
     required this.onDateChange,
   }) : super(key: key);
 
@@ -37,17 +37,32 @@ class _DateRangeWithFareWidgetState extends State<DateRangeWithFareWidget> {
         endYear != null) {
       int startIndex = months.indexOf(startMonth!);
       int endIndex = months.indexOf(endMonth!);
-      int yearDiff = endYear! - startYear!;
-      int totalMonths = (yearDiff * 12) + (endIndex - startIndex + 1);
 
-      setState(() {
-        totalFare = totalMonths * widget.farePerMonth;
-      });
+      // Ensure the end date is not earlier than the start date
+      if (endYear! > startYear! || (endYear! == startYear! && endIndex >= startIndex)) {
+        DateTime startDate = DateTime(startYear!, startIndex + 1, 1);
+        print(startDate);
+        DateTime endDate = DateTime(endYear!, endIndex + 1, 1);
+        print(endDate);
+        int totalDays = endDate.difference(startDate).inDays + 1;
+        print(totalDays);
 
-      // Pass data to parent widget
+
+        setState(() {
+          totalFare = totalDays * widget.farePerDay;
+        });
+      } else {
+        // If the date range is invalid, reset the total fare
+        setState(() {
+          totalFare = 0;
+        });
+      }
+
+      // Pass data to the parent widget
       widget.onDateChange(startMonth, startYear, endMonth, endYear, totalFare);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

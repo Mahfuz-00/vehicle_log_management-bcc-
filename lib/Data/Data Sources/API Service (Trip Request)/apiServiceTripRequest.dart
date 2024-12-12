@@ -92,7 +92,11 @@ class TripRequestAPIService {
         }
         else if(jsonResponse['status'] == true) {
           print('Trip request sent successfully.');
-          return jsonResponse['message'];
+          // Extract the trip_id from the records
+          var tripId = jsonResponse['records']['trip_id'];
+
+          // Return a message that includes both the message and the trip_id
+          return '${jsonResponse['message']} (Trip ID: $tripId)';
         } else{
           return 'Something went wrong';
         }

@@ -12,6 +12,7 @@ import '../../../Data/Models/tripRequestModelRecent.dart';
 import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
@@ -704,7 +705,7 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI()));
+                                  LoginwithEmailUI()));
                     }
                   },
                   child: Text(

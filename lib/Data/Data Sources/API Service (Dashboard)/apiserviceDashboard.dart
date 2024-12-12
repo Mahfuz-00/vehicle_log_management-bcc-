@@ -53,6 +53,7 @@ class DashboardAPIService{
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
+        printFieldTypes(jsonData);
         print(jsonData);
         return jsonData;
       } else {
@@ -63,4 +64,23 @@ class DashboardAPIService{
       throw Exception('Error fetching dashboard items: $e');
     }
   }
+
+  void printFieldTypes(dynamic data, [String parentKey = 'root']) {
+    if (data is Map<String, dynamic>) {
+      data.forEach((key, value) {
+        final fieldKey = '$parentKey > $key';
+        print('$fieldKey: ${value.runtimeType}');
+        printFieldTypes(value, fieldKey); // Recursively handle nested objects
+      });
+    } else if (data is List) {
+      for (int i = 0; i < data.length; i++) {
+        final fieldKey = '$parentKey[$i]';
+        print('$fieldKey: ${data[i].runtimeType}');
+        printFieldTypes(data[i], fieldKey); // Recursively handle list items
+      }
+    }
+  }
+
+
+
 }

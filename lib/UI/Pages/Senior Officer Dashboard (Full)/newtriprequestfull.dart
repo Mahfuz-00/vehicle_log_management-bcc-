@@ -12,6 +12,7 @@ import '../../../Data/Models/tripRequestModelSROfficer.dart';
 import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/SrOfficerPendingTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
@@ -176,7 +177,11 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type']),
+              type: request['trip_type'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],),
           onPressed: () {
             Navigator.push(
               context,
@@ -196,7 +201,11 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                       endTime: request['end_time'],
                       distance: request['approx_distance'],
                       category: request['trip_category'],
-                      type: request['trip_type']),
+                      type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],),
                 ),
               ),
             );
@@ -288,7 +297,11 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type']),
+              type: request['trip_type'],
+            route: request['route_name'],
+            stoppage: request['stoppage_name'],
+            startMonth: request['start_month_and_year'],
+            endMonth: request['end_month_and_year'],),
           onPressed: () {
             Navigator.push(
               context,
@@ -308,7 +321,11 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                       endTime: request['end_time'],
                       distance: request['approx_distance'],
                       category: request['trip_category'],
-                      type: request['trip_type']),
+                      type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],),
                 ),
               ),
             );
@@ -701,7 +718,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginUI()));
+                                  LoginwithEmailUI()));
                     }
                   },
                   child: Text(

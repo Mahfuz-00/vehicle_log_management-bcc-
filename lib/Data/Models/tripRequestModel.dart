@@ -25,25 +25,30 @@ import 'dart:convert';
 /// - [fromJsonList]: A static method that converts a list of JSON maps to a list of TripRequest instances.
 /// - [toJsonList]: A static method that converts a list of TripRequest instances to a list of JSON maps.
 class TripRequest {
-  String name;
-  String designation;
-  String department;
-  String? purpose;
-  String phone;
-  String? destinationFrom;
-  String? destinationTo;
-  String? date;
-  String? startTime;
-  String? endTime;
-  String? distance;
-  String category;
-  String? type;
-  String? route;
-  String? stoppage;
-  String? startDate;
-  String? endDate;
-  String? fare;
-  String? paymentMode;
+  dynamic name;
+  dynamic designation;
+  dynamic department;
+  dynamic? purpose;
+  dynamic phone;
+  dynamic? destinationFrom;
+  dynamic? destinationTo;
+  dynamic? date;
+  dynamic? startTime;
+  dynamic? endTime;
+  dynamic? distance;
+  dynamic category;
+  dynamic? type;
+  dynamic? route;
+  dynamic? stoppage;
+  dynamic? startMonth;
+  dynamic? endMonth;
+  dynamic? fare;
+  dynamic? paymentMode;
+  dynamic? DateTime;
+  dynamic? Driver;
+  dynamic? Car;
+  dynamic? Duration;
+  dynamic? Start;
 
   TripRequest({
     required this.name,
@@ -61,10 +66,15 @@ class TripRequest {
     required this.type,
     this.route,
     this.stoppage,
-    this.startDate,
-    this.endDate,
+    this.startMonth,
+    this.endMonth,
     this.fare,
     this.paymentMode,
+    this.Driver,
+    this.Car,
+    this.Duration,
+    this.Start,
+    this.DateTime,
   });
 
   factory TripRequest.fromJson(Map<String, dynamic> json) {
@@ -84,10 +94,15 @@ class TripRequest {
       type: json['type'],
       route: json['route'],
       stoppage: json['stoppage'],
-      startDate: json['start_date'],
-      endDate: json['end_date'],
+      startMonth: json['start_month_year'],
+      endMonth: json['end_month_year'],
       fare: json['fare'],
       paymentMode: json['payment_mode'],
+      Driver: json['driver'],
+      Car: json['car'],
+      Duration: json['duration'],
+      Start: json['start'],
+      DateTime: json['date_time'],
     );
   }
 
@@ -108,10 +123,15 @@ class TripRequest {
     data['type'] = this.type;
     data['route'] = this.route;
     data['stoppage'] = this.stoppage;
-    data['start_date'] = this.startDate;
-    data['end_date'] = this.endDate;
+    data['start_month_year'] = this.startMonth;
+    data['end_month_year'] = this.endMonth;
     data['fare'] = this.fare;
     data['payment_mode'] = this.paymentMode;
+    data['driver'] = this.Driver;
+    data['car'] = this.Car;
+    data['duration'] = this.Duration;
+    data['start'] = this.Start;
+    data['date_time'] = this.DateTime;
     return data;
   }
 

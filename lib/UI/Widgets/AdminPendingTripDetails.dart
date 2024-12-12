@@ -168,14 +168,22 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
                       _buildRow('Name', staff.name),
                       _buildRow('Designation', staff.designation),
                       _buildRow('Department', staff.department),
-                      _buildRowTime('Date', staff.date),
-                      _buildRow('Start Time', staff.startTime),
-                      _buildRow('End Time', staff.endTime),
-                      _buildRow('Distance', '${staff.distance} KM'),
-                      _buildRow('Trip Type', staff.category),
-                      _buildRow('Trip Mode', staff.type),
-                      _buildRow('Destination From', staff.destinationFrom),
-                      _buildRow('Destination To', staff.destinationTo),
+                      _buildRow('Mobile Number', staff.phone),
+                      _buildRow('Trip Category', staff.category),
+                      if(staff.category != 'Pick Drop')...[
+                        _buildRow('Trip Type', staff.type!),
+                        _buildRow('Date', staff.date!),
+                        _buildRow('Start Time', staff.startTime!),
+                        _buildRow('End Time', staff.endTime!),
+                        _buildRow('Destination From', staff.destinationFrom!),
+                        _buildRow('Destination To', staff.destinationTo!),
+                        _buildRow('Distance', '${staff.distance} KM'),
+                      ], if(staff.category == 'Pick Drop') ...[
+                        _buildRow('Route', staff.route!),
+                        _buildRow('Stoppage', staff.stoppage!),
+                        _buildRow('Start Month', staff.startMonth!),
+                        _buildRow('End Month', staff.endMonth!),
+                      ],
                       SizedBox(height: 10),
                       Divider(),
                       SizedBox(height: 20,),
@@ -281,7 +289,10 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
   }
 
   Widget _buildRowTime(String label, String? value) {
-    if (value == null || value.isEmpty) {
+    print(value);
+
+    // Check if the value is null, empty, or "None"
+    if (value == null || value.isEmpty || value == 'None') {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -332,63 +343,115 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
       );
     }
 
+    try {
+      // Attempt to parse the date
+      DateTime date = DateTime.parse(value);
+      DateFormat dateFormat = DateFormat.yMMMMd('en_US');
+      DateFormat timeFormat = DateFormat.jm();
+      String formattedDate = dateFormat.format(date);
+      String formattedTime = timeFormat.format(date);
 
-    DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-    String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
-    DateTime date = DateTime.parse(value);
-    DateFormat dateFormat = DateFormat.yMMMMd('en_US');
-    DateFormat timeFormat = DateFormat.jm();
-    String formattedDate = dateFormat.format(date);
-    String formattedTime = timeFormat.format(date);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: label,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    height: 1.6,
-                    letterSpacing: 1.3,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'default',
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: label,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      height: 1.6,
+                      letterSpacing: 1.3,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'default',
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text(
-            ":",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              ":",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        Expanded(
-          child: Text(
-            formattedDate, // Format date as DD/MM/YYYY
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              height: 1.6,
-              letterSpacing: 1.3,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'default',
+          Expanded(
+            child: Text(
+              formattedDate, // Format date as DD/MM/YYYY
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                height: 1.6,
+                letterSpacing: 1.3,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'default',
+              ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    } catch (e) {
+      // If there's a parsing error, handle it and display a default message
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: label,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      height: 1.6,
+                      letterSpacing: 1.3,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'default',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              ":",
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              "Invalid Date", // Display this when date format is invalid
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                height: 1.6,
+                letterSpacing: 1.3,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'default',
+              ),
+            ),
+          ),
+        ],
+      );
+    }
   }
+
 
   Widget _buildRow(String label, String value) {
     return Row(
@@ -429,7 +492,7 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: value,
+                  text: value == 'None' ? 'N/A' : value,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,

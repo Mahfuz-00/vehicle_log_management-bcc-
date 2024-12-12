@@ -13,6 +13,7 @@ import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../../Widgets/templateerrorcontainer.dart';
 import '../Driver Dashboard/driverStopTrip.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
@@ -762,7 +763,7 @@ class _DriverDashboardPendingTripsUIState
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginUI()));
+                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
                     }
                   },
                   child: Text(

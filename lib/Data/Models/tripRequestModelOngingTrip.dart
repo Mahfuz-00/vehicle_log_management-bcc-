@@ -31,14 +31,20 @@ class OngoingTripRequest {
   String department;
   String purpose;
   String phone;
-  String destinationFrom;
-  String destinationTo;
-  String date;
-  String startTime;
-  String endTime;
-  String distance;
-  String category;
-  String type;
+  dynamic? destinationFrom;
+  dynamic? destinationTo;
+  dynamic? date;
+  dynamic? startTime;
+  dynamic? endTime;
+  dynamic? distance;
+  dynamic? category;
+  dynamic? type;
+  dynamic? route;
+  dynamic? stoppage;
+  dynamic? startMonth;
+  dynamic? endMonth;
+  dynamic? fare;
+  dynamic? paymentMode;
   String startTrip;
 
   OngoingTripRequest({
@@ -50,14 +56,20 @@ class OngoingTripRequest {
     required this.department,
     required this.purpose,
     required this.phone,
-    required this.destinationFrom,
-    required this.destinationTo,
-    required this.date,
-    required this.startTime,
-    required this.endTime,
-    required this.distance,
-    required this.category,
-    required this.type,
+    this.destinationFrom,
+    this.destinationTo,
+    this.date,
+    this.startTime,
+    this.endTime,
+    this.distance,
+    this.category,
+    this.type,
+    this.route,
+    this.stoppage,
+    this.startMonth,
+    this.endMonth,
+    this.fare,
+    this.paymentMode,
     required this.startTrip,
   });
 
@@ -79,6 +91,12 @@ class OngoingTripRequest {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
+      route: json['route'],
+      stoppage: json['stoppage'],
+      startMonth: json['start_month_year'],
+      endMonth: json['end_month_year'],
+      fare: json['fare'],
+      paymentMode: json['payment_mode'],
       startTrip: json['start_trip'],
     );
   }
@@ -101,6 +119,12 @@ class OngoingTripRequest {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
+    data['route'] = this.route;
+    data['stoppage'] = this.stoppage;
+    data['start_month_year'] = this.startMonth;
+    data['end_month_year'] = this.endMonth;
+    data['fare'] = this.fare;
+    data['payment_mode'] = this.paymentMode;
     data['start_trip'] = this.startTrip;
     return data;
   }

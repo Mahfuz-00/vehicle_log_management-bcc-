@@ -1,5 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // For formatting dates
+import 'package:pdf/pdf.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:printing/printing.dart';
+import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import '../../../Data/Data Sources/API Service (Advance Search)/apiserviceAdvanceSearch.dart';
+import '../../../Data/Data Sources/API Service (Download Report)/apiserviceDownloadReport.dart';
 import '../../Widgets/CustomTextField.dart';
 import '../../Widgets/labelTextTemplate.dart';
 import '../../Widgets/searchCard.dart';
@@ -18,11 +28,12 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
   final _dateController = TextEditingController();
   final _reportTypeController = TextEditingController();
   String? name;
+  bool isLoading = false;
   String? vehicleName;
   String? driverNumber;
   String? routeLocation;
   String? selectedDate;
-  String? reportType;
+  String? TripType;
   String? dateType; // For route/location condition
   String? selectedLocationType; // 'Stoppage' or 'Location'
   final List<String> reportFields = [];
@@ -36,23 +47,211 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
 
   List<Map<String, dynamic>> searchResults = []; // API result placeholder
 
-  void fetchSearchResults() {
-    // Call API with search parameters
+  void fetchSearchResults() async {
     setState(() {
-      searchResults = [
-        {
-          'name': 'John Doe',
-          'vehicle': 'Car A',
-          'driverNumber': '1234',
-          'route': 'Route 1',
-          'date': '2024-12-01',
-        }
-      ];
+      isLoading = true; // Set loading state to true while fetching data
     });
+
+    try {
+      // Initialize the SearchService inside the function
+      final searchService = await AdvanceSearchAPIService
+          .create(); // Create an instance of SearchService
+
+      // Call the API to fetch search results with dynamic data
+      final results = await searchService.searchAPI(
+        name: _nameController.text,
+        // Replace with actual data (e.g., from text controllers)
+        vehicleName: _vehicleController.text,
+        driverName: _driverController.text,
+        locationName: _routeLocationController.text,
+        locationDate: _dateController.text,
+        locationType: TripType,
+        stoppageName: '',
+        date: _dateController.text,
+      );
+
+      setState(() {
+        searchResults =
+            results; // Update the search results with the API response
+        isLoading = false; // Set loading state to false after fetching data
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false; // Set loading state to false if there's an error
+      });
+      print('Error: $e');
+    }
   }
 
-  void downloadReport(String format) {
-    debugPrint('Download report in $format');
+  Future<void> downloadReport(String format) async {
+    const snackBar = SnackBar(
+      content: Text('Sending Request, Please wait'),
+    );
+    ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+    print('Print Triggered!!');
+    try {
+      // Initialize the SearchService inside the function
+      final searchService = await ReportDownloadAPIService
+          .create(); // Create an instance of SearchService
+
+      String LocationName = '';
+      String StoppageName = '';
+
+      if (selectedLocationType == 'Stoppage') {
+        StoppageName = _routeLocationController.text;
+      } else if (selectedLocationType == 'Location') {
+        LocationName = _routeLocationController.text;
+      } else {}
+      // Call the API to fetch search results with dynamic data
+      final dashboardData = await searchService.DownloadReport(
+        name: _nameController.text,
+        vehicleName: _vehicleController.text,
+        driverName: _driverController.text,
+        locationName: LocationName,
+        locationDate: _dateController.text,
+        locationType: TripType,
+        stoppageName: StoppageName,
+        printType: format,
+        stoppagedate: _dateController.text,
+        routeType: selectedLocationType,
+      );
+
+      print('Print Triggered!!');
+      if (dashboardData == null || dashboardData.isEmpty) {
+        print(
+            'No data available or error occurred while fetching dashboard data');
+        return;
+      }
+      print(dashboardData);
+
+      /*    final Map<String, dynamic>? records = dashboardData['data'] ?? [];
+      print(records);
+      if (records == null || records.isEmpty) {
+        print('No records available');
+        return;
+      }*/
+
+      String link = dashboardData['download_url'];
+      if (format == 'PDF') {
+        const snackBar = SnackBar(
+          content: Text('Printing PDF. Please wait...'),
+        );
+        ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+        print('Print Triggered!!');
+        print('PDF generated successfully. Download URL: ${link}');
+        try {
+          print('PDF generated successfully. Download URL: ${link}');
+          final Uri url = Uri.parse(link);
+          var data = await http.get(url);
+          await Printing.layoutPdf(
+              onLayout: (PdfPageFormat format) async => data.bodyBytes);
+        } catch (e) {
+          const snackBar = SnackBar(
+            content: Text('Download Failed. Please try again'),
+          );
+          ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+          print('Error generating PDF: $e');
+        }
+      }
+
+      if (format == 'Excel') {
+        const snackBar = SnackBar(
+          content: Text('Downloading Excel File. Please wait...'),
+        );
+        ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+        print('Excel download URL: $link');
+        try {
+          // Request storage permission
+          if (await Permission.storage.request().isGranted) {
+            // Download the file
+            final Uri url = Uri.parse(link);
+            var response = await http.get(url);
+        /*    final snackBar = SnackBar(
+              content: Text('Response: $response'),
+            );
+            ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);*/
+            if (response.statusCode == 200) {
+              // Get the Downloads directory
+              final directory = Directory('/storage/emulated/0/Download');
+              if (!await directory.exists()) {
+                await directory.create(recursive: true);
+              }
+
+              // Save the file
+              final filePath = '${directory.path}/ict_division_vehicle_report_file.xlsx';
+              final file = File(filePath);
+              await file.writeAsBytes(response.bodyBytes);
+              print('Excel downloaded successfully: $filePath');
+
+              final snackBar = SnackBar(
+                content: Text('File downloaded in $filePath'),
+              );
+              ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+
+              // Open the file
+              await OpenFile.open(filePath);
+            } else {
+              print('Failed to download file. Status code: ${response.statusCode}');
+           /*   final snackBar = SnackBar(
+                content: Text('Failed to download file. Status code: ${response.statusCode}'),
+              );
+              ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);*/
+            }
+          } else {
+            requestStoragePermission();
+            final snackBar = SnackBar(
+              content: Text('Storage permission denied.'),
+            );
+            ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+            print('Storage permission denied.');
+          }
+        } catch (e) {
+          final snackBar = SnackBar(
+            content: Text('Download Failed.'),
+          );
+          ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+          print('Error downloading or opening Excel file: $e');
+        }
+      }
+
+      /*  final Map<String, dynamic>? records = dashboardData['data'] ?? [];
+      print(records);
+      if (records == null || records.isEmpty) {
+        print('No records available');
+        return;
+      }*/
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<bool> requestStoragePermission() async {
+    // Check current permission status
+    var status = await Permission.storage.status;
+    print("Storage permission status: $status");
+
+    if (status.isDenied || status.isRestricted || status.isLimited) {
+      // Explicitly request the permission
+      status = await Permission.storage.request();
+    }
+
+    // Check the result after the request
+    if (status.isGranted) {
+      print("Storage permission granted.");
+      return true;
+    } else if (status.isPermanentlyDenied) {
+      final snackBar = SnackBar(
+        content: Text('Download Failed.'),
+      );
+      ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+      // If permission is permanently denied, open app settings
+      print("Storage permission permanently denied.");
+      await openAppSettings();
+    } else {
+      print("Storage permission denied.");
+    }
+
+    return false;
   }
 
   @override
@@ -200,7 +399,7 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
               SizedBox(
                 height: 10,
               ),
-              if(selectedLocationType == 'Location')...[
+              if (selectedLocationType == 'Location') ...[
                 LabeledTextWithoutAsterisk(text: 'Location Name'),
                 SizedBox(height: 5),
                 CustomTextFormField(
@@ -215,7 +414,7 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
                   keyboardType: TextInputType.text,
                 ),
               ],
-              if(selectedLocationType == 'Stoppage')...[
+              if (selectedLocationType == 'Stoppage') ...[
                 LabeledTextWithoutAsterisk(text: 'Stoppage Name'),
                 SizedBox(height: 5),
                 CustomTextFormField(
@@ -242,13 +441,13 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
                       _dateController.text = value!;
                     }),
 
-              if(selectedLocationType != 'Stoppage')...[
+              if (selectedLocationType != 'Stoppage') ...[
                 LabeledTextWithoutAsterisk(text: 'Trip Category'),
                 SizedBox(height: 5),
                 _buildDropdown(
                   'Type',
                   ['Personal', 'Official'],
-                      (value) => reportType = value,
+                  (value) => TripType = value,
                 ),
               ],
 
@@ -300,14 +499,16 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
-                          fixedSize: Size(MediaQuery.of(context).size.width * 0.4,
+                          backgroundColor:
+                              const Color.fromRGBO(25, 192, 122, 1),
+                          fixedSize: Size(
+                              MediaQuery.of(context).size.width * 0.4,
                               MediaQuery.of(context).size.height * 0.06),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () => _showFieldsDialog(context, 'PDF'),
+                        onPressed: () => downloadReport('PDF'),
                         child: Text(
                           'Download PDF',
                           textAlign: TextAlign.center,
@@ -322,14 +523,16 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
                       SizedBox(width: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
-                          fixedSize: Size(MediaQuery.of(context).size.width * 0.4,
+                          backgroundColor:
+                              const Color.fromRGBO(25, 192, 122, 1),
+                          fixedSize: Size(
+                              MediaQuery.of(context).size.width * 0.4,
                               MediaQuery.of(context).size.height * 0.06),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () => _showFieldsDialog(context, 'Excel'),
+                        onPressed: () => downloadReport('Excel'),
                         child: Text(
                           'Download Excel',
                           textAlign: TextAlign.center,

@@ -13,6 +13,7 @@ import '../../../Data/Models/tripRequestModelRecent.dart';
 import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
+import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
@@ -730,7 +731,7 @@ class _AdminDashboardRecentTripsUIState
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginUI()));
+                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
                     }
                   },
                   child: Text(
