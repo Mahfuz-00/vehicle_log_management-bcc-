@@ -24,7 +24,7 @@ import 'dart:convert';
 /// - [toJson]: A method that converts the TripRequest instance to a JSON map.
 /// - [fromJsonList]: A static method that converts a list of JSON maps to a list of TripRequest instances.
 /// - [toJsonList]: A static method that converts a list of TripRequest instances to a list of JSON maps.
-class TripRequest {
+class TripRequestSubmit {
   dynamic name;
   dynamic designation;
   dynamic department;
@@ -50,7 +50,7 @@ class TripRequest {
   dynamic? Duration;
   dynamic? Start;
 
-  TripRequest({
+  TripRequestSubmit({
     required this.name,
     required this.designation,
     required this.department,
@@ -77,8 +77,8 @@ class TripRequest {
     this.DateTime,
   });
 
-  factory TripRequest.fromJson(Map<String, dynamic> json) {
-    return TripRequest(
+  factory TripRequestSubmit.fromJson(Map<String, dynamic> json) {
+    return TripRequestSubmit(
       name: json['name'],
       designation: json['designation'],
       department: json['department'],
@@ -92,10 +92,10 @@ class TripRequest {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
-      route: json['route'],
-      stoppage: json['stoppage'],
-      startMonth: json['start_month_year'],
-      endMonth: json['end_month_year'],
+      route: json['route_name'],
+      stoppage: json['stoppage_name'],
+      startMonth: json['start_month_and_year'],
+      endMonth: json['end_month_and_year'],
       fare: json['fare'],
       paymentMode: json['payment_mode'],
       Driver: json['driver'],
@@ -121,10 +121,10 @@ class TripRequest {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
-    data['route'] = this.route;
-    data['stoppage'] = this.stoppage;
-    data['start_month_year'] = this.startMonth;
-    data['end_month_year'] = this.endMonth;
+    data['route_id'] = this.route;
+    data['stoppage_id'] = this.stoppage;
+    data['start_month_and_year'] = this.startMonth;
+    data['end_month_and_year'] = this.endMonth;
     data['fare'] = this.fare;
     data['payment_mode'] = this.paymentMode;
     data['driver'] = this.Driver;
@@ -135,11 +135,11 @@ class TripRequest {
     return data;
   }
 
-  static List<TripRequest> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => TripRequest.fromJson(json)).toList();
+  static List<TripRequestSubmit> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => TripRequestSubmit.fromJson(json)).toList();
   }
 
-  static List<Map<String, dynamic>> toJsonList(List<TripRequest> trips) {
+  static List<Map<String, dynamic>> toJsonList(List<TripRequestSubmit> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }
 }

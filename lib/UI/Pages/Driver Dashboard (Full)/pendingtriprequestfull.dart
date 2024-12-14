@@ -142,7 +142,7 @@ class _DriverDashboardPendingTripsUIState
 
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],
@@ -162,8 +162,6 @@ class _DriverDashboardPendingTripsUIState
               MaterialPageRoute(
                 builder: (context) => DriverStopTripUI(
                   staff: ApprovedStaffTripRequest(
-                    driver: request['driver'],
-                    Car: request['car'],
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],
@@ -178,28 +176,34 @@ class _DriverDashboardPendingTripsUIState
                     distance: request['approx_distance'],
                     category: request['trip_category'],
                     type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
                   ),
                 ),
               ),
             );
             DriverStopTripUI(
               staff: ApprovedStaffTripRequest(
-                  driver: request['driver'],
-                  Car: request['car'],
-                  name: request['name'],
-                  designation: request['designation'],
-                  department: request['department'],
-                  purpose: request['purpose'],
-                  phone: request['phone'],
-                  destinationFrom: request['destination_from'],
-                  destinationTo: request['destination_to'],
-                  date: request['date'],
-                  startTime: request['start_time'],
-                  endTime: request['end_time'],
-                  distance: request['approx_distance'],
-                  category: request['trip_category'],
-                  type: request['trip_type'],
-                  id: request['trip_id']),
+                id: request['trip_id'],
+                name: request['name'],
+                designation: request['designation'],
+                department: request['department'],
+                purpose: request['purpose'],
+                phone: request['phone'],
+                destinationFrom: request['destination_from'],
+                destinationTo: request['destination_to'],
+                date: request['date'],
+                startTime: request['start_time'],
+                endTime: request['end_time'],
+                distance: request['approx_distance'],
+                category: request['trip_category'],
+                type: request['trip_type'],
+                route: request['route_name'],
+                stoppage: request['stoppage_name'],
+                startMonth: request['start_month_and_year'],
+                endMonth: request['end_month_and_year'],),
             );
           },
         );
@@ -263,7 +267,7 @@ class _DriverDashboardPendingTripsUIState
 
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],
@@ -283,8 +287,6 @@ class _DriverDashboardPendingTripsUIState
               MaterialPageRoute(
                 builder: (context) => DriverStopTripUI(
                   staff: ApprovedStaffTripRequest(
-                    driver: request['driver'],
-                    Car: request['car'],
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],
@@ -299,28 +301,34 @@ class _DriverDashboardPendingTripsUIState
                     distance: request['approx_distance'],
                     category: request['trip_category'],
                     type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
                   ),
                 ),
               ),
             );
             DriverStopTripUI(
               staff: ApprovedStaffTripRequest(
-                  driver: request['driver'],
-                  Car: request['car'],
-                  name: request['name'],
-                  designation: request['designation'],
-                  department: request['department'],
-                  purpose: request['purpose'],
-                  phone: request['phone'],
-                  destinationFrom: request['destination_from'],
-                  destinationTo: request['destination_to'],
-                  date: request['date'],
-                  startTime: request['start_time'],
-                  endTime: request['end_time'],
-                  distance: request['approx_distance'],
-                  category: request['trip_category'],
-                  type: request['trip_type'],
-                  id: request['trip_id']),
+                id: request['trip_id'],
+                name: request['name'],
+                designation: request['designation'],
+                department: request['department'],
+                purpose: request['purpose'],
+                phone: request['phone'],
+                destinationFrom: request['destination_from'],
+                destinationTo: request['destination_to'],
+                date: request['date'],
+                startTime: request['start_time'],
+                endTime: request['end_time'],
+                distance: request['approx_distance'],
+                category: request['trip_category'],
+                type: request['trip_type'],
+                route: request['route_name'],
+                stoppage: request['stoppage_name'],
+                startMonth: request['start_month_and_year'],
+                endMonth: request['end_month_and_year'],),
             );
           },
         );

@@ -155,7 +155,7 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
 
       final List<Widget> recentWidgets = recentTripData.map((request) {
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],
@@ -175,23 +175,28 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
                   staff: RecentTrip(
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      startTime: request['start_time'],
-                      endTime: request['end_time'],
-                      distance: request['approx_distance'],
-                      category: request['trip_category'],
-                      type: request['trip_type'],
-                      driver: request['driver'],
-                      Car: request['car'],
-                      id: request['trip_id'],
-                      Duration: request['duration']),
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
+                    DateTime: request['date_time'],
+                    Driver: request['driver'],
+                    Car: request['car'],
+                    Duration: request['duration'],
+                    Start: request['start'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],),
                 ),
               ),
             );
@@ -257,7 +262,7 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
 
       final List<Widget> recentWidgets = recentTripData.map((request) {
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],
@@ -277,23 +282,28 @@ class _DriverDashboardRecentTripsUIState extends State<DriverDashboardRecentTrip
               MaterialPageRoute(
                 builder: (context) => RecentTripDetails(
                   staff: RecentTrip(
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      startTime: request['start_time'],
-                      endTime: request['end_time'],
-                      distance: request['approx_distance'],
-                      category: request['trip_category'],
-                      type: request['trip_type'],
-                      driver: request['driver'],
-                      Car: request['car'],
-                      id: request['trip_id'],
-                      Duration: request['duration']),
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
+                    DateTime: request['date_time'],
+                    Driver: request['driver'],
+                    Car: request['car'],
+                    Duration: request['duration'],
+                    Start: request['start'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],),
                 ),
               ),
             );

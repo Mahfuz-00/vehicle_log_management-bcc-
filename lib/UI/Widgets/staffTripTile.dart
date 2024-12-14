@@ -9,13 +9,13 @@ import '../../Data/Models/tripRequestModel.dart';
 /// background color and includes a forward arrow icon for navigation.
 ///
 /// The widget takes two parameters:
-/// - [staff]: a [TripRequest] object that contains the details
+/// - [staff]: a [TripRequestSubmit] object that contains the details
 ///   of the trip request.
 /// - [onPressed]: a callback function that is executed when the
 ///   tile is tapped, allowing the parent widget to define the
 ///   action to be taken on tap.
 class StaffTile extends StatelessWidget {
-  final TripRequest staff;
+  final TripRequestSubmit staff;
   final VoidCallback onPressed;
 
   final DateFormat dateFormat = DateFormat('dd-MM-yyyy');

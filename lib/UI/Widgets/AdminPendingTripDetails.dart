@@ -172,17 +172,17 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
                       _buildRow('Trip Category', staff.category),
                       if(staff.category != 'Pick Drop')...[
                         _buildRow('Trip Type', staff.type!),
-                        _buildRow('Date', staff.date!),
-                        _buildRow('Start Time', staff.startTime!),
-                        _buildRow('End Time', staff.endTime!),
+                        _buildRowTime('Date', staff.date!),
+                        _buildRowTime('Start Time', staff.startTime!),
+                        _buildRowTime('End Time', staff.endTime!),
                         _buildRow('Destination From', staff.destinationFrom!),
                         _buildRow('Destination To', staff.destinationTo!),
                         _buildRow('Distance', '${staff.distance} KM'),
                       ], if(staff.category == 'Pick Drop') ...[
                         _buildRow('Route', staff.route!),
                         _buildRow('Stoppage', staff.stoppage!),
-                        _buildRow('Start Month', staff.startMonth!),
-                        _buildRow('End Month', staff.endMonth!),
+                        _buildRowTime('Start Month', staff.startMonth!),
+                        _buildRowTime('End Month', staff.endMonth!),
                       ],
                       SizedBox(height: 10),
                       Divider(),
@@ -288,168 +288,93 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
     }
   }
 
-  Widget _buildRowTime(String label, String? value) {
-    print(value);
-
-    // Check if the value is null, empty, or "None"
-    if (value == null || value.isEmpty || value == 'None') {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: label,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      height: 1.6,
-                      letterSpacing: 1.3,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              ":",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "No Date", // Display "No Date" if value is null
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-                height: 1.6,
-                letterSpacing: 1.3,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'default',
-              ),
-            ),
-          ),
-        ],
-      );
-    }
+  Widget _buildRowTime(String label, String value) {
+    String formattedDate = 'Invalid date';
 
     try {
-      // Attempt to parse the date
-      DateTime date = DateTime.parse(value);
-      DateFormat dateFormat = DateFormat.yMMMMd('en_US');
-      DateFormat timeFormat = DateFormat.jm();
-      String formattedDate = dateFormat.format(date);
-      String formattedTime = timeFormat.format(date);
+      if (staff.category == 'Pick Drop') {
+        // Parse the date using the appropriate format for 'Pick Drop'
+        DateTime dateTime = DateFormat('yyyy-MM-dd').parse(value);
+        // Format the parsed date into "MMMM yyyy" (e.g., "January 2024")
+        formattedDate = DateFormat.yMMMM('en_US').format(dateTime);
+      } else {
+        DateTime dateTime;
 
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: label,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      height: 1.6,
-                      letterSpacing: 1.3,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              ":",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              formattedDate, // Format date as DD/MM/YYYY
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-                height: 1.6,
-                letterSpacing: 1.3,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'default',
-              ),
-            ),
-          ),
-        ],
-      );
+        // Identify if the input contains date only, time only, or both
+        if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+          // Input contains only a date (e.g., "2024-01-01")
+          dateTime = DateFormat('yyyy-MM-dd').parse(value);
+          formattedDate = DateFormat.yMMMMd('en_US')
+              .format(dateTime); // e.g., "January 1, 2024"
+        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$').hasMatch(value)) {
+          // Input contains only a time (e.g., "10:30" or "10:30:00")
+          dateTime = DateFormat('HH:mm').parse(value, true);
+          formattedDate = DateFormat.jm().format(dateTime); // e.g., "10:30 AM"
+        } else if (RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$')
+            .hasMatch(value)) {
+          // Input contains both date and time (e.g., "2024-01-01 10:30:00")
+          dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(value);
+          String formattedDatePart =
+          DateFormat.yMMMMd('en_US').format(dateTime);
+          String formattedTimePart = DateFormat.jm().format(dateTime);
+          formattedDate =
+          '$formattedDatePart, $formattedTimePart'; // Combine date and time
+        } else {
+          throw FormatException('Unsupported date/time format: $value');
+        }
+      }
     } catch (e) {
-      // If there's a parsing error, handle it and display a default message
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: label,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      height: 1.6,
-                      letterSpacing: 1.3,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              ":",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "Invalid Date", // Display this when date format is invalid
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-                height: 1.6,
-                letterSpacing: 1.3,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'default',
-              ),
-            ),
-          ),
-        ],
-      );
+      print('Error parsing date: $e');
     }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: label,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    height: 1.6,
+                    letterSpacing: 1.3,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            ":",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            formattedDate, // Display the formatted date
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              height: 1.6,
+              letterSpacing: 1.3,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'default',
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
 

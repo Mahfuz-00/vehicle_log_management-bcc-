@@ -134,15 +134,22 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
                                     _buildRow('Name', staff.name),
                                     _buildRow('Designation', staff.designation),
                                     _buildRow('Department', staff.department),
-                                    _buildRow('Trip Type', staff.type),
-                                    _buildRowTime('Date', staff.date),
-                                    _buildRow('Start Time', staff.startTime),
-                                    _buildRow('Destination From',
-                                        staff.destinationFrom),
-                                    _buildRow(
-                                        'Destination To', staff.destinationTo),
-                                    _buildRow('Driver', staff.driver),
-                                    _buildRow('Car', staff.Car),
+                                    _buildRow('Mobile Number', staff.phone),
+                                    _buildRow('Trip Category', staff.category),
+                                    if(staff.category != 'Pick Drop')...[
+                                      _buildRow('Trip Type', staff.type!),
+                                      _buildRowTime('Date', staff.date!),
+                                      _buildRow('Start Time', staff.startTime!),
+                                      _buildRow('End Time', staff.endTime!),
+                                      _buildRow('Destination From', staff.destinationFrom!),
+                                      _buildRow('Destination To', staff.destinationTo!),
+                                      _buildRow('Distance', '${staff.distance} KM'),
+                                    ], if(staff.category == 'Pick Drop') ...[
+                                      _buildRow('Route', staff.route!),
+                                     // _buildRow('Stoppage', staff.stoppage!),
+                                      _buildRowTime('Start Month', staff.startMonth!),
+                                      _buildRowTime('End Month', staff.endMonth!),
+                                    ],
                                   ],
                                 ),
                               ),
@@ -161,14 +168,26 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(
-                                      '${staff.destinationFrom} to ${staff.destinationTo}',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 30,
-                                        fontFamily: 'default',
-                                      )),
+                                  if(staff.category != 'Pick Drop') ...[
+                                    Text(
+                                        '${staff.destinationFrom} to ${staff.destinationTo}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          fontFamily: 'default',
+                                        )),
+                                  ],
+                                  if(staff.category == 'Pick Drop') ...[
+                                    Text(
+                                        '${staff.route}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          fontFamily: 'default',
+                                        )),
+                                  ],
                                   SizedBox(height: screenHeight * 0.03),
                                   Text.rich(
                                     TextSpan(

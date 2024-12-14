@@ -36,16 +36,35 @@ class AdvanceSearchAPIService {
   }) async {
    // _loadAuthToken();
     // Define the parameters to send in the request
-    final Map<String, String> params = {
-      'name': name?? '',
-      'vehicle_name': vehicleName ?? '',
-      'driver_name': driverName ?? '',
-      'location_name': locationName ?? '',
-      'location_date': locationDate ?? '',
-      'location_type': locationType ?? '',
-      'stoppage_name': stoppageName ?? '',
-      'date': date ?? '',
-    };
+    final Map<String, String> params = {};
+
+    if (name != null && name.isNotEmpty) {
+      params['name'] = name;
+    }
+    if (vehicleName != null && vehicleName.isNotEmpty) {
+      params['vehicle_name'] = vehicleName;
+    }
+    if (driverName != null && driverName.isNotEmpty) {
+      params['driver_name'] = driverName;
+    }
+    if (locationName != null && locationName.isNotEmpty) {
+      params['location_name'] = locationName;
+    }
+    if (locationDate != null && locationDate.isNotEmpty) {
+      params['location_date'] = locationDate;
+    }
+    if (locationType != null && locationType.isNotEmpty) {
+      params['location_type'] = locationType;
+    }
+    if (stoppageName != null && stoppageName.isNotEmpty) {
+      params['stoppage_name'] = stoppageName;
+    }
+    if (date != null && date.isNotEmpty) {
+      params['date'] = date;
+    }
+
+    print('Parameters: $params');
+    print('Params: ${json.encode(params)}');
 
     try {
       // Send the POST request
@@ -55,10 +74,20 @@ class AdvanceSearchAPIService {
           'Accept': 'application/json',
           'Authorization': 'Bearer $authToken', // Make sure to replace with your token
         },
-        body: json.encode(params), // Pass parameters as JSON
+        body: /*json.encode(params)*/{
+          "name": "$name" ?? '',
+          "vehicle_name": "$vehicleName" ?? '',
+          "driver_name": "$driverName" ?? '',
+          "location_name": "$locationName" ?? '',
+          "location_date": "$locationDate" ?? '',
+          "location_type": "$locationType" ?? '',
+          "stoppage_name": "$stoppageName" ?? '',
+          "date": "$date" ?? ''
+        }, // Pass parameters as JSON
       );
 
-      print('Response: ${response.body}');
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         // Parse the JSON response

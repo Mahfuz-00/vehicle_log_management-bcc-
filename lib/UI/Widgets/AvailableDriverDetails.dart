@@ -137,7 +137,7 @@ Widget _buildRow(String label, String value) {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: value,
+                  text: value == 'None' ? 'N/A' : value,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,

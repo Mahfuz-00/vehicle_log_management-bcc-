@@ -53,7 +53,7 @@ class TripRequestAPIService {
     return token;
   }
 
-  Future<String> postTripRequest(TripRequest request, File? file) async {
+  Future<String> postTripRequest(TripRequestSubmit request, File? file) async {
     final String token = await authToken;
     try {
       if (token.isEmpty) {

@@ -139,32 +139,31 @@ class _StaffDashboardAcceptedTripsUIState
 
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
-          staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              startTime: request['start_time'],
-              endTime: request['end_time'],
-              distance: request['approx_distance'],
-              category: request['trip_category'],
-              type: request['trip_type'],
+          staff: TripRequestSubmit(
+            name: request['name'],
+            designation: request['designation'],
+            department: request['department'],
+            purpose: request['purpose'],
+            phone: request['phone'],
+            destinationFrom: request['destination_from'],
+            destinationTo: request['destination_to'],
+            date: request['date'],
+            startTime: request['start_time'],
+            endTime: request['end_time'],
+            distance: request['approx_distance'],
+            category: request['trip_category'],
+            type: request['trip_type'],
             route: request['route_name'],
             stoppage: request['stoppage_name'],
             startMonth: request['start_month_and_year'],
-            endMonth: request['end_month_and_year'],),
+            endMonth: request['end_month_and_year'],
+          ),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ApprovedStaffTrip(
                   staff: ApprovedStaffTripRequest(
-                    driver: request['driver'],
-                    Car: request['car'],
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],
@@ -179,6 +178,10 @@ class _StaffDashboardAcceptedTripsUIState
                     distance: request['approx_distance'],
                     category: request['trip_category'],
                     type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
                   ),
                 ),
               ),
@@ -244,32 +247,31 @@ class _StaffDashboardAcceptedTripsUIState
 
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
-          staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              startTime: request['start_time'],
-              endTime: request['end_time'],
-              distance: request['approx_distance'],
-              category: request['trip_category'],
-              type: request['trip_type'],
+          staff: TripRequestSubmit(
+            name: request['name'],
+            designation: request['designation'],
+            department: request['department'],
+            purpose: request['purpose'],
+            phone: request['phone'],
+            destinationFrom: request['destination_from'],
+            destinationTo: request['destination_to'],
+            date: request['date'],
+            startTime: request['start_time'],
+            endTime: request['end_time'],
+            distance: request['approx_distance'],
+            category: request['trip_category'],
+            type: request['trip_type'],
             route: request['route_name'],
             stoppage: request['stoppage_name'],
             startMonth: request['start_month_and_year'],
-            endMonth: request['end_month_and_year'],),
+            endMonth: request['end_month_and_year'],
+          ),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ApprovedStaffTrip(
                   staff: ApprovedStaffTripRequest(
-                    driver: request['driver'],
-                    Car: request['car'],
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],
@@ -284,6 +286,10 @@ class _StaffDashboardAcceptedTripsUIState
                     distance: request['approx_distance'],
                     category: request['trip_category'],
                     type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
                   ),
                 ),
               ),
@@ -725,8 +731,10 @@ class _StaffDashboardAcceptedTripsUIState
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoginwithEmailUI()));
                     }
                   },
                   child: Text(

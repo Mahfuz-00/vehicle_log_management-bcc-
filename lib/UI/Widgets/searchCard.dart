@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SearchResultCard extends StatelessWidget {
   final Map<String, dynamic> result;
@@ -22,31 +23,123 @@ class SearchResultCard extends StatelessWidget {
             _buildResultRow('Vehicle', result['vehicle_name']),
             _buildResultRow('Driver', result['driver_name']),
             _buildResultRow('Trip Category', result['trip_category']),
-            if(result['trip_category'] != 'Pick-Drop')...[
+            if(result['trip_category'] != 'Pick Drop')...[
               _buildResultRow('From', result['destination_from']),
               _buildResultRow('To', result['destination_to']),
-              _buildResultRow('Date', result['date']),
-              _buildResultRow('Start Time', result['start_time']),
-              _buildResultRow('End Time', result['end_time']),
+              _buildRowTime('Date', result['date']),
+              _buildRowTime('Start Time', result['start_time']),
+              _buildRowTime('End Time', result['end_time']),
               _buildResultRow('Distance', result['approx_distance']),
               _buildResultRow('Trip Type', result['type']),
-              _buildResultRow('Start Trip', result['start_trip']),
-              _buildResultRow('Stop Trip', result['stop_trip']),
+              _buildRowTime('Start Trip', result['start_trip']),
+            /*  _buildResultRow('Stop Trip', result['stop_trip']),*/
             ],
-            if(result['trip_category'] == 'Pick-Drop') ...[
+            if(result['trip_category'] == 'Pick Drop') ...[
               _buildResultRow('Stoppage Name', result['stoppage_name']),
-              _buildResultRow('Stoppage Distance', result['stoppage_distance']),
-              _buildResultRow('Stoppage Fare', result['stoppage_fare']),
-              _buildResultRow('Start Month & Year', result['start_month_and_year']),
-              _buildResultRow('End Month & Year', result['end_month_and_year']),
+              _buildResultRow('Stoppage Distance', '${result['stoppage_distance']} KM'),
+              _buildResultRow('Stoppage Fare', '${result['stoppage_fare']} TK'),
+              _buildRowTime('Start Month & Year', result['start_month_and_year']),
+              _buildRowTime('End Month & Year', result['end_month_and_year']),
               _buildResultRow('Payment Method', result['type']),
             ],
-            _buildResultRow('Attachment File', result['attachment_file']),
+      /*      _buildResultRow('Attachment File', result['attachment_file']),*/
             _buildResultRow('Status', result['status']),
 
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildRowTime(String label, String value) {
+    String formattedDate = 'Invalid date';
+
+    try {
+      if (value == 'N/A') {
+        // Handle the "N/A" case explicitly
+        formattedDate = 'N/A';
+      } else if (result['trip_category'] == 'Pick Drop') {
+        // Parse the date using the appropriate format for 'Pick Drop'
+        DateTime dateTime = DateFormat('yyyy-MM-dd').parse(value);
+        // Format the parsed date into "MMMM yyyy" (e.g., "January 2024")
+        formattedDate = DateFormat.yMMMM('en_US').format(dateTime);
+      } else {
+        DateTime dateTime;
+
+        // Identify if the input contains date only, time only, or both
+        if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+          // Input contains only a date (e.g., "2024-01-01")
+          dateTime = DateFormat('yyyy-MM-dd').parse(value);
+          formattedDate = DateFormat.yMMMMd('en_US')
+              .format(dateTime); // e.g., "January 1, 2024"
+        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$').hasMatch(value)) {
+          // Input contains only a time (e.g., "10:30" or "10:30:00")
+          dateTime = DateFormat('HH:mm').parse(value, true);
+          formattedDate = DateFormat.jm().format(dateTime); // e.g., "10:30 AM"
+        } else if (RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$')
+            .hasMatch(value)) {
+          // Input contains both date and time (e.g., "2024-01-01 10:30:00")
+          dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(value);
+          String formattedDatePart =
+          DateFormat.yMMMMd('en_US').format(dateTime);
+          String formattedTimePart = DateFormat.jm().format(dateTime);
+          formattedDate =
+          '$formattedDatePart, $formattedTimePart'; // Combine date and time
+        } else {
+          throw FormatException('Unsupported date/time format: $value');
+        }
+      }
+    } catch (e) {
+      print('Error parsing date: $e');
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: label,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    height: 1.6,
+                    letterSpacing: 1.3,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            ":",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            formattedDate, // Display the formatted date
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              height: 1.6,
+              letterSpacing: 1.3,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'default',
+            ),
+          ),
+        ),
+      ],
     );
   }
 

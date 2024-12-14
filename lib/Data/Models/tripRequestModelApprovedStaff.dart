@@ -24,27 +24,34 @@ import 'dart:convert';
 /// - [type]: A String representing the type of the trip.
 /// - [startTrip]: A DateTime representing the actual start time of the trip.
 class ApprovedStaffTripRequest {
-  String driver;
-  String Car;
   int id;
-  String name;
-  String designation;
-  String department;
-  String purpose;
-  String phone;
-  String destinationFrom;
-  String destinationTo;
-  String date;
-  String startTime;
-  String endTime;
-  String distance;
-  String category;
-  String type;
-  DateTime? startTrip;
+  dynamic name;
+  dynamic designation;
+  dynamic department;
+  dynamic? purpose;
+  dynamic phone;
+  dynamic? destinationFrom;
+  dynamic? destinationTo;
+  dynamic? date;
+  dynamic? startTime;
+  dynamic? endTime;
+  dynamic? distance;
+  dynamic category;
+  dynamic? type;
+  dynamic? route;
+  dynamic? stoppage;
+  dynamic? startMonth;
+  dynamic? endMonth;
+  dynamic? fare;
+  dynamic? paymentMode;
+  dynamic? DateTime;
+  dynamic? Driver;
+  dynamic? Car;
+  dynamic? Duration;
+  dynamic? Start;
+
 
   ApprovedStaffTripRequest({
-    required this.driver,
-    required this.Car,
     required this.id,
     required this.name,
     required this.designation,
@@ -59,13 +66,21 @@ class ApprovedStaffTripRequest {
     required this.distance,
     required this.category,
     required this.type,
-    this.startTrip,
+    this.route,
+    this.stoppage,
+    this.startMonth,
+    this.endMonth,
+    this.fare,
+    this.paymentMode,
+    this.Driver,
+    this.Car,
+    this.Duration,
+    this.Start,
+    this.DateTime,
   });
 
   factory ApprovedStaffTripRequest.fromJson(Map<String, dynamic> json) {
     return ApprovedStaffTripRequest(
-      driver: json['driver'],
-      Car: json['car'],
       id: json['trip_id'],
       name: json['name'],
       designation: json['designation'],
@@ -80,14 +95,23 @@ class ApprovedStaffTripRequest {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
-      startTrip: json['start_trip'] != null ? DateTime.parse(json['start_trip']) : null,
+      route: json['route_id'],
+      stoppage: json['stoppage_id'],
+      startMonth: json['start_month_and_year'],
+      endMonth: json['end_month_and_year'],
+      fare: json['fare'],
+      paymentMode: json['payment_mode'],
+      Driver: json['driver'],
+      Car: json['car'],
+      Duration: json['duration'],
+      Start: json['start'],
+      DateTime: json['date_time'],
+
     );
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['driver'] = this.driver;
-    data['car'] = this.Car;
     data['id'] = this.id;
     data['name'] = this.name;
     data['designation'] = this.designation;
@@ -102,6 +126,17 @@ class ApprovedStaffTripRequest {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
+    data['route_name'] = this.route;
+    data['stoppage_name'] = this.stoppage;
+    data['start_month_and_year'] = this.startMonth;
+    data['end_month_and_year'] = this.endMonth;
+    data['fare'] = this.fare;
+    data['payment_mode'] = this.paymentMode;
+    data['driver'] = this.Driver;
+    data['car'] = this.Car;
+    data['duration'] = this.Duration;
+    data['start'] = this.Start;
+    data['date_time'] = this.DateTime;
     return data;
   }
 

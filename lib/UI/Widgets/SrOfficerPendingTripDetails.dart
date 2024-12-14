@@ -33,6 +33,24 @@ class SROfficerPendingTrip extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    print('Staff Name: ${staff.name}');
+    print('Designation: ${staff.designation}');
+    print('Department: ${staff.department}');
+    print('Phone: ${staff.phone}');
+    print('Trip Category: ${staff.category}');
+    print('Type: ${staff.type}');
+    print('Date: ${staff.date!}');
+    print('Start Time ${staff.startTime!}');
+    print('End Time ${staff.endTime!}');
+    print('Destination From: ${staff.destinationFrom}');
+    print('Destination To: ${staff.destinationTo}');
+    print('Distance: ${staff.distance} KM');
+    print('Route: ${staff.route}');
+    print('Stoppage: ${staff.stoppage}');
+    print('Start Month: ${staff.startMonth}');
+    print('End Month: ${staff.endMonth}');
+
+
     return InternetConnectionChecker(
       child: Scaffold(
         key: _scaffoldKey,
@@ -87,7 +105,7 @@ class SROfficerPendingTrip extends StatelessWidget {
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
                 _buildRow('Trip Category', staff.category),
-                if(staff.category != 'Pick-Drop')...[
+                if(staff.category != 'Pick Drop')...[
                   _buildRow('Trip Type', staff.type!),
                   _buildRowTime('Date', staff.date!),
                   _buildRow('Start Time', staff.startTime!),
@@ -188,15 +206,47 @@ class SROfficerPendingTrip extends StatelessWidget {
   }
 
   Widget _buildRowTime(String label, String value) {
-    //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
+    String formattedDate = 'Invalid date';
 
-    DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-    String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
-    DateTime date = DateTime.parse(value);
-    DateFormat dateFormat = DateFormat.yMMMMd('en_US');
-    DateFormat timeFormat = DateFormat.jm();
-    String formattedDate = dateFormat.format(date);
-    String formattedTime = timeFormat.format(date);
+    try {
+      if (value == 'N/A') {
+        // Handle the "N/A" case explicitly
+        formattedDate = 'N/A';
+      } else if (staff.category == 'Pick Drop') {
+        // Parse the date using the appropriate format for 'Pick Drop'
+        DateTime dateTime = DateFormat('yyyy-MM-dd').parse(value);
+        // Format the parsed date into "MMMM yyyy" (e.g., "January 2024")
+        formattedDate = DateFormat.yMMMM('en_US').format(dateTime);
+      } else {
+        DateTime dateTime;
+
+        // Identify if the input contains date only, time only, or both
+        if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+          // Input contains only a date (e.g., "2024-01-01")
+          dateTime = DateFormat('yyyy-MM-dd').parse(value);
+          formattedDate = DateFormat.yMMMMd('en_US')
+              .format(dateTime); // e.g., "January 1, 2024"
+        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$').hasMatch(value)) {
+          // Input contains only a time (e.g., "10:30" or "10:30:00")
+          dateTime = DateFormat('HH:mm').parse(value, true);
+          formattedDate = DateFormat.jm().format(dateTime); // e.g., "10:30 AM"
+        } else if (RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$')
+            .hasMatch(value)) {
+          // Input contains both date and time (e.g., "2024-01-01 10:30:00")
+          dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(value);
+          String formattedDatePart =
+          DateFormat.yMMMMd('en_US').format(dateTime);
+          String formattedTimePart = DateFormat.jm().format(dateTime);
+          formattedDate =
+          '$formattedDatePart, $formattedTimePart'; // Combine date and time
+        } else {
+          throw FormatException('Unsupported date/time format: $value');
+        }
+      }
+    } catch (e) {
+      print('Error parsing date: $e');
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -232,7 +282,7 @@ class SROfficerPendingTrip extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            formattedDate, // Format date as DD/MM/YYYY
+            formattedDate, // Display the formatted date
             style: TextStyle(
               color: Colors.black,
               fontSize: 18,
@@ -246,6 +296,7 @@ class SROfficerPendingTrip extends StatelessWidget {
       ],
     );
   }
+
 
   Widget _buildRow(String label, String value) {
     return Row(
@@ -286,7 +337,7 @@ class SROfficerPendingTrip extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: value,
+                  text: value == 'None' ? 'N/A' : value,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,

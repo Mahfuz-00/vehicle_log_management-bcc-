@@ -56,7 +56,9 @@ class ApprovedStaffTrip extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 40,),
+                SizedBox(
+                  height: 40,
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0),
                   child: const Center(
@@ -78,17 +80,21 @@ class ApprovedStaffTrip extends StatelessWidget {
                 _buildRow('Designation', staff.designation),
                 _buildRow('Department', staff.department),
                 _buildRow('Mobile Number', staff.phone),
-                _buildRow('Trip Type', staff.type),
-                _buildRow('Date', staff.date),
-                _buildRow('Start Time', staff.startTime),
-                _buildRow('End Time', staff.endTime),
-                _buildRow('Distance', '${staff.distance} KM'),
-                _buildRow('Trip Type', staff.category),
-                _buildRow('Trip Mode', staff.type),
-                _buildRow('Destination From', staff.destinationFrom),
-                _buildRow('Destination To', staff.destinationTo),
-                _buildRow('Driver', staff.driver),
-                _buildRow('Car', staff.Car),
+                _buildRow('Trip Category', staff.category),
+                if(staff.category != 'Pick Drop')...[
+                  _buildRow('Trip Type', staff.type!),
+                  _buildRowTime('Date', staff.date!),
+                  _buildRow('Start Time', staff.startTime!),
+                  _buildRow('End Time', staff.endTime!),
+                  _buildRow('Destination From', staff.destinationFrom!),
+                  _buildRow('Destination To', staff.destinationTo!),
+                  _buildRow('Distance', '${staff.distance} KM'),
+                ], if(staff.category == 'Pick Drop') ...[
+                  _buildRow('Route', staff.route!),
+                  _buildRow('Stoppage', staff.stoppage!),
+                  _buildRowTime('Start Month', staff.startMonth!),
+                  _buildRowTime('End Month', staff.endMonth!),
+                ],
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(
@@ -120,68 +126,48 @@ class ApprovedStaffTrip extends StatelessWidget {
     );
   }
 
-  Widget _buildRowTime(String label, dynamic value) {
+  Widget _buildRowTime(String label, String value) {
+    String formattedDate = 'Invalid date';
 
-    // Check if the value is null, empty, or "None"
-    if (value == null || value.isEmpty || value == 'None') {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: label,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      height: 1.6,
-                      letterSpacing: 1.3,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'default',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              ":",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "No Date", // Display "No Date" if value is null
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 18,
-                height: 1.6,
-                letterSpacing: 1.3,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'default',
-              ),
-            ),
-          ),
-        ],
-      );
+    try {
+      if (value == 'N/A') {
+        // Handle the "N/A" case explicitly
+        formattedDate = 'N/A';
+      } else if (staff.category == 'Pick Drop') {
+        // Parse the date using the appropriate format for 'Pick Drop'
+        DateTime dateTime = DateFormat('yyyy-MM-dd').parse(value);
+        // Format the parsed date into "MMMM yyyy" (e.g., "January 2024")
+        formattedDate = DateFormat.yMMMM('en_US').format(dateTime);
+      } else {
+        DateTime dateTime;
+
+        // Identify if the input contains date only, time only, or both
+        if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+          // Input contains only a date (e.g., "2024-01-01")
+          dateTime = DateFormat('yyyy-MM-dd').parse(value);
+          formattedDate = DateFormat.yMMMMd('en_US')
+              .format(dateTime); // e.g., "January 1, 2024"
+        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$').hasMatch(value)) {
+          // Input contains only a time (e.g., "10:30" or "10:30:00")
+          dateTime = DateFormat('HH:mm').parse(value, true);
+          formattedDate = DateFormat.jm().format(dateTime); // e.g., "10:30 AM"
+        } else if (RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$')
+            .hasMatch(value)) {
+          // Input contains both date and time (e.g., "2024-01-01 10:30:00")
+          dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(value);
+          String formattedDatePart =
+          DateFormat.yMMMMd('en_US').format(dateTime);
+          String formattedTimePart = DateFormat.jm().format(dateTime);
+          formattedDate =
+          '$formattedDatePart, $formattedTimePart'; // Combine date and time
+        } else {
+          throw FormatException('Unsupported date/time format: $value');
+        }
+      }
+    } catch (e) {
+      print('Error parsing date: $e');
     }
-    //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
 
-    DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-    String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
-    DateTime date = DateTime.parse(value);
-    DateFormat dateFormat = DateFormat.yMMMMd('en_US');
-    DateFormat timeFormat = DateFormat.jm();
-    String formattedDate = dateFormat.format(date);
-    String formattedTime = timeFormat.format(date);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -217,7 +203,7 @@ class ApprovedStaffTrip extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            formattedDate, // Format date as DD/MM/YYYY
+            formattedDate, // Display the formatted date
             style: TextStyle(
               color: Colors.black,
               fontSize: 18,
@@ -271,7 +257,7 @@ class ApprovedStaffTrip extends StatelessWidget {
             text: TextSpan(
               children: [
                 TextSpan(
-                  text: value,
+                  text: value == 'None' ? 'N/A' : value,
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,

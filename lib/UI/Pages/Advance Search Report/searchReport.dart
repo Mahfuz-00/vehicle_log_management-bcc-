@@ -33,9 +33,9 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
   String? driverNumber;
   String? routeLocation;
   String? selectedDate;
-  String? TripType;
-  String? dateType; // For route/location condition
-  String? selectedLocationType; // 'Stoppage' or 'Location'
+  String? TripType = '';
+  String? dateType = ''; // For route/location condition
+  String? selectedLocationType = ''; // 'Stoppage' or 'Location'
   final List<String> reportFields = [];
   final List<String> availableFields = [
     'Name',
@@ -53,6 +53,14 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
     });
 
     try {
+      print('Name : ${_nameController.text}');
+      print('Vehicle Name : ${_vehicleController.text}');
+      print('Driver Number : ${_driverController.text}');
+      print('Route/Location : ${_routeLocationController.text}');
+      print('Date : ${_dateController.text}');
+      print('Trip Type : ${TripType}');
+      print('Stoppage Name : ${selectedLocationType}');
+      print('Date Type : ${dateType}');
       // Initialize the SearchService inside the function
       final searchService = await AdvanceSearchAPIService
           .create(); // Create an instance of SearchService
@@ -66,7 +74,7 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
         locationName: _routeLocationController.text,
         locationDate: _dateController.text,
         locationType: TripType,
-        stoppageName: '',
+        stoppageName: selectedLocationType,
         date: _dateController.text,
       );
 
@@ -166,7 +174,7 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
             // Download the file
             final Uri url = Uri.parse(link);
             var response = await http.get(url);
-        /*    final snackBar = SnackBar(
+            /*    final snackBar = SnackBar(
               content: Text('Response: $response'),
             );
             ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);*/
@@ -178,7 +186,8 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
               }
 
               // Save the file
-              final filePath = '${directory.path}/ict_division_vehicle_report_file.xlsx';
+              final filePath =
+                  '${directory.path}/ict_division_vehicle_report_file.xlsx';
               final file = File(filePath);
               await file.writeAsBytes(response.bodyBytes);
               print('Excel downloaded successfully: $filePath');
@@ -186,13 +195,15 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
               final snackBar = SnackBar(
                 content: Text('File downloaded in $filePath'),
               );
-              ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+              ScaffoldMessenger.of(context as BuildContext)
+                  .showSnackBar(snackBar);
 
               // Open the file
               await OpenFile.open(filePath);
             } else {
-              print('Failed to download file. Status code: ${response.statusCode}');
-           /*   final snackBar = SnackBar(
+              print(
+                  'Failed to download file. Status code: ${response.statusCode}');
+              /*   final snackBar = SnackBar(
                 content: Text('Failed to download file. Status code: ${response.statusCode}'),
               );
               ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);*/
@@ -202,7 +213,8 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
             final snackBar = SnackBar(
               content: Text('Storage permission denied.'),
             );
-            ScaffoldMessenger.of(context as BuildContext).showSnackBar(snackBar);
+            ScaffoldMessenger.of(context as BuildContext)
+                .showSnackBar(snackBar);
             print('Storage permission denied.');
           }
         } catch (e) {
@@ -465,15 +477,17 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
                     ),
                   ),
                   onPressed: fetchSearchResults,
-                  child: Text(
-                    'Search',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      fontFamily: 'default',
-                    ),
-                  ),
+                  child: isLoading
+                      ? CircularProgressIndicator()
+                      : Text(
+                          'Search',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            fontFamily: 'default',
+                          ),
+                        ),
                 ),
               ),
 
@@ -550,6 +564,35 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
                 SizedBox(
                   height: 20,
                 )
+              ] else ...[
+                Text(
+                  'Search Results',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontFamily: 'default',
+                  ),
+                ),
+                Divider(),
+                SizedBox(
+                  height: 20,
+                ),
+                Center(
+                  child: Text(
+                    'No Data Found',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      fontFamily: 'default',
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 70,
+                ),
               ],
             ],
           ),

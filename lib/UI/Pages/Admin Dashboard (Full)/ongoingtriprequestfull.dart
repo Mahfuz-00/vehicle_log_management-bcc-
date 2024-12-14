@@ -161,7 +161,7 @@ class _AdminDashboardOngoingTripsUIState
 
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],
@@ -288,7 +288,7 @@ class _AdminDashboardOngoingTripsUIState
 
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],

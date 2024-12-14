@@ -1,4 +1,4 @@
-import 'dart:convert';  // For encoding/decoding JSON
+import 'dart:convert'; // For encoding/decoding JSON
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,17 +47,16 @@ class ReportDownloadAPIService {
     print('Stoppage Date: $stoppagedate');
     print('Route Type: $routeType');
 
-
     String url = '';
-    if(printType == 'PDF'){
+    if (printType == 'PDF') {
       url = 'https://bcc.touchandsolve.com/api/vlm/pdf/download/trips';
-    } else if(printType == 'Excel') {
+    } else if (printType == 'Excel') {
       url = 'https://bcc.touchandsolve.com/api/vlm/excel/download/trips';
     }
     // _loadAuthToken();
     // Define the parameters to send in the request
     final Map<String, String> params = {
-      'name': name?? '',
+      'name': name ?? '',
       'vehicle_name': vehicleName ?? '',
       'driver_name': driverName ?? '',
       'location_name': locationName ?? '',
@@ -76,9 +75,20 @@ class ReportDownloadAPIService {
         Uri.parse(url),
         headers: {
           'Accept': 'application/json',
-          'Authorization': 'Bearer $authToken', // Make sure to replace with your token
+          'Authorization': 'Bearer $authToken',
+          // Make sure to replace with your token
         },
-        body: json.encode(params), // Pass parameters as JSON
+        body: /*json.encode(params)*/ {
+          'name': name ?? '',
+          'vehicle_name': vehicleName ?? '',
+          'driver_name': driverName ?? '',
+          'location_name': locationName ?? '',
+          'location_date': locationDate ?? '',
+          'location_type': locationType ?? '',
+          'stoppage_name': stoppageName ?? '',
+          'stoppage_date': stoppagedate ?? '',
+          'route_type': routeType ?? '',
+        }, // Pass parameters as JSON
       );
 
       print('Response Code: ${response.statusCode}');

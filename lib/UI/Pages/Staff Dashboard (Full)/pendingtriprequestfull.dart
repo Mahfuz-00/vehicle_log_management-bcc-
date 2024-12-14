@@ -8,6 +8,7 @@ import '../../../Data/Data Sources/API Service (Dashboard)/apiserviceDashboardFu
 import '../../../Data/Data Sources/API Service (Log Out)/apiServiceLogOut.dart';
 import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
+import '../../../Data/Models/triprequestfetchModel.dart';
 import '../../Bloc/auth_cubit.dart';
 import '../../Widgets/staffPendingTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
@@ -60,10 +61,12 @@ class StaffDashboardPendingTripsUI extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StaffDashboardPendingTripsUI> createState() => _StaffDashboardPendingTripsUIState();
+  State<StaffDashboardPendingTripsUI> createState() =>
+      _StaffDashboardPendingTripsUIState();
 }
 
-class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTripsUI> {
+class _StaffDashboardPendingTripsUIState
+    extends State<StaffDashboardPendingTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> pendingRequests = [];
   List<Widget> acceptedRequests = [];
@@ -178,24 +181,25 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
         print(request['time']);
         print(request['trip_type']);
         return StaffTile(
-          staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              startTime: request['start_time'],
-              endTime: request['end_time'],
-              distance: request['approx_distance'],
-              category: request['trip_category'],
-              type: request['trip_type'],
+          staff: TripRequestSubmit(
+            name: request['name'],
+            designation: request['designation'],
+            department: request['department'],
+            purpose: request['purpose'],
+            phone: request['phone'],
+            destinationFrom: request['destination_from'],
+            destinationTo: request['destination_to'],
+            date: request['date'],
+            startTime: request['start_time'],
+            endTime: request['end_time'],
+            distance: request['approx_distance'],
+            category: request['trip_category'],
+            type: request['trip_type'],
             route: request['route_name'],
             stoppage: request['stoppage_name'],
             startMonth: request['start_month_and_year'],
-            endMonth: request['end_month_and_year'],),
+            endMonth: request['end_month_and_year'],
+          ),
           onPressed: () {
             Navigator.push(
               context,
@@ -298,43 +302,49 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
         print(request['time']);
         print(request['trip_type']);
         return StaffTile(
-          staff: TripRequest(
-              name: request['name'],
-              designation: request['designation'],
-              department: request['department'],
-              purpose: request['purpose'],
-              phone: request['phone'],
-              destinationFrom: request['destination_from'],
-              destinationTo: request['destination_to'],
-              date: request['date'],
-              startTime: request['start_time'],
-              endTime: request['end_time'],
-              distance: request['approx_distance'],
-              category: request['trip_category'],
-              type: request['trip_type'],
+          staff: TripRequestSubmit(
+            name: request['name'],
+            designation: request['designation'],
+            department: request['department'],
+            purpose: request['purpose'],
+            phone: request['phone'],
+            destinationFrom: request['destination_from'],
+            destinationTo: request['destination_to'],
+            date: request['date'],
+            startTime: request['start_time'],
+            endTime: request['end_time'],
+            distance: request['approx_distance'],
+            category: request['trip_category'],
+            type: request['trip_type'],
             route: request['route_name'],
             stoppage: request['stoppage_name'],
             startMonth: request['start_month_and_year'],
-            endMonth: request['end_month_and_year'],),
+            endMonth: request['end_month_and_year'],
+          ),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => PendingStaffTrip(
                   staff: TripRequest(
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      startTime: request['start_time'],
-                      endTime: request['end_time'],
-                      distance: request['approx_distance'],
-                      category: request['trip_category'],
-                      type: request['trip_type']),
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
+                    route: request['route_name'],
+                    stoppage: request['stoppage_name'],
+                    startMonth: request['start_month_and_year'],
+                    endMonth: request['end_month_and_year'],
+                  ),
                 ),
               ),
             );
@@ -789,8 +799,7 @@ class _StaffDashboardPendingTripsUIState extends State<StaffDashboardPendingTrip
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  LoginwithEmailUI()));
+                              builder: (context) => LoginwithEmailUI()));
                     }
                   },
                   child: Text(

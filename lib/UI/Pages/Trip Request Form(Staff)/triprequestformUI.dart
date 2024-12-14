@@ -59,7 +59,7 @@ import '../Staff Dashboard/staffdashboardUI.dart';
 /// - [_destinationtoController]: Controller for the destination input field.
 /// - [triptype]: Stores the selected trip mode (e.g., One-Way, Round-Trip).
 /// - [tripCatagory]: Stores the selected trip type (e.g., Personal, Official).
-/// - [_tripRequest]: Instance of [TripRequest] model used to hold trip details.
+/// - [_tripRequest]: Instance of [TripRequestSubmit] model used to hold trip details.
 /// - [Date]: Stores the selected trip date.
 /// - [_file]: Holds the selected file for official trip requests.
 /// - [_scaffoldKey]: Global key for the scaffold to manage state and display snack bars.
@@ -92,7 +92,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
   late String triptype = '';
   late String paymentMethod = '';
   late String tripCatagory = '';
-  late TripRequest _tripRequest;
+  late TripRequestSubmit _tripRequest;
   late DateTime? Date;
   File? _file;
   File? _challanfile;
@@ -270,7 +270,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
     _endMonthController.addListener(_recalculateFare);
     _endYearController.addListener(_recalculateFare);
     Date = null;
-    _tripRequest = TripRequest(
+    _tripRequest = TripRequestSubmit(
         name: '',
         designation: '',
         department: '',
@@ -1033,7 +1033,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
         triptype = paymentMethod;
       }
 
-      _tripRequest = TripRequest(
+      _tripRequest = TripRequestSubmit(
           name: _nameController.text,
           designation: _desinationController.text,
           department: _departmentController.text,

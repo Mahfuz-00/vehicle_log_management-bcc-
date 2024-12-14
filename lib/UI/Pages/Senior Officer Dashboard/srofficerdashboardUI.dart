@@ -155,7 +155,7 @@ class _SROfficerDashboardUIState extends State<SROfficerDashboardUI> {
         print(request['time']);
         print(request['trip_type']);
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],
@@ -206,7 +206,7 @@ class _SROfficerDashboardUIState extends State<SROfficerDashboardUI> {
 
       final List<Widget> acceptedWidgets = acceptedRequestsData.map((request) {
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],
@@ -422,7 +422,7 @@ class _SROfficerDashboardUIState extends State<SROfficerDashboardUI> {
                                   RequestsWidget(
                                     loading: _isLoading,
                                     fetch: _isFetched,
-                                    errorText: 'No trip request reviewed yet.',
+                                    errorText: 'No ongoing trip right now.',
                                     listWidget: acceptedRequests,
                                     fetchData: fetchConnectionRequests(),
                                     numberOfWidgets: 5,

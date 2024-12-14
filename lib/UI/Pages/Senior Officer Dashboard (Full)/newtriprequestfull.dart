@@ -164,7 +164,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
         print(request['time']);
         print(request['trip_type']);
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],
@@ -284,7 +284,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
         print(request['time']);
         print(request['trip_type']);
         return StaffTile(
-          staff: TripRequest(
+          staff: TripRequestSubmit(
               name: request['name'],
               designation: request['designation'],
               department: request['department'],

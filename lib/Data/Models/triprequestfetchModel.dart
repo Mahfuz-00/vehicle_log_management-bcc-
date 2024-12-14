@@ -1,29 +1,30 @@
 import 'dart:convert';
 
-/// Represents a recent trip request.
+/// Represents a trip request with various details.
 ///
-/// This class contains detailed information about a trip that has recently occurred.
+/// This class holds all the necessary information related to a trip request.
 ///
 /// **Variables:**
-/// - [driver]: A String representing the name of the driver.
-/// - [Car]: A String representing the name of the car used for the trip.
-/// - [id]: An integer representing the unique identifier for the trip.
-/// - [name]: A String representing the name of the staff member requesting the trip.
-/// - [designation]: A String representing the designation of the staff member.
-/// - [department]: A String representing the department of the staff member.
-/// - [purpose]: A String representing the purpose of the trip.
-/// - [phone]: A String representing the contact phone number of the staff member.
-/// - [destinationFrom]: A String representing the starting location of the trip.
+/// - [name]: A String representing the name of the person making the request.
+/// - [designation]: A String representing the designation of the requester.
+/// - [department]: A String indicating the department of the requester.
+/// - [purpose]: A String describing the purpose of the trip.
+/// - [phone]: A String for the contact phone number of the requester.
+/// - [destinationFrom]: A String representing the starting point of the trip.
 /// - [destinationTo]: A String representing the destination of the trip.
-/// - [date]: A String representing the date of the trip.
-/// - [startTime]: A String representing the scheduled start time of the trip.
-/// - [endTime]: A String representing the scheduled end time of the trip.
-/// - [distance]: A String representing the approximate distance of the trip.
-/// - [category]: A String representing the category of the trip.
-/// - [type]: A String representing the type of the trip.
-/// - [Duration]: An integer representing the duration of the trip in minutes.
-/// - [startTrip]: A DateTime representing the actual start time of the trip, which can be null.
-class RecentTrip {
+/// - [date]: A String indicating the date of the trip.
+/// - [startTime]: A String representing the starting time of the trip.
+/// - [endTime]: A String representing the ending time of the trip.
+/// - [distance]: A String indicating the approximate distance of the trip.
+/// - [category]: A String categorizing the trip.
+/// - [type]: A String specifying the type of the trip.
+///
+/// **Actions:**
+/// - [fromJson]: A factory constructor that creates a TripRequest instance from a JSON map.
+/// - [toJson]: A method that converts the TripRequest instance to a JSON map.
+/// - [fromJsonList]: A static method that converts a list of JSON maps to a list of TripRequest instances.
+/// - [toJsonList]: A static method that converts a list of TripRequest instances to a list of JSON maps.
+class TripRequest {
   dynamic name;
   dynamic designation;
   dynamic department;
@@ -49,7 +50,7 @@ class RecentTrip {
   dynamic? Duration;
   dynamic? Start;
 
-  RecentTrip({
+  TripRequest({
     required this.name,
     required this.designation,
     required this.department,
@@ -76,8 +77,8 @@ class RecentTrip {
     this.DateTime,
   });
 
-  factory RecentTrip.fromJson(Map<String, dynamic> json) {
-    return RecentTrip(
+  factory TripRequest.fromJson(Map<String, dynamic> json) {
+    return TripRequest(
       name: json['name'],
       designation: json['designation'],
       department: json['department'],
@@ -91,10 +92,10 @@ class RecentTrip {
       distance: json['approx_distance'],
       category: json['trip_category'],
       type: json['type'],
-      route: json['route'],
-      stoppage: json['stoppage'],
-      startMonth: json['start_month_year'],
-      endMonth: json['end_month_year'],
+      route: json['route_id'],
+      stoppage: json['stoppage_id'],
+      startMonth: json['start_month_and_year'],
+      endMonth: json['end_month_and_year'],
       fare: json['fare'],
       paymentMode: json['payment_mode'],
       Driver: json['driver'],
@@ -120,10 +121,10 @@ class RecentTrip {
     data['approx_distance'] = this.distance;
     data['trip_category'] = this.category;
     data['type'] = this.type;
-    data['route'] = this.route;
-    data['stoppage'] = this.stoppage;
-    data['start_month_year'] = this.startMonth;
-    data['end_month_year'] = this.endMonth;
+    data['route_name'] = this.route;
+    data['stoppage_name'] = this.stoppage;
+    data['start_month_and_year'] = this.startMonth;
+    data['end_month_and_year'] = this.endMonth;
     data['fare'] = this.fare;
     data['payment_mode'] = this.paymentMode;
     data['driver'] = this.Driver;
@@ -134,11 +135,11 @@ class RecentTrip {
     return data;
   }
 
-  static List<RecentTrip> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => RecentTrip.fromJson(json)).toList();
+  static List<TripRequest> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => TripRequest.fromJson(json)).toList();
   }
 
-  static List<Map<String, dynamic>> toJsonList(List<RecentTrip> trips) {
+  static List<Map<String, dynamic>> toJsonList(List<TripRequest> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }
 }
