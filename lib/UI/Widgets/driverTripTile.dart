@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../Data/Models/driverstaffModel.dart';
 import '../../Data/Models/tripRequestModel.dart';
 
-/// The [StaffTile] class is a stateless widget that represents a
+/// The [DriverTile] class is a stateless widget that represents a
 /// tile displaying information about a staff member's trip request.
 /// It shows the [staff.name], formatted [staff.date], and
 /// [staff.startTime]. The tile is designed with a visually appealing
@@ -14,13 +15,13 @@ import '../../Data/Models/tripRequestModel.dart';
 /// - [onPressed]: a callback function that is executed when the
 ///   tile is tapped, allowing the parent widget to define the
 ///   action to be taken on tap.
-class StaffTile extends StatelessWidget {
-  final TripRequestSubmit staff;
+class DriverTile extends StatelessWidget {
+  final DriveTripRoute staff;
   final VoidCallback onPressed;
 
   final DateFormat dateFormat = DateFormat('dd-MM-yyyy');
 
-  StaffTile({
+  DriverTile({
     Key? key,
     required this.staff,
     required this.onPressed,
@@ -28,7 +29,7 @@ class StaffTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(staff.category);
+    /*print(staff.category);
     String formattedDate = '';
     if(staff.category != 'Pick Drop'){
       print('Not a Pick Drop');
@@ -47,7 +48,7 @@ class StaffTile extends StatelessWidget {
       } else{
         formattedDate = 'N/A'; // Default to 'N/A' if the date is empty or 'None'
       }
-    }
+    }*/
 
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -79,7 +80,16 @@ class StaffTile extends StatelessWidget {
             ),
             subtitle: Row(
               children: [
-                if(staff.category != 'Pick Drop')...[
+                Text(
+                  'Start Time: ${staff.startTime}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    fontFamily: 'default',
+                  ),
+                ),
+               /* if(staff.category != 'Pick Drop')...[
                   Text(
                     'Date: $formattedDate',
                     style: TextStyle(
@@ -110,7 +120,7 @@ class StaffTile extends StatelessWidget {
                       fontFamily: 'default',
                     ),
                   ),
-                ]
+                ]*/
               ],
             ),
             trailing: Icon(

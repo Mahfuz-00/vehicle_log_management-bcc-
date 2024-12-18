@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:vehicle_log_management/Data/Models/driverstaffModel.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Start Trip)/apiServicePickDropStartTrip.dart';
 import '../../../Data/Data Sources/API Service (Start Trip)/apiServiceStartTrip.dart';
 import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../Widgets/customclipperbottomnavbar.dart';
 import '../../Widgets/customnotchpainter.dart';
 import '../Profile UI/profileUI.dart';
+import 'driverPickDropStopTrip.dart';
 import 'driverStopTrip.dart';
 import 'driverdashboardUI.dart';
 
-/// The [DriverStartTripUI] class is a StatefulWidget that represents the
+/// The [DriverPickDropStartTripUI] class is a StatefulWidget that represents the
 /// user interface for drivers to start a trip. It takes in a
 /// [shouldRefresh] boolean to determine if the page should refresh and
 /// an [ApprovedStaffModel] object [staff] that contains the trip
@@ -31,21 +34,22 @@ import 'driverdashboardUI.dart';
 ///   the screen.
 /// - [_buildRowTime]: Builds a row to display time in a formatted
 ///   manner.
-class DriverStartTripUI extends StatefulWidget {
+class DriverPickDropStartTripUI extends StatefulWidget {
   final bool shouldRefresh;
-  final ApprovedStaffModel staff;
+  final DriveTripRoute staff;
 
-  const DriverStartTripUI(
+  const DriverPickDropStartTripUI(
       {Key? key, this.shouldRefresh = false, required this.staff})
       : super(key: key);
 
   @override
-  State<DriverStartTripUI> createState() => _DriverStartTripUIState();
+  State<DriverPickDropStartTripUI> createState() =>
+      _DriverPickDropStartTripUIState();
 }
 
-class _DriverStartTripUIState extends State<DriverStartTripUI> {
+class _DriverPickDropStartTripUIState extends State<DriverPickDropStartTripUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late ApprovedStaffModel staff;
+  late DriveTripRoute staff;
   bool _isFetched = false;
   bool _isLoading = false;
   bool _pageLoading = true;
@@ -131,25 +135,69 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
                                 padding: EdgeInsets.all(20),
                                 child: Column(
                                   children: [
-                                    _buildRow('Name', staff.name),
-                                    _buildRow('Designation', staff.designation),
-                                    _buildRow('Department', staff.department),
-                                    _buildRow('Mobile Number', staff.phone),
-                                    _buildRow('Trip Category', staff.category),
-                                    if(staff.category != 'Pick Drop')...[
-                                      _buildRow('Trip Type', staff.type!),
-                                      _buildRowTime('Date', staff.date!),
-                                      _buildRow('Start Time', staff.startTime!),
-                                      _buildRow('End Time', staff.endTime!),
-                                      _buildRow('Destination From', staff.destinationFrom!),
-                                      _buildRow('Destination To', staff.destinationTo!),
-                                      _buildRow('Distance', '${staff.distance} KM'),
-                                    ], if(staff.category == 'Pick Drop') ...[
-                                      _buildRow('Route', staff.route!),
-                                     // _buildRow('Stoppage', staff.stoppage!),
-                                      _buildRowTime('Start Month', staff.startMonth!),
-                                      _buildRowTime('End Month', staff.endMonth!),
-                                    ],
+                                    _buildRow('Route', staff.name),
+                                    _buildRowTime('Date', staff.date!),
+                                    _buildRowTime(
+                                        'Start Time', staff.startTime),
+                                    _buildRowTime('End Time', staff.endTime!),
+                                    SizedBox(height: 20),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: 'Stoppage Name',
+                                                  style: TextStyle(
+                                                    color: Color.fromRGBO(25, 192, 122, 1),
+                                                    fontSize: 19,
+                                                    height: 1.6,
+                                                    letterSpacing: 1.3,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'default',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Text(
+                                            "::",
+                                            style: TextStyle(
+                                              color: Color.fromRGBO(25, 192, 122, 1),
+                                              fontSize: 19,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: 'Staff(s)',
+                                                  style: TextStyle(
+                                                    color: Color.fromRGBO(25, 192, 122, 1),
+                                                    fontSize: 19,
+                                                    height: 1.6,
+                                                    letterSpacing: 1.3,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'default',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    _buildStoppages(staff.stoppages),
                                   ],
                                 ),
                               ),
@@ -158,7 +206,7 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
                             Divider(),
                             SizedBox(height: screenHeight * 0.02),
                             Container(
-                              width: screenWidth*0.9,
+                              width: screenWidth * 0.9,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
@@ -168,26 +216,13 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  if(staff.category != 'Pick Drop') ...[
-                                    Text(
-                                        '${staff.destinationFrom} to ${staff.destinationTo}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30,
-                                          fontFamily: 'default',
-                                        )),
-                                  ],
-                                  if(staff.category == 'Pick Drop') ...[
-                                    Text(
-                                        '${staff.route}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30,
-                                          fontFamily: 'default',
-                                        )),
-                                  ],
+                                  Text('${staff.name}',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 30,
+                                        fontFamily: 'default',
+                                      )),
                                   SizedBox(height: screenHeight * 0.03),
                                   Text.rich(
                                     TextSpan(
@@ -290,10 +325,12 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () {
-                            Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DriverDashboardUI(shouldRefresh: true,)));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DriverDashboardUI(
+                                        shouldRefresh: true,
+                                      )));
                         },
                         child: Container(
                           width: screenWidth / 3,
@@ -366,7 +403,9 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const ProfileUI(shouldRefresh: true,)));
+                                  builder: (context) => const ProfileUI(
+                                        shouldRefresh: true,
+                                      )));
                         },
                         behavior: HitTestBehavior.translucent,
                         child: Container(
@@ -413,18 +452,23 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
 
   Future<void> StartTrip() async {
     showTopToast(context, 'Processing...');
-    print('Trip Id: ${staff.id}');
-    if (staff.id > 0) {
-      final apiService = await StartTripAPIService.create();
-      bool checker = await apiService.TripStarted(tripId: staff.id,);
-      if(checker == true){
+    print('Trip Id: ${staff.routeId}');
+    if (staff.routeId > 0) {
+      final apiService = await PickDropStartTripAPIService.create();
+      bool checker = await apiService.TripStarted(
+        tripId: staff.routeId,
+      );
+      if (checker == true) {
         showTopToast(context, 'Trip Started successfully!');
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DriverStopTripUI(shouldRefresh: true, staff: staff,)),
+          MaterialPageRoute(
+              builder: (context) => DriverPickDropStopTripUI(
+                    shouldRefresh: true,
+                    staff: staff,
+                  )),
         );
-      }
-      else if(checker == false){
+      } else if (checker == false) {
         showTopToast(context, 'The trip failed to start. Try again.');
       }
     } else {
@@ -462,15 +506,69 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
     });
   }
 
+  Widget _buildStoppages(Map<String, dynamic> stoppages) {
+    List<Widget> stoppageWidgets = [];
+    stoppages.forEach((stoppage, description) {
+      stoppageWidgets.add(
+        _buildRow(
+          stoppage,
+          description.isEmpty
+              ? 'N/A'
+              : description, // Display N/A if description is empty
+        ),
+      );
+    });
+
+    return Column(
+      children: stoppageWidgets,
+    );
+  }
+
   Widget _buildRowTime(String label, String value) {
-    //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
-    DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-    String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
-    DateTime date = DateTime.parse(value);
-    DateFormat dateFormat = DateFormat.yMMMMd('en_US');
-    DateFormat timeFormat = DateFormat.jm();
-    String formattedDate = dateFormat.format(date);
-    String formattedTime = timeFormat.format(date);
+    String formattedDate = 'Invalid date';
+
+    try {
+      if (value == 'N/A' || value == 'None') {
+        // Handle the "N/A" case explicitly
+        formattedDate = 'N/A';
+      }
+      /*else if (staff.category == 'Pick Drop') {
+        // Parse the date using the appropriate format for 'Pick Drop'
+        DateTime dateTime = DateFormat('yyyy-MM-dd').parse(value);
+        // Format the parsed date into "MMMM yyyy" (e.g., "January 2024")
+        formattedDate = DateFormat.yMMMM('en_US').format(dateTime);
+      }*/
+      else {
+        DateTime dateTime;
+
+        // Identify if the input contains date only, time only, or both
+        if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+          // Input contains only a date (e.g., "2024-01-01")
+          dateTime = DateFormat('yyyy-MM-dd').parse(value);
+          formattedDate = DateFormat.yMMMMd('en_US')
+              .format(dateTime); // e.g., "January 1, 2024"
+        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$')
+            .hasMatch(value)) {
+          // Input contains only a time (e.g., "10:30" or "10:30:00")
+          dateTime = DateFormat('HH:mm').parse(value, true);
+          formattedDate = DateFormat.jm().format(dateTime); // e.g., "10:30 AM"
+        } else if (RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$')
+            .hasMatch(value)) {
+          // Input contains both date and time (e.g., "2024-01-01 10:30:00")
+          dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(value);
+          String formattedDatePart =
+              DateFormat.yMMMMd('en_US').format(dateTime);
+          String formattedTimePart = DateFormat.jm().format(dateTime);
+          formattedDate =
+              '$formattedDatePart, $formattedTimePart'; // Combine date and time
+        } else {
+          throw FormatException('Unsupported date/time format: $value');
+        }
+      }
+    } catch (e) {
+      print('Error parsing date: $e');
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -506,7 +604,7 @@ class _DriverStartTripUIState extends State<DriverStartTripUI> {
         ),
         Expanded(
           child: Text(
-            formattedDate, // Format date as DD/MM/YYYY
+            formattedDate, // Display the formatted date
             style: TextStyle(
               color: Colors.black,
               fontSize: 18,

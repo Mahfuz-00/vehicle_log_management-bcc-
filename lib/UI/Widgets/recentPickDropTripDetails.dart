@@ -1,24 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
-import '../../Data/Models/tripRequestModelApprovedStaff.dart';
+import '../../Data/Models/driverstaffModel.dart';
+import '../../Data/Models/tripRequestModelRecent.dart';
 
-/// A widget that displays the details of an approved trip for staff.
+/// [RecentPickDropTripDetails] is a StatelessWidget that displays detailed information about a recent trip.
 ///
-/// This widget takes a [ApprovedStaffModel] object as input and
-/// presents various details related to the trip, such as the staff's
-/// name, designation, department, mobile number, trip type, date,
-/// start time, end time, distance, trip mode, destination details,
-/// driver information, and car details. It also includes a back button
-/// to return to the previous screen.
+/// It receives a [RecentTrip] object as a parameter, which contains all the relevant details about the trip.
+/// The widget includes an app bar for navigation, displays various trip details, and provides a back button
+/// for returning to the previous screen.
+///
+/// Parameters:
+/// - [staff]: A required [RecentTrip] object containing the trip details.
 ///
 /// Actions:
-/// - Navigate back to the previous screen when the back button is pressed.
-class ApprovedStaffTrip extends StatelessWidget {
+/// - The widget builds the UI by utilizing the [build] method, which constructs a scrollable layout with
+///   information displayed in rows.
+/// - The [convertDuration] method is used to convert the trip duration from minutes to a formatted string
+///   displaying hours and minutes.
+/// - The [onPressed] action for the back button navigates the user back to the previous screen when tapped.
+///
+/// Private Methods:
+/// - [_buildRow]: A helper method that creates a row displaying a label and a corresponding value.
+/// - [_buildRowTime]: A helper method that formats and displays a date and time label along with the formatted date.
+class RecentPickDropTripDetails extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final ApprovedStaffModel staff;
+  final DriveTripRoute staff;
 
-  ApprovedStaffTrip({Key? key, required this.staff}) : super(key: key);
+  RecentPickDropTripDetails({Key? key, required this.staff}) : super(key: key);
+
+  String convertDuration(int duration) {
+    int hours = duration ~/ 60;
+    int minutes = duration % 60;
+
+    String result = hours > 0 ? "${hours} hr ${minutes} min" : "${minutes} min";
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +57,7 @@ class ApprovedStaffTrip extends StatelessWidget {
                 color: Colors.white,
               )),
           title: const Text(
-            'Approved Trip',
+            'Recent Trip',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -56,9 +73,7 @@ class ApprovedStaffTrip extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 40,
-                ),
+                SizedBox(height: 40,),
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0),
                   child: const Center(
@@ -76,25 +91,69 @@ class ApprovedStaffTrip extends StatelessWidget {
                 ),
                 Divider(),
                 SizedBox(height: 20),
-                _buildRow('Name', staff.name),
-                _buildRow('Designation', staff.designation),
-                _buildRow('Department', staff.department),
-                _buildRow('Mobile Number', staff.phone),
-                _buildRow('Trip Category', staff.category),
-                if(staff.category != 'Pick Drop')...[
-                  _buildRow('Trip Type', staff.type!),
-                  _buildRowTime('Date', staff.date!),
-                  _buildRow('Start Time', staff.startTime!),
-                  _buildRow('End Time', staff.endTime!),
-                  _buildRow('Destination From', staff.destinationFrom!),
-                  _buildRow('Destination To', staff.destinationTo!),
-                  _buildRow('Distance', '${staff.distance} KM'),
-                ], if(staff.category == 'Pick Drop') ...[
-                  _buildRow('Route', staff.route!),
-                  _buildRow('Stoppage', staff.stoppage!),
-                  _buildRowTime('Start Month', staff.startMonth!),
-                  _buildRowTime('End Month', staff.endMonth!),
-                ],
+                _buildRow('Route', staff.name),
+                _buildRowTime('Date', staff.date!),
+                _buildRowTime(
+                    'Start Time', staff.startTime),
+                _buildRowTime('End Time', staff.endTime!),
+                SizedBox(height: 20),
+                Row(
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Stoppage Name',
+                              style: TextStyle(
+                                color: Color.fromRGBO(25, 192, 122, 1),
+                                fontSize: 19,
+                                height: 1.6,
+                                letterSpacing: 1.3,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'default',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0),
+                      child: Text(
+                        "::",
+                        style: TextStyle(
+                          color: Color.fromRGBO(25, 192, 122, 1),
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Staff(s)',
+                              style: TextStyle(
+                                color: Color.fromRGBO(25, 192, 122, 1),
+                                fontSize: 19,
+                                height: 1.6,
+                                letterSpacing: 1.3,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'default',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                _buildStoppages(staff.stoppages),
                 SizedBox(height: 40),
                 Center(
                   child: ElevatedButton(
@@ -126,19 +185,39 @@ class ApprovedStaffTrip extends StatelessWidget {
     );
   }
 
+  Widget _buildStoppages(Map<String, dynamic> stoppages) {
+    List<Widget> stoppageWidgets = [];
+    stoppages.forEach((stoppage, description) {
+      stoppageWidgets.add(
+        _buildRow(
+          stoppage,
+          description.isEmpty
+              ? 'N/A'
+              : description, // Display N/A if description is empty
+        ),
+      );
+    });
+
+    return Column(
+      children: stoppageWidgets,
+    );
+  }
+
   Widget _buildRowTime(String label, String value) {
     String formattedDate = 'Invalid date';
 
     try {
-      if (value == 'N/A') {
+      if (value == 'N/A' || value == 'None') {
         // Handle the "N/A" case explicitly
         formattedDate = 'N/A';
-      } else if (staff.category == 'Pick Drop') {
+      }
+      /*else if (staff.category == 'Pick Drop') {
         // Parse the date using the appropriate format for 'Pick Drop'
         DateTime dateTime = DateFormat('yyyy-MM-dd').parse(value);
         // Format the parsed date into "MMMM yyyy" (e.g., "January 2024")
         formattedDate = DateFormat.yMMMM('en_US').format(dateTime);
-      } else {
+      }*/
+      else {
         DateTime dateTime;
 
         // Identify if the input contains date only, time only, or both
@@ -147,7 +226,8 @@ class ApprovedStaffTrip extends StatelessWidget {
           dateTime = DateFormat('yyyy-MM-dd').parse(value);
           formattedDate = DateFormat.yMMMMd('en_US')
               .format(dateTime); // e.g., "January 1, 2024"
-        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$').hasMatch(value)) {
+        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$')
+            .hasMatch(value)) {
           // Input contains only a time (e.g., "10:30" or "10:30:00")
           dateTime = DateFormat('HH:mm').parse(value, true);
           formattedDate = DateFormat.jm().format(dateTime); // e.g., "10:30 AM"

@@ -163,7 +163,7 @@ class _StaffDashboardAcceptedTripsUIState
               context,
               MaterialPageRoute(
                 builder: (context) => ApprovedStaffTrip(
-                  staff: ApprovedStaffTripRequest(
+                  staff: ApprovedStaffModel(
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],
@@ -271,7 +271,7 @@ class _StaffDashboardAcceptedTripsUIState
               context,
               MaterialPageRoute(
                 builder: (context) => ApprovedStaffTrip(
-                  staff: ApprovedStaffTripRequest(
+                  staff: ApprovedStaffModel(
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],

@@ -99,6 +99,7 @@ flutter:
     - Assets/Images/BCC-Logo-Textless-1024.png
     - Assets/Images/Success-Mark.png
     - Assets/Images/VMS-Logo.png
+    - Assets/Images/BD ICT.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

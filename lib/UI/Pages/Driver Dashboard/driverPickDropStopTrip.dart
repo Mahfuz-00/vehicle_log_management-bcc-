@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../Core/Connection Checker/internetconnectioncheck.dart';
+import '../../../Data/Data Sources/API Service (Stop Trip)/apiServicePickDropStopTrip.dart';
 import '../../../Data/Data Sources/API Service (Stop Trip)/apiServiceStopTrip.dart';
+import '../../../Data/Models/driverstaffModel.dart';
 import '../../../Data/Models/tripRequestModelApprovedStaff.dart';
 import '../../Widgets/customclipperbottomnavbar.dart';
 import '../../Widgets/customnotchpainter.dart';
 import '../Profile UI/profileUI.dart';
 import 'driverdashboardUI.dart';
 
-/// The [DriverStopTripUI] class represents the UI for the driver's trip stop
+/// The [DriverPickDropStopTripUI] class represents the UI for the driver's trip stop
 /// interface. It allows the driver to view current trip details, elapsed
 /// time, and stop the trip when necessary.
 ///
@@ -38,21 +40,21 @@ import 'driverdashboardUI.dart';
 /// - [_timer]: A Timer to update the elapsed time periodically.
 /// - [_elapsed]: A Duration object representing the total elapsed time since
 ///   the trip started.
-class DriverStopTripUI extends StatefulWidget {
+class DriverPickDropStopTripUI extends StatefulWidget {
   final bool shouldRefresh;
-  final ApprovedStaffModel staff;
+  final DriveTripRoute staff;
 
-  const DriverStopTripUI(
+  const DriverPickDropStopTripUI(
       {Key? key, this.shouldRefresh = false, required this.staff})
       : super(key: key);
 
   @override
-  State<DriverStopTripUI> createState() => _DriverStartTripState();
+  State<DriverPickDropStopTripUI> createState() => _DriverStartTripState();
 }
 
-class _DriverStartTripState extends State<DriverStopTripUI> {
+class _DriverStartTripState extends State<DriverPickDropStopTripUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late ApprovedStaffModel staff;
+  late DriveTripRoute staff;
   bool _isFetched = false;
   bool _isLoading = false;
   bool _pageLoading = true;
@@ -195,25 +197,68 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
                             padding: EdgeInsets.all(20),
                             child: Column(
                               children: [
-                                _buildRow('Name', staff.name),
-                                _buildRow('Designation', staff.designation),
-                                _buildRow('Department', staff.department),
-                                _buildRow('Mobile Number', staff.phone),
-                                _buildRow('Trip Category', staff.category),
-                                if(staff.category != 'Pick Drop')...[
-                                  _buildRow('Trip Type', staff.type!),
-                                  _buildRowTime('Date', staff.date!),
-                                  _buildRow('Start Time', staff.startTime!),
-                                  _buildRow('End Time', staff.endTime!),
-                                  _buildRow('Destination From', staff.destinationFrom!),
-                                  _buildRow('Destination To', staff.destinationTo!),
-                                  _buildRow('Distance', '${staff.distance} KM'),
-                                ], if(staff.category == 'Pick Drop') ...[
-                                  _buildRow('Route', staff.route!),
-                                  // _buildRow('Stoppage', staff.stoppage!),
-                                  _buildRowTime('Start Month', staff.startMonth!),
-                                  _buildRowTime('End Month', staff.endMonth!),
-                                ],
+                                _buildRow('Route', staff.name),
+                                _buildRowTime('Date', staff.date!),
+                                _buildRowTime('Start Time', staff.startTime),
+                                _buildRowTime('End Time', staff.endTime!),
+                                SizedBox(height: 20),
+                                Row(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: 'Stoppage Name',
+                                              style: TextStyle(
+                                                color: Color.fromRGBO(25, 192, 122, 1),
+                                                fontSize: 19,
+                                                height: 1.6,
+                                                letterSpacing: 1.3,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'default',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Text(
+                                        "::",
+                                        style: TextStyle(
+                                          color: Color.fromRGBO(25, 192, 122, 1),
+                                          fontSize: 19,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: 'Staff(s)',
+                                              style: TextStyle(
+                                                color: Color.fromRGBO(25, 192, 122, 1),
+                                                fontSize: 19,
+                                                height: 1.6,
+                                                letterSpacing: 1.3,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'default',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                _buildStoppages(staff.stoppages),
                               ],
                             ),
                           ),
@@ -233,7 +278,7 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                  '${staff.destinationFrom} to ${staff.destinationTo}',
+                                  '${staff.name}',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
@@ -331,7 +376,7 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
                   GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () {
-                        Navigator.push(
+                      Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => DriverDashboardUI(shouldRefresh: true,)));
@@ -455,10 +500,10 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
 
   Future<void> StopTrip() async {
     showTopToast(context, 'Processing...');
-    print('Trip Id: ${staff.id}');
-    if (staff.id > 0) {
-      final apiService = await StopTripAPIService.create();
-      bool checker = await apiService.TripStopped(tripId: staff.id,);
+    print('Trip Id: ${staff.routeId}');
+    if (staff.routeId > 0) {
+      final apiService = await PickDropStopTripAPIService.create();
+      bool checker = await apiService.TripStopped(tripId: staff.routeId,);
       if(checker == true){
         showTopToast(context, 'Trip Finished successfully!');
         _clearStartTimeAndDuration();
@@ -505,15 +550,64 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
     });
   }
 
+  Widget _buildStoppages(Map<String, dynamic> stoppages) {
+    List<Widget> stoppageWidgets = [];
+    stoppages.forEach((stoppage, description) {
+      stoppageWidgets.add(
+        _buildRow(
+          stoppage,
+          description.isEmpty ? 'N/A' : description, // Display N/A if description is empty
+        ),
+      );
+    });
+
+    return Column(
+      children: stoppageWidgets,
+    );
+  }
+
   Widget _buildRowTime(String label, String value) {
-    //String formattedDateTime = DateFormat('dd/MM/yyyy hh:mm a').format(value); // 'a' for AM/PM
-    DateTime dateTime = DateFormat('dd-MM-yyyy').parse(value);
-    String formattedDateTime = DateFormat('dd-MM-yyyy').format(dateTime);
-    DateTime date = DateTime.parse(value);
-    DateFormat dateFormat = DateFormat.yMMMMd('en_US');
-    DateFormat timeFormat = DateFormat.jm();
-    String formattedDate = dateFormat.format(date);
-    String formattedTime = timeFormat.format(date);
+    String formattedDate = 'Invalid date';
+
+    try {
+      if (value == 'N/A' || value == 'None') {
+        // Handle the "N/A" case explicitly
+        formattedDate = 'N/A';
+      } /*else if (staff.category == 'Pick Drop') {
+        // Parse the date using the appropriate format for 'Pick Drop'
+        DateTime dateTime = DateFormat('yyyy-MM-dd').parse(value);
+        // Format the parsed date into "MMMM yyyy" (e.g., "January 2024")
+        formattedDate = DateFormat.yMMMM('en_US').format(dateTime);
+      }*/ else {
+        DateTime dateTime;
+
+        // Identify if the input contains date only, time only, or both
+        if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+          // Input contains only a date (e.g., "2024-01-01")
+          dateTime = DateFormat('yyyy-MM-dd').parse(value);
+          formattedDate = DateFormat.yMMMMd('en_US')
+              .format(dateTime); // e.g., "January 1, 2024"
+        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$').hasMatch(value)) {
+          // Input contains only a time (e.g., "10:30" or "10:30:00")
+          dateTime = DateFormat('HH:mm').parse(value, true);
+          formattedDate = DateFormat.jm().format(dateTime); // e.g., "10:30 AM"
+        } else if (RegExp(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$')
+            .hasMatch(value)) {
+          // Input contains both date and time (e.g., "2024-01-01 10:30:00")
+          dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(value);
+          String formattedDatePart =
+          DateFormat.yMMMMd('en_US').format(dateTime);
+          String formattedTimePart = DateFormat.jm().format(dateTime);
+          formattedDate =
+          '$formattedDatePart, $formattedTimePart'; // Combine date and time
+        } else {
+          throw FormatException('Unsupported date/time format: $value');
+        }
+      }
+    } catch (e) {
+      print('Error parsing date: $e');
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -549,7 +643,7 @@ class _DriverStartTripState extends State<DriverStopTripUI> {
         ),
         Expanded(
           child: Text(
-            formattedDate, // Format date as DD/MM/YYYY
+            formattedDate, // Display the formatted date
             style: TextStyle(
               color: Colors.black,
               fontSize: 18,

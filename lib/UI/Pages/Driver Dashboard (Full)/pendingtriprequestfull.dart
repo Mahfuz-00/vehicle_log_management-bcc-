@@ -161,7 +161,7 @@ class _DriverDashboardPendingTripsUIState
               context,
               MaterialPageRoute(
                 builder: (context) => DriverStopTripUI(
-                  staff: ApprovedStaffTripRequest(
+                  staff: ApprovedStaffModel(
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],
@@ -185,7 +185,7 @@ class _DriverDashboardPendingTripsUIState
               ),
             );
             DriverStopTripUI(
-              staff: ApprovedStaffTripRequest(
+              staff: ApprovedStaffModel(
                 id: request['trip_id'],
                 name: request['name'],
                 designation: request['designation'],
@@ -286,7 +286,7 @@ class _DriverDashboardPendingTripsUIState
               context,
               MaterialPageRoute(
                 builder: (context) => DriverStopTripUI(
-                  staff: ApprovedStaffTripRequest(
+                  staff: ApprovedStaffModel(
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],
@@ -310,7 +310,7 @@ class _DriverDashboardPendingTripsUIState
               ),
             );
             DriverStopTripUI(
-              staff: ApprovedStaffTripRequest(
+              staff: ApprovedStaffModel(
                 id: request['trip_id'],
                 name: request['name'],
                 designation: request['designation'],

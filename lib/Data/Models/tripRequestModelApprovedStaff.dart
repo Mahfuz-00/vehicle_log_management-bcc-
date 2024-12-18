@@ -23,7 +23,7 @@ import 'dart:convert';
 /// - [category]: A String representing the category of the trip.
 /// - [type]: A String representing the type of the trip.
 /// - [startTrip]: A DateTime representing the actual start time of the trip.
-class ApprovedStaffTripRequest {
+class ApprovedStaffModel {
   int id;
   dynamic name;
   dynamic designation;
@@ -51,7 +51,7 @@ class ApprovedStaffTripRequest {
   dynamic? Start;
 
 
-  ApprovedStaffTripRequest({
+  ApprovedStaffModel({
     required this.id,
     required this.name,
     required this.designation,
@@ -79,8 +79,8 @@ class ApprovedStaffTripRequest {
     this.DateTime,
   });
 
-  factory ApprovedStaffTripRequest.fromJson(Map<String, dynamic> json) {
-    return ApprovedStaffTripRequest(
+  factory ApprovedStaffModel.fromJson(Map<String, dynamic> json) {
+    return ApprovedStaffModel(
       id: json['trip_id'],
       name: json['name'],
       designation: json['designation'],
@@ -140,11 +140,11 @@ class ApprovedStaffTripRequest {
     return data;
   }
 
-  static List<ApprovedStaffTripRequest> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => ApprovedStaffTripRequest.fromJson(json)).toList();
+  static List<ApprovedStaffModel> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => ApprovedStaffModel.fromJson(json)).toList();
   }
 
-  static List<Map<String, dynamic>> toJsonList(List<ApprovedStaffTripRequest> trips) {
+  static List<Map<String, dynamic>> toJsonList(List<ApprovedStaffModel> trips) {
     return trips.map((trip) => trip.toJson()).toList();
   }
 }

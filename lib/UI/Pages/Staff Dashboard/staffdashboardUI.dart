@@ -257,7 +257,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
               context,
               MaterialPageRoute(
                 builder: (context) => ApprovedStaffTrip(
-                  staff: ApprovedStaffTripRequest(
+                  staff: ApprovedStaffModel(
                     id: request['trip_id'],
                     name: request['name'],
                     designation: request['designation'],

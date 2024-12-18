@@ -51,9 +51,10 @@ class DashboardAPIService{
         },
       );
 
+      print(response.body);
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        printFieldTypes(jsonData);
+        //printFieldTypes(jsonData);
         print(jsonData);
         return jsonData;
       } else {
@@ -65,7 +66,7 @@ class DashboardAPIService{
     }
   }
 
-  void printFieldTypes(dynamic data, [String parentKey = 'root']) {
+/*  void printFieldTypes(dynamic data, [String parentKey = 'root']) {
     if (data is Map<String, dynamic>) {
       data.forEach((key, value) {
         final fieldKey = '$parentKey > $key';
@@ -79,7 +80,7 @@ class DashboardAPIService{
         printFieldTypes(data[i], fieldKey); // Recursively handle list items
       }
     }
-  }
+  }*/
 
 
 

@@ -60,8 +60,6 @@ class _SplashScreenUIState extends State<SplashScreenUI>
     _checkAuthAndNavigate(context);
   }
 
-
-
   final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
 // In the SplashScreen widget:
@@ -223,40 +221,54 @@ class _SplashScreenUIState extends State<SplashScreenUI>
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Update Available",
+            title: Text(
+              "Update Available",
               style: TextStyle(
-                color: Color.fromRGBO(0, 162, 222, 1),
+                color: Color.fromRGBO(25, 192, 122, 1),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'default',
-              ),),
-            content: Text("A new version of the app is available. Please update to the latest version.",
+              ),
+            ),
+            content: Text(
+              "A new version of the app is available. Please update to the latest version.",
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'default',
-              ),),
+              ),
+            ),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   // Trigger the immediate update
                   InAppUpdate.performImmediateUpdate();
                 },
-                child: Text("Update",
+                child: Text(
+                  "Update",
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'default',
-                  ),),
+                  ),
+                ),
               ),
               TextButton(
                 onPressed: () {
                   // Close the dialog without updating
                   Navigator.of(context).pop();
                 },
-                child: Text("Later"),
+                child: Text(
+                  "Later",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'default',
+                  ),
+                ),
               ),
             ],
           );
@@ -294,7 +306,7 @@ class _SplashScreenUIState extends State<SplashScreenUI>
           children: [
             const Image(
               image: AssetImage(
-                'Assets/Images/BCC-Logo.png',
+                'Assets/Images/BD ICT.png',
               ),
               width: 200,
               height: 200,
@@ -343,7 +355,8 @@ class _SplashScreenUIState extends State<SplashScreenUI>
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const LoginwithEmailUI()));
+                                    builder: (context) =>
+                                        const LoginwithEmailUI()));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
