@@ -26,7 +26,7 @@ import '../Profile UI/profileUI.dart';
 ///
 /// The main [variables] utilized within this class are:
 /// - [_scaffoldKey]: A key for controlling the scaffold of the screen.
-/// - [pendingRequests], [acceptedRequests], [recentRequests], [drivers]: Lists of widgets that display various types of requests and drivers.
+/// - [pickdropRequests], [acceptedRequests], [recentRequests], [drivers]: Lists of widgets that display various types of requests and drivers.
 /// - [_isFetched], [_isFetchedFull], [_isLoading], [_pageLoading], [_errorOccurred]: Flags used to manage the loading and error states of the screen.
 /// - [userName], [organizationName], [photoUrl]: Strings that store user information for display.
 /// - [notifications]: A list of notifications fetched from the API.
@@ -264,16 +264,19 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
                 backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                 titleSpacing: 5,
                 automaticallyImplyLeading: false,
-                title: const Text(
-                  'Admin Dashboard',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    fontFamily: 'default',
+                title: Padding(
+                  padding: EdgeInsets.only(left: screenWidth*0.05),
+                  child: const Text(
+                    'Admin Dashboard',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      fontFamily: 'default',
+                    ),
                   ),
                 ),
-                centerTitle: true,
+                //centerTitle: true,
               ),
               body: SingleChildScrollView(
                 child: SafeArea(
@@ -598,7 +601,7 @@ class _AdminDashboardAvailableDriverUIState extends State<AdminDashboardAvailabl
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginwithEmailUI()));
+                                  LoginUI()));
                     }
                   },
                   child: Text(

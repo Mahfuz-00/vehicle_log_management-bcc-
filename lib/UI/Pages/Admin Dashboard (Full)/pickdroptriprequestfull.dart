@@ -10,62 +10,55 @@ import '../../../Data/Models/paginationModel.dart';
 import '../../../Data/Models/tripRequestModel.dart';
 import '../../../Data/Models/tripRequestModelSROfficer.dart';
 import '../../Bloc/auth_cubit.dart';
-import '../../Widgets/SrOfficerPendingTripDetails.dart';
+import '../../Widgets/AdminPendingTripDetails.dart';
+import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/staffTripTile.dart';
 import '../Login UI/loginEmailUI.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
-/// This class represents the UI for the Senior Officer Dashboard, specifically for new trip requests.
+/// [AdminDashboardPickDropTripsUI] is a [StatefulWidget] that represents the UI for the admin dashboard
+/// showing pending trips, including various connection requests and available drivers.
 ///
-/// The [SROfficerDashboardNewTripsUI] class handles the display of pending trip requests
-/// and manages the state of data fetching and user profile loading.
+/// Variables and Actions:
+/// - [shouldRefresh]: A bool variable indicating whether the UI should refresh.
+/// - [_scaffoldKey]: A [GlobalKey] used for the Scaffold to control it programmatically.
+/// - [pickdropRequests], [acceptedRequests], [recentRequests], [drivers]: Lists of [Widget]s representing
+///   different categories of trip requests.
+/// - [_isFetched], [_isFetchedFull], [_isLoading], [_pageLoading], [_errorOccurred]: bool flags to
+///   track the loading and fetching status.
+/// - [userName], [organizationName], [photoUrl]: String variables holding user profile data.
+/// - [notifications]: A list of String containing user notifications.
+/// - [pendingPagination]: An instance of [Pagination] to handle the pagination of pending trips.
+/// - [canFetchMorePending]: A bool flag to indicate whether more pending trips can be fetched.
+/// - [pickdropNext], [pendingPrev]: String variables to hold the URLs for the next and previous pages
+///   of pending trips.
 ///
-/// Variables:
-/// - [shouldRefresh]: A boolean to determine whether to refresh the user profile.
-/// - [_scaffoldKey]: A GlobalKey for the Scaffold widget.
-/// - [pendingRequests]: A list of widgets displaying pending trip requests.
-/// - [acceptedRequests]: A list of widgets displaying accepted trip requests.
-/// - [_isFetched]: A boolean indicating whether data has been fetched.
-/// - [_isFetchedFull]: A boolean indicating whether all data has been fetched.
-/// - [_isLoading]: A boolean indicating whether data is currently being loaded.
-/// - [_pageLoading]: A boolean indicating whether the page is in a loading state.
-/// - [_errorOccurred]: A boolean indicating whether an error has occurred during data fetching.
-/// - [userName]: A string storing the user's name.
-/// - [organizationName]: A string storing the user's organization name.
-/// - [photoUrl]: A string storing the user's profile photo URL.
-/// - [notifications]: A list of notifications for the user.
-/// - [pendingPagination]: An instance of [Pagination] for managing pending requests pagination.
-/// - [acceptedPagination]: An instance of [Pagination] for managing accepted requests pagination.
-/// - [recentPagination]: An instance of [Pagination] for managing recent requests pagination.
-/// - [canFetchMorePending]: A boolean indicating whether more pending requests can be fetched.
-/// - [canFetchMoreAccepted]: A boolean indicating whether more accepted requests can be fetched.
-/// - [canFetchMoreRecent]: A boolean indicating whether more recent requests can be fetched.
-/// - [pendingNext]: A string storing the next page URL for pending requests.
-/// - [acceptedNext]: A string storing the next page URL for accepted requests.
-/// - [recentNext]: A string storing the next page URL for recent requests.
-/// - [pendingPrev]: A string storing the previous page URL for pending requests.
-/// - [acceptedPrev]: A string storing the previous page URL for accepted requests.
-/// - [recentPrev]: A string storing the previous page URL for recent requests.
-///
-/// Actions:
-/// - [loadUserProfile]: Loads the user profile information from SharedPreferences.
-/// - [fetchConnectionRequests]: Fetches the connection requests data for the dashboard.
-/// - [fetchConnectionRequestsPagination]: Fetches paginated connection requests data.
-class SROfficerDashboardNewTripsUI extends StatefulWidget {
+/// Functions:
+/// - [loadUserProfile]: Loads the user profile from [SharedPreferences] and updates the state with the
+///   retrieved data.
+/// - [fetchConnectionRequests]: Fetches the pending trip requests and driver details from the API using
+///   [DashboardAPIService], processes the data, and updates the state with the resulting widgets.
+/// - [fetchConnectionRequestsPagination]: Similar to [fetchConnectionRequests], but handles pagination
+///   by fetching data from a specific URL using [DashboardFullAPIService].
+class AdminDashboardPickDropTripsUI extends StatefulWidget {
   final bool shouldRefresh;
 
-  const SROfficerDashboardNewTripsUI({Key? key, this.shouldRefresh = false})
+  const AdminDashboardPickDropTripsUI({Key? key, this.shouldRefresh = false})
       : super(key: key);
 
   @override
-  State<SROfficerDashboardNewTripsUI> createState() => _SROfficerDashboardNewTripsUIState();
+  State<AdminDashboardPickDropTripsUI> createState() =>
+      _AdminDashboardPickDropTripsUIState();
 }
 
-class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTripsUI> {
+class _AdminDashboardPickDropTripsUIState
+    extends State<AdminDashboardPickDropTripsUI> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Widget> pendingRequests = [];
+  List<Widget> pickdropRequests = [];
   List<Widget> acceptedRequests = [];
+  List<Widget> recentRequests = [];
+  List<Widget> drivers = [];
   bool _isFetched = false;
   bool _isFetchedFull = false;
   bool _isLoading = false;
@@ -75,18 +68,11 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
   late String organizationName = '';
   late String photoUrl = '';
   List<String> notifications = [];
-  late Pagination pendingPagination;
-  late Pagination acceptedPagination;
-  late Pagination recentPagination;
-  bool canFetchMorePending = false;
-  bool canFetchMoreAccepted = false;
-  bool canFetchMoreRecent = false;
-  late String pendingNext = '';
-  late String acceptedNext = '';
-  late String recentNext = '';
-  late String pendingPrev = '';
-  late String acceptedPrev = '';
-  late String recentPrev = '';
+  late Pagination pickdropPagination;
+  bool canFetchMorePickDrop = false;
+
+  late String pickdropNext = '';
+  late String pickdropPrev = '';
 
   Future<void> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
@@ -106,6 +92,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
     if (_isFetched) return;
     try {
       final apiService = await DashboardAPIService.create();
+
       final Map<String, dynamic>? dashboardData =
       await apiService.fetchDashboardItems();
       if (dashboardData == null || dashboardData.isEmpty) {
@@ -127,31 +114,46 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-      pendingPagination = Pagination.fromJson(pagination['pending']);
+      pickdropPagination = Pagination.fromJson(pagination['pick_drop']);
+      print(pickdropPagination.nextPage);
 
-      print(pendingPagination.nextPage);
       setState(() {
-        pendingNext = pendingPagination.nextPage as String;
+        pickdropNext = pickdropPagination.nextPage as String;
       });
-      print(pendingPagination.previousPage);
+      print(pickdropPagination.previousPage);
       setState(() {
-        pendingPrev = pendingPagination.previousPage as String;
+        pickdropPrev = pickdropPagination.previousPage as String;
       });
 
-      canFetchMorePending = pendingPagination.canFetchNext;
-      print(canFetchMorePending);
+      canFetchMorePickDrop = pickdropPagination.canFetchNext;
+      print(canFetchMorePickDrop);
 
       notifications = List<String>.from(records['notifications'] ?? []);
 
       await Future.delayed(Duration(seconds: 3));
 
-      final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
-      for (var index = 0; index < pendingRequestsData.length; index++) {
-        print(
-            'Pending Request at index $index: ${pendingRequestsData[index]}\n');
+      final List<dynamic> driverData = records['Available_Driver'] ?? [];
+      for (var index = 0; index < driverData.length; index++) {
+        print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
+      final List<Widget> driverWidgets = driverData.map((request) {
+        return DriverInfoCard(
+          Name: request['name'],
+          MobileNo: request['phone'],
+          CarName: request['car_name'],
+          CarRegNo: request['car_number'],
+          CarModel: request['car_model'],
+        );
+      }).toList();
+
+      final List<dynamic> pickdropRequestsData = records['Pick_Drop'] ?? [];
+      for (var index = 0; index < pickdropRequestsData.length; index++) {
+        print(
+            'Pending Request at index $index: ${pickdropRequestsData[index]}\n');
+      }
+
+      final List<Widget> pickdropWidgets = pickdropRequestsData.map((request) {
         print('Pending Trip');
         print(request['name']);
         print(request['designation']);
@@ -177,35 +179,35 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type'],
-            route: request['route_name'],
-            stoppage: request['stoppage_name'],
-            startMonth: request['start_month_and_year'],
-            endMonth: request['end_month_and_year'],),
+              type: request['trip_type']),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SROfficerPendingTrip(
+                builder: (context) => AdminPendingTrip(
+                  shouldRefresh: true,
                   staff: SROfficerTripRequest(
-                      id: request['trip_id'],
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      startTime: request['start_time'],
-                      endTime: request['end_time'],
-                      distance: request['approx_distance'],
-                      category: request['trip_category'],
-                      type: request['trip_type'],
+                    id: request['trip_id'],
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
                     route: request['route_name'],
                     stoppage: request['stoppage_name'],
                     startMonth: request['start_month_and_year'],
-                    endMonth: request['end_month_and_year'],),
+                    endMonth: request['end_month_and_year'],
+                  ),
+                  tripCatagory: request['trip_category'],
+                  routeID: request['route_id'],
                 ),
               ),
             );
@@ -214,7 +216,8 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
       }).toList();
 
       setState(() {
-        pendingRequests = pendingWidgets;
+        drivers = driverWidgets;
+        pickdropRequests = pickdropWidgets;
         _isFetched = true;
       });
     } catch (e) {
@@ -227,6 +230,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
     if (_isFetchedFull) return;
     try {
       final apiService = await DashboardFullAPIService.create();
+
       final Map<String, dynamic>? dashboardData =
       await apiService.fetchDashboardItemsFull(url);
       if (dashboardData == null || dashboardData.isEmpty) {
@@ -242,36 +246,53 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
         print('No records available');
         return;
       }
+
       setState(() {
         _isLoading = true;
       });
 
       final Map<String, dynamic> pagination = records['pagination'] ?? {};
-      pendingPagination = Pagination.fromJson(pagination['pending']);
 
-      print(pendingPagination.nextPage);
+      pickdropPagination = Pagination.fromJson(pagination['pick_drop']);
+
+      print(pickdropPagination.nextPage);
       setState(() {
-        pendingNext = pendingPagination.nextPage as String;
+        pickdropNext = pickdropPagination.nextPage as String;
       });
-      print(pendingPagination.previousPage);
+      print(pickdropPagination.previousPage);
       setState(() {
-        pendingPrev = pendingPagination.previousPage as String;
+        pickdropPrev = pickdropPagination.previousPage as String;
       });
 
-      canFetchMorePending = pendingPagination.canFetchNext;
-      print(canFetchMorePending);
+      canFetchMorePickDrop = pickdropPagination.canFetchNext;
+      print(canFetchMorePickDrop);
 
       notifications = List<String>.from(records['notifications'] ?? []);
 
       await Future.delayed(Duration(seconds: 3));
 
-      final List<dynamic> pendingRequestsData = records['Pending'] ?? [];
-      for (var index = 0; index < pendingRequestsData.length; index++) {
-        print(
-            'Pending Request at index $index: ${pendingRequestsData[index]}\n');
+      final List<dynamic> driverData = records['Available_Driver'] ?? [];
+      for (var index = 0; index < driverData.length; index++) {
+        print('Pending Request at index $index: ${driverData[index]}\n');
       }
 
-      final List<Widget> pendingWidgets = pendingRequestsData.map((request) {
+      final List<Widget> driverWidgets = driverData.map((request) {
+        return DriverInfoCard(
+          Name: request['name'],
+          MobileNo: request['phone'],
+          CarName: request['car_name'],
+          CarRegNo: request['car_number'],
+          CarModel: request['car_model'],
+        );
+      }).toList();
+
+      final List<dynamic> pickdropRequestsData = records['Pick_Drop'] ?? [];
+      for (var index = 0; index < pickdropRequestsData.length; index++) {
+        print(
+            'Pending Request at index $index: ${pickdropRequestsData[index]}\n');
+      }
+
+      final List<Widget> pickdropWidgets = pickdropRequestsData.map((request) {
         print('Pending Trip');
         print(request['name']);
         print(request['designation']);
@@ -297,35 +318,35 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
               endTime: request['end_time'],
               distance: request['approx_distance'],
               category: request['trip_category'],
-              type: request['trip_type'],
-            route: request['route_name'],
-            stoppage: request['stoppage_name'],
-            startMonth: request['start_month_and_year'],
-            endMonth: request['end_month_and_year'],),
+              type: request['trip_type']),
           onPressed: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SROfficerPendingTrip(
+                builder: (context) => AdminPendingTrip(
+                  shouldRefresh: true,
                   staff: SROfficerTripRequest(
-                      id: request['trip_id'],
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      startTime: request['start_time'],
-                      endTime: request['end_time'],
-                      distance: request['approx_distance'],
-                      category: request['trip_category'],
-                      type: request['trip_type'],
+                    id: request['trip_id'],
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
                     route: request['route_name'],
                     stoppage: request['stoppage_name'],
                     startMonth: request['start_month_and_year'],
-                    endMonth: request['end_month_and_year'],),
+                    endMonth: request['end_month_and_year'],
+                  ),
+                  tripCatagory: request['trip_category'],
+                  routeID: request['route_id'],
                 ),
               ),
             );
@@ -334,7 +355,8 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
       }).toList();
 
       setState(() {
-        pendingRequests = pendingWidgets;
+        drivers = driverWidgets;
+        pickdropRequests = pickdropWidgets;
         _isFetchedFull = true;
       });
     } catch (e) {
@@ -346,7 +368,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
   @override
   void initState() {
     super.initState();
-    pendingPagination = Pagination(nextPage: null, previousPage: null);
+    pickdropPagination = Pagination(nextPage: null, previousPage: null);
     print('initState called');
     loadUserProfile();
     if (!_isFetched) {
@@ -388,9 +410,9 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                 titleSpacing: 5,
                 automaticallyImplyLeading: false,
                 title: Padding(
-                  padding: EdgeInsets.only(left: screenWidth*0.05),
+                  padding: EdgeInsets.only(left: screenWidth * 0.05),
                   child: const Text(
-                    'Sr Officer Dashboard',
+                    'Admin Dashboard',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -405,7 +427,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                 child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        vertical: 20.0, horizontal: 20),
+                        horizontal: 20, vertical: 20),
                     child: Center(
                       child: Column(
                         children: [
@@ -425,34 +447,44 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                               style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 25,
+                                fontSize: 30,
                                 fontFamily: 'default',
                               )),
                           SizedBox(height: screenHeight * 0.01),
-                          Divider(),
                           AllRequestsWidget(
                             loading: _isLoading,
                             fetch: _isFetched,
-                            errorText: 'No new trip request.',
-                            listWidget: pendingRequests,
+                            errorText:
+                            'There aren\'t any trip request yet.',
+                            listWidget: pickdropRequests,
                             fetchData: fetchConnectionRequests(),
                           ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
                             children: [
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: (pendingPrev.isNotEmpty && pendingPrev != 'None' && _isLoading)
-                                      ? const Color.fromRGBO(25, 192, 122, 1)
+                                  backgroundColor:
+                                  (pickdropPrev.isNotEmpty &&
+                                      pickdropPrev != 'None' &&
+                                      _isLoading)
+                                      ? const Color.fromRGBO(
+                                      25, 192, 122, 1)
                                       : Colors.grey,
                                   fixedSize: Size(
-                                      MediaQuery.of(context).size.width * 0.35,
-                                      MediaQuery.of(context).size.height * 0.05),
+                                      MediaQuery.of(context).size.width *
+                                          0.35,
+                                      MediaQuery.of(context).size.height *
+                                          0.05),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius:
+                                    BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: (pendingPrev.isNotEmpty && pendingPrev != 'None' && _isLoading)
+                                onPressed: (pickdropPrev.isNotEmpty &&
+                                    pickdropPrev != 'None' &&
+                                    _isLoading)
                                     ? () {
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(
@@ -460,11 +492,12 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                                       content: Text('Loading...'),
                                     ),
                                   );
-                                  print('Prev: $pendingPrev');
+                                  print('Prev: $pickdropPrev');
                                   setState(() {
                                     _isFetchedFull = false;
-                                    fetchConnectionRequestsPagination(pendingPrev);
-                                    pendingPrev = '';
+                                    fetchConnectionRequestsPagination(
+                                        pickdropPrev);
+                                    pickdropPrev = '';
                                   });
                                 }
                                     : null,
@@ -478,17 +511,26 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                               ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: (pendingNext.isNotEmpty && pendingNext != 'None' && _isLoading)
-                                      ? const Color.fromRGBO(25, 192, 122, 1)
+                                  backgroundColor:
+                                  (pickdropNext.isNotEmpty &&
+                                      pickdropNext != 'None' &&
+                                      _isLoading)
+                                      ? const Color.fromRGBO(
+                                      25, 192, 122, 1)
                                       : Colors.grey,
                                   fixedSize: Size(
-                                      MediaQuery.of(context).size.width * 0.35,
-                                      MediaQuery.of(context).size.height * 0.05),
+                                      MediaQuery.of(context).size.width *
+                                          0.35,
+                                      MediaQuery.of(context).size.height *
+                                          0.05),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius:
+                                    BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: (pendingNext.isNotEmpty && pendingNext != 'None' && _isLoading)
+                                onPressed: (pickdropNext.isNotEmpty &&
+                                    pickdropNext != 'None' &&
+                                    _isLoading)
                                     ? () {
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(
@@ -496,11 +538,12 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                                       content: Text('Loading...'),
                                     ),
                                   );
-                                  print('Next: $pendingNext');
+                                  print('Next: $pickdropNext');
                                   setState(() {
                                     _isFetchedFull = false;
-                                    fetchConnectionRequestsPagination(pendingNext);
-                                    pendingNext = '';
+                                    fetchConnectionRequestsPagination(
+                                        pickdropNext);
+                                    pickdropNext = '';
                                   });
                                 }
                                     : null,
@@ -514,6 +557,9 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                               ),
                             ],
                           ),
+                          SizedBox(
+                            height: 20,
+                          )
                         ],
                       ),
                     ),
@@ -532,7 +578,9 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SROfficerDashboardNewTripsUI()));
+                                builder: (context) =>
+                                    AdminDashboardPickDropTripsUI(
+                                        shouldRefresh: true)));
                       },
                       child: Container(
                         width: screenWidth / 3,
@@ -567,7 +615,9 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const ProfileUI(shouldRefresh: true,)));
+                                builder: (context) => const ProfileUI(
+                                  shouldRefresh: true,
+                                )));
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Container(
@@ -631,7 +681,7 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                               height: 5,
                             ),
                             Text(
-                              'Log Out',
+                              'Logout',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -717,11 +767,8 @@ class _SROfficerDashboardNewTripsUIState extends State<SROfficerDashboardNewTrip
                     if (await logoutApiService.signOut()) {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  LoginUI()));
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

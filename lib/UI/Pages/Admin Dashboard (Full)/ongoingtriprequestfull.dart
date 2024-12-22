@@ -392,16 +392,19 @@ class _AdminDashboardOngoingTripsUIState
                       backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                       titleSpacing: 5,
                       automaticallyImplyLeading: false,
-                      title: const Text(
-                        'Admin Dashboard',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          fontFamily: 'default',
+                      title: Padding(
+                        padding: EdgeInsets.only(left: screenWidth*0.05),
+                        child: const Text(
+                          'Admin Dashboard',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'default',
+                          ),
                         ),
                       ),
-                      centerTitle: true,
+                      //centerTitle: true,
                     ),
                     body: SingleChildScrollView(
                       child: SafeArea(
@@ -750,7 +753,7 @@ class _AdminDashboardOngoingTripsUIState
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginwithEmailUI())); // Close the drawer
+                                  LoginUI())); // Close the drawer
                     }
                   },
                   child: Text(

@@ -48,7 +48,7 @@ class ApprovedStaffTrip extends StatelessWidget {
               fontFamily: 'default',
             ),
           ),
-          centerTitle: true,
+          //centerTitle: true,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -91,7 +91,7 @@ class ApprovedStaffTrip extends StatelessWidget {
                   _buildRow('Distance', '${staff.distance} KM'),
                 ], if(staff.category == 'Pick Drop') ...[
                   _buildRow('Route', staff.route!),
-                  _buildRow('Stoppage', staff.stoppage!),
+                  _buildRow('Pickup/Drop Point', staff.stoppage!),
                   _buildRowTime('Start Month', staff.startMonth!),
                   _buildRowTime('End Month', staff.endMonth!),
                 ],

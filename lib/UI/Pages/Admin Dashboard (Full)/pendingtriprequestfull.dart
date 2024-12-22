@@ -23,7 +23,7 @@ import '../Profile UI/profileUI.dart';
 /// Variables and Actions:
 /// - [shouldRefresh]: A bool variable indicating whether the UI should refresh.
 /// - [_scaffoldKey]: A [GlobalKey] used for the Scaffold to control it programmatically.
-/// - [pendingRequests], [acceptedRequests], [recentRequests], [drivers]: Lists of [Widget]s representing
+/// - [pickdropRequests], [acceptedRequests], [recentRequests], [drivers]: Lists of [Widget]s representing
 ///   different categories of trip requests.
 /// - [_isFetched], [_isFetchedFull], [_isLoading], [_pageLoading], [_errorOccurred]: bool flags to
 ///   track the loading and fetching status.
@@ -31,7 +31,7 @@ import '../Profile UI/profileUI.dart';
 /// - [notifications]: A list of String containing user notifications.
 /// - [pendingPagination]: An instance of [Pagination] to handle the pagination of pending trips.
 /// - [canFetchMorePending]: A bool flag to indicate whether more pending trips can be fetched.
-/// - [pendingNext], [pendingPrev]: String variables to hold the URLs for the next and previous pages
+/// - [pickdropNext], [pendingPrev]: String variables to hold the URLs for the next and previous pages
 ///   of pending trips.
 ///
 /// Functions:
@@ -187,24 +187,26 @@ class _AdminDashboardPendingTripsUIState
                 builder: (context) => AdminPendingTrip(
                   shouldRefresh: true,
                   staff: SROfficerTripRequest(
-                      id: request['trip_id'],
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      startTime: request['start_time'],
-                      endTime: request['end_time'],
-                      distance: request['approx_distance'],
-                      category: request['trip_category'],
-                      type: request['trip_type'],
+                    id: request['trip_id'],
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
                     route: request['route_name'],
                     stoppage: request['stoppage_name'],
                     startMonth: request['start_month_and_year'],
-                    endMonth: request['end_month_and_year'],),
+                    endMonth: request['end_month_and_year'],
+                  ),
+                  tripCatagory: request['trip_category'],
                 ),
               ),
             );
@@ -323,24 +325,26 @@ class _AdminDashboardPendingTripsUIState
                 builder: (context) => AdminPendingTrip(
                   shouldRefresh: true,
                   staff: SROfficerTripRequest(
-                      id: request['trip_id'],
-                      name: request['name'],
-                      designation: request['designation'],
-                      department: request['department'],
-                      purpose: request['purpose'],
-                      phone: request['phone'],
-                      destinationFrom: request['destination_from'],
-                      destinationTo: request['destination_to'],
-                      date: request['date'],
-                      startTime: request['start_time'],
-                      endTime: request['end_time'],
-                      distance: request['approx_distance'],
-                      category: request['trip_category'],
-                      type: request['trip_type'],
+                    id: request['trip_id'],
+                    name: request['name'],
+                    designation: request['designation'],
+                    department: request['department'],
+                    purpose: request['purpose'],
+                    phone: request['phone'],
+                    destinationFrom: request['destination_from'],
+                    destinationTo: request['destination_to'],
+                    date: request['date'],
+                    startTime: request['start_time'],
+                    endTime: request['end_time'],
+                    distance: request['approx_distance'],
+                    category: request['trip_category'],
+                    type: request['trip_type'],
                     route: request['route_name'],
                     stoppage: request['stoppage_name'],
                     startMonth: request['start_month_and_year'],
-                    endMonth: request['end_month_and_year'],),
+                    endMonth: request['end_month_and_year'],
+                  ),
+                  tripCatagory: request['trip_category'],
                 ),
               ),
             );
@@ -403,16 +407,19 @@ class _AdminDashboardPendingTripsUIState
                       backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                       titleSpacing: 5,
                       automaticallyImplyLeading: false,
-                      title: const Text(
-                        'Admin Dashboard',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          fontFamily: 'default',
+                      title: Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.05),
+                        child: const Text(
+                          'Admin Dashboard',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'default',
+                          ),
                         ),
                       ),
-                      centerTitle: true,
+                      //centerTitle: true,
                     ),
                     body: SingleChildScrollView(
                       child: SafeArea(
@@ -759,7 +766,7 @@ class _AdminDashboardPendingTripsUIState
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
+                          MaterialPageRoute(builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

@@ -17,6 +17,7 @@ import '../Driver Dashboard/driverdashboardUI.dart';
 import '../Forgot Password UI/forgotpasswordUI.dart';
 import '../Senior Officer Dashboard/srofficerdashboardUI.dart';
 import '../Staff Dashboard/staffdashboardUI.dart';
+import 'loginUI.dart';
 
 /// This [LoginwithEmailUI] class represents the user interface for logging into the application.
 ///
@@ -408,7 +409,7 @@ class _LoginwithEmailUIState extends State<LoginwithEmailUI> {
                   ),
                 ),
                 //SizedBox(height: 20),
-                /*       Footer(
+                       Footer(
                   backgroundColor: const Color.fromRGBO(246, 246, 246, 255),
                   alignment: Alignment.bottomCenter,
                   padding: const EdgeInsets.all(20.0),
@@ -419,7 +420,7 @@ class _LoginwithEmailUIState extends State<LoginwithEmailUI> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            'Want to Login with OTP?  ',
+                            'Want to Login with Password?  ',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Color.fromRGBO(143, 150, 158, 1),
@@ -433,10 +434,10 @@ class _LoginwithEmailUIState extends State<LoginwithEmailUI> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const LoginOPTVerficationUI()));
+                                      builder: (context) => const LoginUI()));
                             },
                             child: const Text(
-                              'OTP Login',
+                              'Password Login',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Color.fromRGBO(25, 192, 122, 1),
@@ -450,7 +451,7 @@ class _LoginwithEmailUIState extends State<LoginwithEmailUI> {
                       ),
                     ],
                   ),
-                ),*/
+                ),
               ],
             ),
           ),

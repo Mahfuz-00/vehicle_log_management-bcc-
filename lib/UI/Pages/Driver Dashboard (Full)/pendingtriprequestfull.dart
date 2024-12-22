@@ -392,16 +392,19 @@ class _DriverDashboardPendingTripsUIState
                       backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                       titleSpacing: 5,
                       automaticallyImplyLeading: false,
-                      title: const Text(
-                        'Driver Dashboard',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          fontFamily: 'default',
+                      title: Padding(
+                        padding: EdgeInsets.only(left: screenWidth*0.05),
+                        child: const Text(
+                          'Driver Dashboard',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'default',
+                          ),
                         ),
                       ),
-                      centerTitle: true,
+                      //centerTitle: true,
                     ),
                     body: SingleChildScrollView(
                       child: Padding(
@@ -771,7 +774,7 @@ class _DriverDashboardPendingTripsUIState
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
+                          MaterialPageRoute(builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

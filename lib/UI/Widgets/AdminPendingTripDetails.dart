@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../Core/Connection Checker/internetconnectioncheck.dart';
 import '../../Data/Data Sources/API Service (Fetch Drivers)/apiServiceFetchDrivers.dart';
+import '../../Data/Data Sources/API Service (Fetch Drivers)/apiServicePickDropFetchDrivers.dart';
 import '../../Data/Data Sources/Api Service (Assign Driver)/apiServiceAssignDriver.dart';
 import '../../Data/Models/tripRequestModelSROfficer.dart';
 import '../Pages/Admin Dashboard/admindashboardUI.dart';
@@ -26,9 +27,16 @@ import 'dropdownmodel.dart';
 /// - [carID]: An [int] representing the ID of the selected car.
 class AdminPendingTrip extends StatefulWidget {
   final bool shouldRefresh;
+  final String tripCatagory;
+  final dynamic? routeID;
   final SROfficerTripRequest staff;
 
-  AdminPendingTrip({Key? key, this.shouldRefresh = false, required this.staff})
+  AdminPendingTrip(
+      {Key? key,
+      this.shouldRefresh = false,
+      required this.staff,
+      required this.tripCatagory,
+      this.routeID})
       : super(key: key);
 
   @override
@@ -48,29 +56,39 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
   late int carID = 0;
 
   Future<void> fetchConnectionRequests() async {
+    print(widget.routeID);
     if (_isFetched) return;
     setState(() {
       _isLoading = true;
     });
     try {
-      final apiService = await FetchDriverAPIService.create();
+      final apiService;
+      final Map<String, dynamic>? dashboardData;
 
-      final Map<String, dynamic>? dashboardData = await apiService.fetchDrivers();
+      if (widget.tripCatagory == 'Pick Drop') {
+        apiService = await FetchPickDropDriverAPIService.create();
+        dashboardData = await apiService.fetchDrivers(widget.routeID);
+      } else {
+        apiService = await FetchDriverAPIService.create();
+        dashboardData = await apiService.fetchDrivers();
+      }
+
       if (dashboardData == null || dashboardData.isEmpty) {
-        print('No data available or error occurred while fetching dashboard data');
+        print(
+            'No data available or error occurred while fetching dashboard data');
         return;
       }
 
-      final List<dynamic> driverData = dashboardData['records']['Available_Driver'] ?? [];
+      final List<dynamic> driverData =
+          dashboardData['records']['Available_Driver'] ?? [];
       final List<String> driverNames = driverData.map<String>((data) {
         final carId = data['car_id'].toString();
         return '${data['name']} - ${data['car_name']} - $carId';
       }).toList();
 
       setState(() {
-        drivers = driverNames.isNotEmpty
-            ? driverNames
-            : ['No driver available'];
+        drivers =
+            driverNames.isNotEmpty ? driverNames : ['No driver available'];
         _isFetched = true;
         _isLoading = false;
       });
@@ -136,7 +154,7 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
                     fontFamily: 'default',
                   ),
                 ),
-                centerTitle: true,
+                //centerTitle: true,
               ),
               body: SingleChildScrollView(
                 child: Padding(
@@ -170,7 +188,7 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
                       _buildRow('Department', staff.department),
                       _buildRow('Mobile Number', staff.phone),
                       _buildRow('Trip Category', staff.category),
-                      if(staff.category != 'Pick Drop')...[
+                      if (staff.category != 'Pick Drop') ...[
                         _buildRow('Trip Type', staff.type!),
                         _buildRowTime('Date', staff.date!),
                         _buildRowTime('Start Time', staff.startTime!),
@@ -178,47 +196,50 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
                         _buildRow('Destination From', staff.destinationFrom!),
                         _buildRow('Destination To', staff.destinationTo!),
                         _buildRow('Distance', '${staff.distance} KM'),
-                      ], if(staff.category == 'Pick Drop') ...[
+                      ],
+                      if (staff.category == 'Pick Drop') ...[
                         _buildRow('Route', staff.route!),
-                        _buildRow('Stoppage', staff.stoppage!),
+                        _buildRow('Pickup/Drop Point', staff.stoppage!),
                         _buildRowTime('Start Month', staff.startMonth!),
                         _buildRowTime('End Month', staff.endMonth!),
                       ],
                       SizedBox(height: 10),
                       Divider(),
-                      SizedBox(height: 20,),
-                      Text('Assign Driver',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        fontFamily: 'default',
-                      ),),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'Assign Driver',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          fontFamily: 'default',
+                        ),
+                      ),
                       SizedBox(height: 10),
                       Stack(
                         children: [
                           DropdownMenuModel(
-                            label: 'Driver',
-                            options: drivers,
-                            onChanged: (selectedDriver) {
-                              print('Selected driver: $selectedDriver');
-                            },
-                            onCarIdChanged:(selectedDriver){
-                              print('Selected driver ID: $selectedDriver');
-                              setState(() {
-                                carID = int.parse(selectedDriver!);
-                                print('Car ID: $carID');
-                              });
-                            }
-                          ),
+                              label: 'Driver',
+                              options: drivers,
+                              onChanged: (selectedDriver) {
+                                print('Selected driver: $selectedDriver');
+                              },
+                              onCarIdChanged: (selectedDriver) {
+                                print('Selected driver ID: $selectedDriver');
+                                setState(() {
+                                  carID = int.parse(selectedDriver!);
+                                  print('Car ID: $carID');
+                                });
+                              }),
                           if (_isLoading)
                             Padding(
-                              padding: const EdgeInsets.only(top:15.0),
+                              padding: const EdgeInsets.only(top: 15.0),
                               child: Align(
                                 alignment: Alignment.center,
                                 child: CircularProgressIndicator(
-                                  color:
-                                  const Color.fromRGBO(25, 192, 122, 1),
+                                  color: const Color.fromRGBO(25, 192, 122, 1),
                                 ),
                               ),
                             ),
@@ -238,7 +259,7 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
                             ),
                           ),
                           onPressed: () {
-                              assignDriver(carID);
+                            assignDriver(carID);
                           },
                           child: Text('Submit',
                               style: TextStyle(
@@ -266,18 +287,19 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
     print('Trip Id: ${staff.id}');
     if (staff.id > 0 && driver > 0) {
       final apiService = await AssignCarAPIService.create();
-      bool checker = await apiService.assignCarToTrip(tripId: staff.id, carId: driver);
-      if(checker == true){
+      bool checker =
+          await apiService.assignCarToTrip(tripId: staff.id, carId: driver);
+      if (checker == true) {
         const snackBar = SnackBar(
           content: Text('Car assigned successfully!'),
         );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AdminDashboardUI(shouldRefresh: true)),
+          MaterialPageRoute(
+              builder: (context) => AdminDashboardUI(shouldRefresh: true)),
         );
-      }
-      else if(checker == false){
+      } else if (checker == false) {
         const snackBar = SnackBar(
           content: Text('Car assigned failed. Try again.'),
         );
@@ -306,7 +328,8 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
           dateTime = DateFormat('yyyy-MM-dd').parse(value);
           formattedDate = DateFormat.yMMMMd('en_US')
               .format(dateTime); // e.g., "January 1, 2024"
-        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$').hasMatch(value)) {
+        } else if (RegExp(r'^\d{1,2}:\d{2}([ ]?[APap][Mm])?$')
+            .hasMatch(value)) {
           // Input contains only a time (e.g., "10:30" or "10:30:00")
           dateTime = DateFormat('HH:mm').parse(value, true);
           formattedDate = DateFormat.jm().format(dateTime); // e.g., "10:30 AM"
@@ -315,10 +338,10 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
           // Input contains both date and time (e.g., "2024-01-01 10:30:00")
           dateTime = DateFormat('yyyy-MM-dd HH:mm').parse(value);
           String formattedDatePart =
-          DateFormat.yMMMMd('en_US').format(dateTime);
+              DateFormat.yMMMMd('en_US').format(dateTime);
           String formattedTimePart = DateFormat.jm().format(dateTime);
           formattedDate =
-          '$formattedDatePart, $formattedTimePart'; // Combine date and time
+              '$formattedDatePart, $formattedTimePart'; // Combine date and time
         } else {
           throw FormatException('Unsupported date/time format: $value');
         }
@@ -376,7 +399,6 @@ class _AdminPendingTripState extends State<AdminPendingTrip> {
       ],
     );
   }
-
 
   Widget _buildRow(String label, String value) {
     return Row(

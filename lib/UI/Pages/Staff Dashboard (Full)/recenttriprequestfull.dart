@@ -353,16 +353,19 @@ class _StaffDashboardRecentTripsUIState
                       backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                       titleSpacing: 5,
                       automaticallyImplyLeading: false,
-                      title: const Text(
-                        'Staff Dashboard',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          fontFamily: 'default',
+                      title: Padding(
+                        padding: EdgeInsets.only(left: screenWidth*0.05),
+                        child: const Text(
+                          'Staff Dashboard',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'default',
+                          ),
                         ),
                       ),
-                      centerTitle: true,
+                      //centerTitle: true,
                       actions: [
                         IconButton(
                           onPressed: () {
@@ -734,7 +737,7 @@ class _StaffDashboardRecentTripsUIState
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
+                          MaterialPageRoute(builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

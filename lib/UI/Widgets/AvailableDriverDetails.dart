@@ -68,6 +68,8 @@ class DriverInfoCard extends StatelessWidget {
                       height: 1.6,
                       letterSpacing: 1.3,
                     ),
+                    maxLines: 1, // Restrict to a single line
+                    overflow: TextOverflow.ellipsis, // Add ellipsis if the text overflows
                   )
                 ],
               ),
@@ -82,7 +84,7 @@ class DriverInfoCard extends StatelessWidget {
                     children: [
                       _buildRow('Name', Name),
                       _buildRow('Mobile No', MobileNo),
-                      _buildRow('Car', CarName),
+                      _buildRow('Car Brand', CarName),
                       _buildRow('Car Model', CarModel),
                       _buildRow('Car No', CarRegNo),
                     ],
@@ -103,6 +105,7 @@ Widget _buildRow(String label, String value) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
+          flex: 2,
           child: RichText(
             text: TextSpan(
               children: [
@@ -133,6 +136,7 @@ Widget _buildRow(String label, String value) {
           ),
         ),
         Expanded(
+          flex: 3,
           child: RichText(
             text: TextSpan(
               children: [

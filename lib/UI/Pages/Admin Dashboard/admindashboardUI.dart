@@ -22,6 +22,7 @@ import '../../Widgets/AvailableDriverDetails.dart';
 import '../../Widgets/OngoingTripDetails.dart';
 import '../../Widgets/RecentTripDetails.dart';
 import '../../Widgets/staffTripTile.dart';
+import '../Admin Dashboard (Full)/pickdroptriprequestfull.dart';
 import '../Login UI/loginUI.dart';
 import '../Profile UI/profileUI.dart';
 
@@ -37,7 +38,7 @@ import '../Profile UI/profileUI.dart';
 ///
 /// **State Management:**
 /// - [_scaffoldKey] (GlobalKey<ScaffoldState>): Key for managing the scaffold state.
-/// - [pendingRequests] (List<Widget>): List of widgets representing pending requests.
+/// - [pickdropRequests] (List<Widget>): List of widgets representing pending requests.
 /// - [acceptedRequests] (List<Widget>): List of widgets representing accepted requests.
 /// - [recentRequests] (List<Widget>): List of widgets representing recent requests.
 /// - [drivers] (List<Widget>): List of widgets representing available drivers.
@@ -53,13 +54,13 @@ import '../Profile UI/profileUI.dart';
 /// - [notifications] (List<String>): Stores a list of user notifications.
 ///
 /// **Pagination Data:**
-/// - [pendingPagination] (Pagination): Manages pagination for pending requests.
+/// - [pickdropPagination] (Pagination): Manages pagination for pending requests.
 /// - [acceptedPagination] (Pagination): Manages pagination for accepted requests.
 /// - [recentPagination] (Pagination): Manages pagination for recent requests.
 /// - [driversPagination] (Pagination): Manages pagination for available drivers.
 ///
 /// **Data Fetching Flags:**
-/// - [canFetchMorePending] (bool): Indicates if more pending requests can be fetched.
+/// - [canFetchMorePickDrop] (bool): Indicates if more pending requests can be fetched.
 /// - [canFetchMoreAccepted] (bool): Indicates if more accepted requests can be fetched.
 /// - [canFetchMoreRecent] (bool): Indicates if more recent requests can be fetched.
 /// - [canFetchMoreDrivers] (bool): Indicates if more drivers can be fetched.
@@ -92,11 +93,13 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
   late Pagination acceptedPagination;
   late Pagination recentPagination;
   late Pagination driversPagination;
+  late Pagination pickdropPagination;
 
   bool canFetchMorePending = false;
   bool canFetchMoreAccepted = false;
   bool canFetchMoreRecent = false;
   bool canFetchMoreDrivers = false;
+  bool canFetchMorePickDrop = false;
 
   Future<void> loadUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
@@ -143,10 +146,12 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
       pendingPagination = Pagination.fromJson(pagination['new_trip']);
       acceptedPagination = Pagination.fromJson(pagination['ongoing']);
       driversPagination = Pagination.fromJson(pagination['driver']);
+      pickdropPagination = Pagination.fromJson(pagination['pick_drop']);
 
       canFetchMorePending = pendingPagination.canFetchNext;
       canFetchMoreAccepted = acceptedPagination.canFetchNext;
       canFetchMoreDrivers = driversPagination.canFetchNext;
+      canFetchMorePickDrop = pickdropPagination.canFetchNext;
 
       notifications = List<String>.from(records['notifications'] ?? []);
 
@@ -258,6 +263,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                     startMonth: request['start_month_and_year'],
                     endMonth: request['end_month_and_year'],
                   ),
+                  tripCatagory: request['trip_category'],
                 ),
               ),
             );
@@ -378,7 +384,8 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                     route: request['route_name'],
                     stoppage: request['stoppage_name'],
                     startMonth: request['start_month_and_year'],
-                    endMonth: request['end_month_and_year'],),
+                    endMonth: request['end_month_and_year'],
+                  ),
                 ),
               ),
             );
@@ -437,6 +444,8 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                     startMonth: request['start_month_and_year'],
                     endMonth: request['end_month_and_year'],
                   ),
+                  tripCatagory: request['trip_category'],
+                  routeID: request['route_id'],
                 ),
               ),
             );
@@ -468,6 +477,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
     pendingPagination = Pagination(nextPage: null, previousPage: null);
     acceptedPagination = Pagination(nextPage: null, previousPage: null);
     recentPagination = Pagination(nextPage: null, previousPage: null);
+    pickdropPagination = Pagination(nextPage: null, previousPage: null);
     print('initState called');
     if (!_isFetched) {
       fetchConnectionRequests();
@@ -510,16 +520,19 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                         titleSpacing: 5,
                         automaticallyImplyLeading: false,
-                        title: const Text(
-                          'Admin Dashboard',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            fontFamily: 'default',
+                        title: Padding(
+                          padding: EdgeInsets.only(left: screenWidth * 0.05),
+                          child: const Text(
+                            'Admin Dashboard',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              fontFamily: 'default',
+                            ),
                           ),
                         ),
-                        centerTitle: true,
+                        //centerTitle: true,
                         actions: [
                           Stack(
                             children: [
@@ -680,12 +693,12 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                                     fetchData: fetchConnectionRequests(),
                                     numberOfWidgets: 5,
                                     showSeeAllButton: (shouldShowSeeAllButton(
-                                        acceptedRequests)),
+                                        PickDropRequests)),
                                     seeAllButtonText: 'See All Pick-Drop Trips',
-                                    nextView: AdminDashboardOngoingTripsUI(
+                                    nextView: AdminDashboardPickDropTripsUI(
                                       shouldRefresh: true,
                                     ),
-                                    pagination: canFetchMoreAccepted,
+                                    pagination: canFetchMorePickDrop,
                                   ),
                                   SizedBox(
                                     height: 20,
@@ -976,7 +989,7 @@ class _AdminDashboardUIState extends State<AdminDashboardUI> {
                       Navigator.pop(context);
                       context.read<AuthCubit>().logout();
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginwithEmailUI()));
+                          MaterialPageRoute(builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

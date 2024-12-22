@@ -547,7 +547,7 @@ class _ProfileUIState extends State<ProfileUI> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginwithEmailUI()));
+                                  LoginUI()));
                     }
                   },
                   child: Text(

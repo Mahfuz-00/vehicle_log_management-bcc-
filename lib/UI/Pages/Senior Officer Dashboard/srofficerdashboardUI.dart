@@ -312,16 +312,19 @@ class _SROfficerDashboardUIState extends State<SROfficerDashboardUI> {
                         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                         titleSpacing: 5,
                         automaticallyImplyLeading: false,
-                        title: const Text(
-                          'Sr Officer Dashboard',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            fontFamily: 'default',
+                        title: Padding(
+                          padding: EdgeInsets.only(left: screenWidth*0.05),
+                          child: const Text(
+                            'Sr Officer Dashboard',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              fontFamily: 'default',
+                            ),
                           ),
                         ),
-                        centerTitle: true,
+                        //centerTitle: true,
                         actions: [
                           Stack(
                             children: [
@@ -718,7 +721,7 @@ class _SROfficerDashboardUIState extends State<SROfficerDashboardUI> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  LoginwithEmailUI()));
+                                  LoginUI()));
                     }
                   },
                   child: Text(

@@ -400,16 +400,19 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                         titleSpacing: 5,
                         automaticallyImplyLeading: false,
-                        title: const Text(
-                          'Staff Dashboard',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            fontFamily: 'default',
+                        title: Padding(
+                          padding: EdgeInsets.only(left: screenWidth*0.05),
+                          child: const Text(
+                            'Staff Dashboard',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              fontFamily: 'default',
+                            ),
                           ),
                         ),
-                        centerTitle: true,
+                        //centerTitle: true,
                         actions: [
                           Stack(
                             children: [
@@ -889,7 +892,7 @@ class _StaffDashboardUIState extends State<StaffDashboardUI> {
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => LoginwithEmailUI()));
+                              builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

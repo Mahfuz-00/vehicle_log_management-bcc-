@@ -150,7 +150,7 @@ class _DriverPickDropStartTripUIState extends State<DriverPickDropStartTripUI> {
                                             text: TextSpan(
                                               children: [
                                                 TextSpan(
-                                                  text: 'Stoppage Name',
+                                                  text: 'Pickup/Drop Point',
                                                   style: TextStyle(
                                                     color: Color.fromRGBO(25, 192, 122, 1),
                                                     fontSize: 19,

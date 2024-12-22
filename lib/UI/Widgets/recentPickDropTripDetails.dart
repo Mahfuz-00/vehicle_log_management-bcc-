@@ -65,7 +65,7 @@ class RecentPickDropTripDetails extends StatelessWidget {
               fontFamily: 'default',
             ),
           ),
-          centerTitle: true,
+         // centerTitle: true,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -106,7 +106,7 @@ class RecentPickDropTripDetails extends StatelessWidget {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: 'Stoppage Name',
+                              text: 'Pickup/Drop Point',
                               style: TextStyle(
                                 color: Color.fromRGBO(25, 192, 122, 1),
                                 fontSize: 19,

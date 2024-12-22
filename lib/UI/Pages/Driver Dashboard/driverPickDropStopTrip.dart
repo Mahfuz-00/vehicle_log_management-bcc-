@@ -159,16 +159,19 @@ class _DriverStartTripState extends State<DriverPickDropStopTripUI> {
             backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
             titleSpacing: 5,
             automaticallyImplyLeading: false,
-            title: const Text(
-              'Current Trip',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                fontFamily: 'default',
+            title: Padding(
+              padding: EdgeInsets.only(left: screenWidth*0.05),
+              child: const Text(
+                'Current Trip',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  fontFamily: 'default',
+                ),
               ),
             ),
-            centerTitle: true,
+            //centerTitle: true,
           ),
           body: SingleChildScrollView(
             child: Padding(
@@ -211,7 +214,7 @@ class _DriverStartTripState extends State<DriverPickDropStopTripUI> {
                                         text: TextSpan(
                                           children: [
                                             TextSpan(
-                                              text: 'Stoppage Name',
+                                              text: 'Pickup/Drop Point',
                                               style: TextStyle(
                                                 color: Color.fromRGBO(25, 192, 122, 1),
                                                 fontSize: 19,

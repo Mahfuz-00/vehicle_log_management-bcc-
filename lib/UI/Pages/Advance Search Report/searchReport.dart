@@ -59,7 +59,7 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
       print('Route/Location : ${_routeLocationController.text}');
       print('Date : ${_dateController.text}');
       print('Trip Type : ${TripType}');
-      print('Stoppage Name : ${selectedLocationType}');
+      print('Pickup/Drop Point : ${selectedLocationType}');
       print('Date Type : ${dateType}');
       // Initialize the SearchService inside the function
       final searchService = await AdvanceSearchAPIService
@@ -379,7 +379,7 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
                     },
                   ),
                   Text(
-                    'Stoppage',
+                    'Pickup/Drop Point',
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -427,14 +427,14 @@ class _AdvancedSearchUIState extends State<AdvancedSearchUI> {
                 ),
               ],
               if (selectedLocationType == 'Stoppage') ...[
-                LabeledTextWithoutAsterisk(text: 'Stoppage Name'),
+                LabeledTextWithoutAsterisk(text: 'Pickup/Drop Point'),
                 SizedBox(height: 5),
                 CustomTextFormField(
                   controller: _routeLocationController,
-                  labelText: 'Stoppage Name',
+                  labelText: 'Pickup/Drop Point',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a Stoppage name';
+                      return 'Please enter a Pickup/Drop Point';
                     }
                     return null;
                   },

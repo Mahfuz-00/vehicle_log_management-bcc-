@@ -620,16 +620,19 @@ class _DriverDashboardUIState extends State<DriverDashboardUI>
                         backgroundColor: const Color.fromRGBO(25, 192, 122, 1),
                         titleSpacing: 5,
                         automaticallyImplyLeading: false,
-                        title: const Text(
-                          'Driver Dashboard',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            fontFamily: 'default',
+                        title: Padding(
+                          padding: EdgeInsets.only(left: screenWidth*0.05),
+                          child: const Text(
+                            'Driver Dashboard',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              fontFamily: 'default',
+                            ),
                           ),
                         ),
-                        centerTitle: true,
+                        //centerTitle: true,
                         actions: [
                           Stack(
                             children: [
@@ -731,7 +734,7 @@ class _DriverDashboardUIState extends State<DriverDashboardUI>
                                         SizedBox(height: screenHeight * 0.01),
                                         if (hasNewTripInPickDropTab) ...[
                                           buildNoRequestsWidget(screenWidth,
-                                              'New Trip in PickDrop Trip Tab')
+                                              'New Trip in Pick-Drop Trip Tab')
                                         ] else if (acceptedRequests
                                             .isEmpty) ...[
                                           RequestsWidget(
@@ -1242,7 +1245,7 @@ class _DriverDashboardUIState extends State<DriverDashboardUI>
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => LoginwithEmailUI()));
+                              builder: (context) => LoginUI()));
                     }
                   },
                   child: Text(

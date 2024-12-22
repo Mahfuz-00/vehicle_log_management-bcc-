@@ -35,9 +35,9 @@ class SearchResultCard extends StatelessWidget {
             /*  _buildResultRow('Stop Trip', result['stop_trip']),*/
             ],
             if(result['trip_category'] == 'Pick Drop') ...[
-              _buildResultRow('Stoppage Name', result['stoppage_name']),
-              _buildResultRow('Stoppage Distance', '${result['stoppage_distance']} KM'),
-              _buildResultRow('Stoppage Fare', '${result['stoppage_fare']} TK'),
+              _buildResultRow('Pickup/Drop Point', result['stoppage_name']),
+              _buildResultRow('Pickup/Drop Point Distance', '${result['stoppage_distance']} KM'),
+              _buildResultRow('Pickup/Drop Point Fare', '${result['stoppage_fare']} TK'),
               _buildRowTime('Start Month & Year', result['start_month_and_year']),
               _buildRowTime('End Month & Year', result['end_month_and_year']),
               _buildResultRow('Payment Method', result['type']),

@@ -42,7 +42,7 @@ class PendingStaffTrip extends StatelessWidget {
     print('Destination To: ${staff.destinationTo}');
     print('Distance: ${staff.distance} KM');
     print('Route: ${staff.route}');
-    print('Stoppage: ${staff.stoppage}');
+    print('Pickup/Drop Point: ${staff.stoppage}');
     print('Start Month: ${staff.startMonth}');
     print('End Month: ${staff.endMonth}');
 
@@ -69,7 +69,7 @@ class PendingStaffTrip extends StatelessWidget {
               fontFamily: 'default',
             ),
           ),
-          centerTitle: true,
+          //centerTitle: true,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -113,7 +113,7 @@ class PendingStaffTrip extends StatelessWidget {
                 ],
                 if (staff.category == 'Pick Drop') ...[
                   _buildRow('Route', staff.route!),
-                  _buildRow('Stoppage', staff.stoppage!),
+                  _buildRow('Pickup/Drop Point', staff.stoppage!),
                   _buildRowTime('Start Month', staff.startMonth!),
                   _buildRowTime('End Month', staff.endMonth!),
                 ],

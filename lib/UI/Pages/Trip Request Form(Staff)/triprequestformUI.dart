@@ -210,8 +210,8 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
       setState(() {
         stoppages = fetchedStoppages;
         for (Stoppages stoppages in fetchedStoppages) {
-          print('Stoppage Name: ${stoppages.name}');
-          print('Stoppage ID: ${stoppages.id}');
+          print('Pickup/Drop Point: ${stoppages.name}');
+          print('Pickup/Drop Point ID: ${stoppages.id}');
         }
         print(stoppages);
         isLoadingStoppage = false;
@@ -219,7 +219,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
         _stoppageID = '';
       });
     } catch (e) {
-      print('Error fetching Stoppages: $e');
+      print('Error fetching Pickup/Drop Point: $e');
     }
   }
 
@@ -729,7 +729,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                             )),
                       ),
                       const SizedBox(height: 10),
-                      LabeledTextWithAsterisk(text: 'Stoppage'),
+                      LabeledTextWithAsterisk(text: 'Pickup/Drop Point'),
                       SizedBox(height: 5),
                       Material(
                         elevation: 5,
@@ -746,7 +746,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
                             child: Stack(
                               children: [
                                 DropdownFormField(
-                                  hintText: 'Select Stoppage',
+                                  hintText: 'Select Pickup/Drop Point',
                                   dropdownItems: stoppages != null
                                       ? stoppages!
                                           .map((Stoppages) => Stoppages.name)
@@ -1013,7 +1013,7 @@ class _TripRequestFormUIState extends State<TripRequestFormUI> {
       print('Distance: ${_distanceController.text}');
       print('Trip Catagory: ${tripCatagory}');
       print('Route ID: ${_routeID}');
-      print('Stoppage ID: ${_stoppageID}');
+      print('Pickup/Drop Point ID: ${_stoppageID}');
       print('Start Month: ${startMonthYear}');
       print('End Month: ${endMonthYear}');
       print('Payment Method: ${paymentMethod}');
